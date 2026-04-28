@@ -27,7 +27,7 @@ header p { color: #666; font-size: 0.82rem; }
 .card h3 {
   font-size: 0.8rem; color: #7878a0;
   margin-bottom: 1rem;
-  font-weight: 600; letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
 .form-group { margin-bottom: 1rem; }
@@ -45,13 +45,9 @@ input, textarea, select {
   outline: none; font-family: inherit;
 }
 textarea { resize: vertical; min-height: 70px; }
-input:focus, textarea:focus, select:focus {
-  border-color: #10a37f;
-  box-shadow: 0 0 0 1px rgba(16,163,127,0.2);
-}
+input:focus, textarea:focus, select:focus { border-color: #10a37f; box-shadow: 0 0 0 1px rgba(16,163,127,0.2); }
 select { cursor: pointer; }
 select option { background: #0c0c18; color: #e0e0e0; }
-
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
 @media (max-width:500px) { .form-row { grid-template-columns: 1fr; } }
 
@@ -98,6 +94,21 @@ video { width: 100%; border-radius: 10px; }
   font-size: 0.82rem;
 }
 
+.progress-bar {
+  height: 4px;
+  background: rgba(16,163,127,0.1);
+  border-radius: 2px;
+  margin: 0.8rem 0;
+  overflow: hidden;
+}
+.progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, #10a37f, #06b6d4);
+  border-radius: 2px;
+  transition: width 1s ease;
+  width: 0%;
+}
+
 .history-item {
   display: flex; gap: 0.8rem;
   padding: 0.8rem 0;
@@ -128,7 +139,7 @@ video { width: 100%; border-radius: 10px; }
     <span style="font-weight:800;font-size:1.1rem;background:linear-gradient(135deg,#10a37f,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">千亿AI</span>
   </div>
   <h1>VEO 视频生成</h1>
-  <p>AI 视频生成，支持参考图</p>
+  <p>AI 视频生成，支持参考图 | 自动查询进度</p>
 </header>
 
 <div class="card">
@@ -188,7 +199,11 @@ video { width: 100%; border-radius: 10px; }
   </div>
 
   <button class="btn" id="generateBtn">生成视频</button>
-  <div id="messageArea"></div>
+  <div id="messageArea">
+    <div class="progress-bar" id="progressBar" style="display:none;">
+      <div class="progress-bar-inner" id="progressInner"></div>
+    </div>
+  </div>
 </div>
 
 <div class="card result-area" id="resultArea">
@@ -216,12 +231,10 @@ const MODELS = {
   'veo_3_1-lite-4K': '轻量版 · 4K · 纯文本',
   'veo_3_1-lite': '轻量版 · 纯文本'
 };
-const modelSelect = $('modelSelect');
-const modelDesc = $('modelDesc');
-modelSelect.addEventListener('change', () => {
-  modelDesc.textContent = modelSelect.value + ' - ' + (MODELS[modelSelect.value] || '');
+$('modelSelect').addEventListener('change', () => {
+  $('modelDesc').textContent = $('modelSelect').value + ' - ' + (MODELS[$('modelSelect').value] || '');
 });
-modelSelect.dispatchEvent(new Event('change'));
+$('modelSelect').dispatchEvent(new Event('change'));
 
 // 图片开关
 $('enableImage').addEventListener('change', function() {
@@ -242,12 +255,8 @@ function addHistory(item) {
 }
 function renderHistory() {
   const items = getHistory();
-  $('historyCount').textContent = items.length > 0 ? '(' + items.length + ')' : '';
-  if (items.length === 0) {
-    $('historyList').innerHTML = '';
-    $('historyEmpty').style.display = 'block';
-    return;
-  }
+  $('historyCount').textContent = items.length ? '(' + items.length + ')' : '';
+  if (!items.length) { $('historyList').innerHTML = ''; $('historyEmpty').style.display = 'block'; return; }
   $('historyEmpty').style.display = 'none';
   $('historyList').innerHTML = items.map((item, i) =>
     '<div class="history-item">' +
@@ -259,23 +268,23 @@ function renderHistory() {
       '</div>' +
       '<div class="history-actions">' +
         '<button class="btn-sm" onclick="playHistory(' + i + ')">播放</button>' +
-        '<button class="btn-sm" onclick="navigator.clipboard.writeText(\'' + item.url + '\').then(()=>showMsg(\'success\',\'链接已复制\'))">链接</button>' +
+        '<button class="btn-sm" onclick="copyHistoryUrl(' + i + ')">链接</button>' +
         '<button class="btn-sm" onclick="deleteHistory(' + i + ')" style="color:#f87171;">删除</button>' +
       '</div>' +
     '</div>'
   ).join('');
 }
-function escHtml(s) {
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function playHistory(i) {
   const item = getHistory()[i];
   if (!item) return;
   $('videoContainer').innerHTML = '<video src="' + item.url + '" controls autoplay style="width:100%"></video>';
   $('resultArea').classList.add('visible');
   $('resultArea').scrollIntoView({ behavior: 'smooth' });
+}
+function copyHistoryUrl(i) {
+  const item = getHistory()[i];
+  if (item) navigator.clipboard.writeText(item.url).then(() => showMsg('success', '链接已复制'));
 }
 function deleteHistory(i) {
   const items = getHistory();
@@ -285,23 +294,27 @@ function deleteHistory(i) {
 }
 renderHistory();
 
-// 生成视频 - 只调一次 create，等它返回
+// ========== 主流程 ==========
+let pollTimer = null;
+
 $('generateBtn').addEventListener('click', async function() {
   const apiKey = $('apiKey').value.trim();
   const prompt = $('prompt').value.trim();
-  const model = modelSelect.value;
+  const model = $('modelSelect').value;
 
   if (!apiKey) { showMsg('error', '请输入 API 密钥'); return; }
   if (!prompt) { showMsg('error', '请输入视频描述'); return; }
 
   clearMsg();
   $('resultArea').classList.remove('visible');
+  if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
   this.disabled = true;
   this.textContent = '生成中...';
 
   try {
     const body = { model, prompt, aspect_ratio: $('aspectSelect').value, enhance_prompt: true, enable_upsample: true };
 
+    // 图片处理
     if ($('enableImage').checked) {
       const rf = $('imageInput').files;
       const sf = $('startFrameInput').files[0];
@@ -314,52 +327,120 @@ $('generateBtn').addEventListener('click', async function() {
       }
     }
 
-    showMsg('info', '正在生成视频，请等待...');
-
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 120000);
+    showMsg('info', '提交任务中...');
 
     const resp = await fetch(API_BASE + '/v1/video/create', {
       method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
       body: JSON.stringify(body)
     });
-    clearTimeout(timer);
 
     if (!resp.ok) {
-      let errjson;
-      try { errjson = await resp.json(); } catch { throw new Error(await resp.text()); }
-      throw new Error(errjson.message || JSON.stringify(errjson));
+      let err;
+      try { err = await resp.json(); } catch { throw new Error(await resp.text()); }
+      throw new Error(err.message || JSON.stringify(err));
     }
 
     const data = await resp.json();
-    console.log('Create:', JSON.stringify(data).slice(0, 400));
+    console.log('Create:', data);
 
-    // 成功拿到视频
-    const vu = data.video_url || data.data?.video_url || data.data?.detail?.download_url || '';
-    if (data.status === 'SUCCESS' && vu) {
-      $('videoContainer').innerHTML = '<video src="' + vu + '" controls autoplay style="width:100%"></video>';
-      $('resultArea').classList.add('visible');
-      $('resultArea').scrollIntoView({ behavior: 'smooth' });
-      addHistory({ url: vu, model, prompt: prompt || '(空)', time: Date.now() });
-      showMsg('success', '生成成功！');
-    } else {
-      // pending / 其他状态
-      showMsg('warning', '任务已提交，id: ' + (data.id || data.task_id || '') + '。请去后台查看结果。');
+    // 如果直接返回了视频
+    if (data.video_url) {
+      showVideo(data.video_url, model, prompt);
+      return;
     }
+
+    // 如果直接 SUCCESS + data.video_url
+    if (data.status === 'SUCCESS' && data.data && data.data.video_url) {
+      showVideo(data.data.video_url, model, prompt);
+      return;
+    }
+
+    // 否则进入轮询：GET /v1/video/query?id=完整id
+    const taskId = data.id;
+    if (!taskId) {
+      showMsg('warning', '未获取到任务ID：' + JSON.stringify(data).slice(0, 200));
+      return;
+    }
+
+    showMsg('info', '任务已提交，查询进度中...');
+    showProgress(true);
+    pollTask(apiKey, taskId, model, prompt);
+
   } catch (err) {
-    if (err.name === 'AbortError') {
-      showMsg('warning', '请求超时（2分钟），任务仍在处理');
-    } else {
-      showMsg('error', err.message);
-    }
+    showMsg('error', err.message);
   }
 
   this.disabled = false;
   this.textContent = '生成视频';
 });
 
+// 轮询任务状态
+async function pollTask(apiKey, taskId, model, prompt) {
+  for (let i = 0; i < 120; i++) { // 120 * 3s = 6分钟
+    await new Promise(r => setTimeout(r, 3000));
+    try {
+      const url = API_BASE + '/v1/video/query?id=' + encodeURIComponent(taskId);
+      const resp = await fetch(url, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json', 'Authorization': 'Bearer ' + apiKey }
+      });
+      if (!resp.ok) continue;
+
+      const data = await resp.json();
+      console.log('Query [' + i + ']:', data.status, data.progress);
+
+      // 显示进度
+      if (data.progress) {
+        const pct = parseInt(data.progress) || 0;
+        showProgress(true, pct);
+      }
+
+      // 完成
+      const st = (data.status || '').toLowerCase();
+      if (st === 'completed' && data.video_url) {
+        showProgress(false);
+        showVideo(data.video_url, model, prompt);
+        return;
+      }
+
+      // 失败
+      if (st === 'failed' || st === 'error') {
+        showProgress(false);
+        showMsg('error', '生成失败: ' + (data.error || data.fail_reason || st));
+        return;
+      }
+
+      if (i % 10 === 0) showMsg('info', '生成中... ' + (data.progress || Math.round(i * 3) + 's'));
+
+    } catch(e) {
+      if (i > 5) throw e;
+    }
+  }
+
+  showProgress(false);
+  showMsg('warning', '等待超时，task_id: ' + taskId);
+}
+
+// 显示视频
+function showVideo(url, model, prompt) {
+  $('videoContainer').innerHTML = '<video src="' + url + '" controls autoplay style="width:100%"></video>';
+  $('resultArea').classList.add('visible');
+  $('resultArea').scrollIntoView({ behavior: 'smooth' });
+  addHistory({ url, model, prompt: prompt || '(空)', time: Date.now() });
+  showMsg('success', '生成成功！');
+}
+
+// 进度条
+function showProgress(show, pct) {
+  const bar = $('progressBar');
+  const inner = $('progressInner');
+  if (!show) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  inner.style.width = (pct || 0) + '%';
+}
+
+// 图片转 base64
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -385,11 +466,13 @@ function fileToBase64(file) {
   });
 }
 
+// 消息
 function showMsg(type, text) {
   $('messageArea').innerHTML = '<div class="msg msg-' + type + '">' + text + '</div>';
 }
 function clearMsg() { $('messageArea').innerHTML = ''; }
 
+// 密钥保存
 try { const saved = localStorage.getItem('ve_video_key'); if (saved) $('apiKey').value = saved; } catch(e) {}
 $('apiKey').addEventListener('input', function() {
   try { localStorage.setItem('ve_video_key', this.value.trim()); } catch(e) {}
