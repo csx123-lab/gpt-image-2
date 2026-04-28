@@ -422,8 +422,10 @@ function showVideo(data, model, prompt, apiKey) {
 }
 
 async function waitAndRetry(apiKey, taskId, model, prompt, body, maxTry) {
+  // 第一次：等一段时间再调 create
+  await new Promise(r => setTimeout(r, 5000));
+  
   for (let i = 0; i < maxTry; i++) {
-    await new Promise(r => setTimeout(r, 3000));
     try {
       const resp = await fetch(API_BASE + '/v1/video/create', {
         method: 'POST',
@@ -434,7 +436,11 @@ async function waitAndRetry(apiKey, taskId, model, prompt, body, maxTry) {
         },
         body: JSON.stringify(body)
       });
-      if (!resp.ok) continue;
+      if (!resp.ok) {
+        if (i % 10 === 0) showMsg('info', '等待中... (' + Math.round(i * 3 + 5) + 's)');
+        await new Promise(r => setTimeout(r, 3000));
+        continue;
+      }
       const data = await resp.json();
       console.log('Retry [' + i + ']:', JSON.stringify(data).slice(0, 200));
       
@@ -446,12 +452,13 @@ async function waitAndRetry(apiKey, taskId, model, prompt, body, maxTry) {
         }
       }
       
-      if (i % 10 === 0) showMsg('info', '生成中... (' + Math.round(i * 3) + 's)');
+      if (i % 10 === 0) showMsg('info', '生成中... (' + Math.round(i * 3 + 5) + 's)');
     } catch(e) {
       if (i > 5) throw e;
     }
+    await new Promise(r => setTimeout(r, 3000));
   }
-  showMsg('warning', '等待超时（6分钟），task_id: ' + taskId);
+  showMsg('warning', '等待超时，请去后台查看任务状态: task_' + taskId.split(':').pop());
 }
 
 function fileToBase64(file) {
