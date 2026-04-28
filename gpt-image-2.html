@@ -186,14 +186,15 @@ select option{background:#0e0e18;color:#e0e0e0}
 /* ─── upload ─── */
 .upload-area{
   border:1.5px dashed rgba(255,255,255,.1);
-  border-radius:12px;padding:1.5rem;text-align:center;
-  cursor:pointer;position:relative;transition:border-color .2s;
+  border-radius:10px;padding:1.5rem 1rem;
+  text-align:center;cursor:pointer;position:relative;
+  transition:all .25s;background:rgba(255,255,255,.02);
 }
 .upload-area:hover{border-color:rgba(16,163,127,.4);background:rgba(16,163,127,.03)}
 .upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
-.upload-area .upload-icon{font-size:1.8rem}
-.upload-area .upload-text{font-size:.82rem;color:#666}
-.upload-area.has-image{border-color:rgba(16,163,127,.3);border-style:solid;padding:.5rem}
+.upload-area .upload-icon{font-size:1.5rem;margin-bottom:.3rem;opacity:.5}
+.upload-area .upload-text{font-size:.78rem;color:#666;line-height:1.4}
+.upload-area.has-image{border-color:rgba(16,163,127,.25);border-style:solid;padding:.75rem}
 .upload-area.has-image .upload-icon,.upload-area.has-image .upload-text{display:none}
 
 .ref-preview{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
@@ -212,6 +213,30 @@ select option{background:#0e0e18;color:#e0e0e0}
 
 /* ─── glow line decoration ─── */
 .glow-line{height:1px;background:linear-gradient(90deg,transparent,rgba(16,163,127,.2),transparent);margin:.5rem 0 1rem}
+
+/* ─── upload zone remake ─── */
+.upload-zone{
+  border:1.5px dashed rgba(255,255,255,.1);
+  border-radius:10px;padding:1.5rem 1rem;
+  text-align:center;cursor:pointer;position:relative;
+  transition:all .25s;background:rgba(255,255,255,.02);
+}
+.upload-zone:hover{border-color:rgba(16,163,127,.4);background:rgba(16,163,127,.03)}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-zone .uz-icon{font-size:1.5rem;margin-bottom:.3rem;opacity:.5}
+.upload-zone .uz-text{font-size:.78rem;color:#666;line-height:1.4}
+.upload-zone .uz-text strong{color:#10a37f;font-weight:500}
+.upload-zone.has-files{border-color:rgba(16,163,127,.25);border-style:solid;padding:.75rem}
+.upload-zone.has-files .uz-icon,.upload-zone.has-files .uz-text{display:none}
+.uz-preview{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
+.uz-preview img{max-height:90px;border-radius:6px;display:block}
+.uz-url-input{margin-top:.6rem}
+.uz-url-input input{background:rgba(255,255,255,.03);font-size:.82rem;padding:.55rem .8rem}
+.uz-meta{display:flex;justify-content:space-between;align-items:center;margin-top:.5rem}
+.uz-meta .uz-count{font-size:.75rem;color:#555}
+.uz-meta .uz-clear{font-size:.7rem;color:#666;border:1px solid rgba(255,255,255,.06);padding:.15rem .5rem;border-radius:5px;cursor:pointer;background:none;transition:all .15s}
+.uz-meta .uz-clear:hover{background:rgba(255,255,255,.04);color:#a0a0a0}
+
 </style>
 </head>
 <body>
