@@ -290,7 +290,7 @@
                 <span style="background:linear-gradient(135deg,#10a37f,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">VEO</span>
                 <span style="color:#b0b0d0;">视频生成</span>
             </h1>
-            <p>veo2/veo3 · 支持图片帧/元素图</p>
+            <p>支持参考图、首尾帧 · 固定 8 秒时长</p>
         </div>
     </header>
 
@@ -312,18 +312,11 @@
         <div class="form-group">
             <label>模型选择</label>
             <select id="modelSelect">
-                <option value="veo2">veo2</option>
-                <option value="veo2-fast" selected>veo2-fast</option>
-                <option value="veo2-fast-frames">veo2-fast-frames</option>
-                <option value="veo2-fast-components">veo2-fast-components</option>
-                <option value="veo2-pro">veo2-pro</option>
-                <option value="veo3">veo3</option>
-                <option value="veo3-fast">veo3-fast</option>
-                <option value="veo3-pro">veo3-pro</option>
-                <option value="veo3-pro-frames">veo3-pro-frames</option>
-                <option value="veo3-fast-frames">veo3-fast-frames</option>
-                <option value="veo3-frames">veo3-frames</option>
+                <option value="veo_3_1-fast-4K">veo_3_1-fast-4K</option>
+                <option value="veo_3_1-fast" selected>veo_3_1-fast</option>
                 <option value="veo3.1-fast-components">veo3.1-fast-components</option>
+                <option value="veo_3_1-lite-4K">veo_3_1-lite-4K</option>
+                <option value="veo_3_1-lite">veo_3_1-lite</option>
             </select>
         </div>
 
@@ -478,18 +471,11 @@
     })();
 
     const MODELS = {
-        'veo2': { desc: 'veo2 基础版', gen: 'veo2', frames: 0, components: false },
-        'veo2-fast': { desc: 'veo2 快速版', gen: 'veo2', frames: 0, components: false },
-        'veo2-fast-frames': { desc: 'veo2 + 首尾帧（最多2张）', gen: 'veo2', frames: 2, components: false },
-        'veo2-fast-components': { desc: 'veo2 + 元素图（最多3张）', gen: 'veo2', frames: 0, components: true },
-        'veo2-pro': { desc: 'veo2 专业版', gen: 'veo2', frames: 0, components: false },
-        'veo3': { desc: 'veo3 基础版 · 16:9/9:16', gen: 'veo3', frames: 0, components: false },
-        'veo3-fast': { desc: 'veo3 快速版 · 16:9/9:16', gen: 'veo3', frames: 0, components: false },
-        'veo3-pro': { desc: 'veo3 专业版 · 16:9/9:16', gen: 'veo3', frames: 0, components: false },
-        'veo3-pro-frames': { desc: 'veo3 + 首帧（最多1张）', gen: 'veo3', frames: 1, components: false },
-        'veo3-fast-frames': { desc: 'veo3 快速帧版', gen: 'veo3', frames: 0, components: false },
-        'veo3-frames': { desc: 'veo3 帧版', gen: 'veo3', frames: 0, components: false },
-        'veo3.1-fast-components': { desc: 'veo3.1 + 元素图（最多3张）· 16:9/9:16', gen: 'veo3', frames: 0, components: true }
+        'veo_3_1-fast-4K': { desc: '快速版 · 4K · 支持参考图', gen: 'veo3', frames: 0, components: false },
+        'veo_3_1-fast': { desc: '快速版 · 支持参考图', gen: 'veo3', frames: 0, components: false },
+        'veo3.1-fast-components': { desc: '快速版 · 支持参考图+首尾帧', gen: 'veo3', frames: 2, components: true },
+        'veo_3_1-lite-4K': { desc: '轻量版 · 4K · 纯文本', gen: 'veo3', frames: 0, components: false },
+        'veo_3_1-lite': { desc: '轻量版 · 纯文本', gen: 'veo3', frames: 0, components: false }
     };
 
     const $ = id => document.getElementById(id);
