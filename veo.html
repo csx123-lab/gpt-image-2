@@ -12,11 +12,7 @@ body {
   color: #e0e0e0;
   min-height: 100vh;
 }
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
+.container { max-width: 600px; margin: 0 auto; padding: 2rem 1rem; }
 header { text-align: center; margin-bottom: 2rem; }
 header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.3rem; }
 header p { color: #666; font-size: 0.82rem; }
@@ -32,7 +28,6 @@ header p { color: #666; font-size: 0.82rem; }
   font-size: 0.8rem; color: #7878a0;
   margin-bottom: 1rem;
   font-weight: 600; letter-spacing: 0.5px;
-  display: flex; align-items: center; gap: 0.4rem;
 }
 
 .form-group { margin-bottom: 1rem; }
@@ -92,7 +87,6 @@ select option { background: #0c0c18; color: #e0e0e0; }
 
 .result-area { display: none; }
 .result-area.visible { display: block; }
-
 video { width: 100%; border-radius: 10px; }
 
 .model-desc {
@@ -111,20 +105,11 @@ video { width: 100%; border-radius: 10px; }
   align-items: center;
 }
 .history-item:last-child { border-bottom: none; }
-.history-thumb {
-  width: 80px; height: 45px;
-  border-radius: 6px;
-  background: rgba(255,255,255,0.04);
-  flex-shrink: 0;
-  overflow: hidden;
-}
+.history-thumb { width: 80px; height: 45px; border-radius: 6px; background: rgba(255,255,255,0.04); flex-shrink: 0; overflow: hidden; }
 .history-thumb video, .history-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .history-info { flex: 1; min-width: 0; }
 .history-info .hi-model { font-size: 0.75rem; color: #10a37f; }
-.history-info .hi-prompt {
-  font-size: 0.8rem; color: #aaa;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
+.history-info .hi-prompt { font-size: 0.8rem; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .history-info .hi-time { font-size: 0.7rem; color: #555; }
 .history-actions { display: flex; gap: 0.3rem; }
 </style>
@@ -175,31 +160,30 @@ video { width: 100%; border-radius: 10px; }
     </select>
   </div>
 
-  <div class="form-group" id="imageGroup" style="border:1px dashed rgba(255,255,255,0.08);border-radius:10px;padding:1rem;">
+  <div class="form-group" style="border:1px dashed rgba(255,255,255,0.08);border-radius:10px;padding:1rem;">
     <label style="display:flex;align-items:center;gap:0.4rem;">
-      <input type="checkbox" id="enableImage" />
-      上传参考图 / 首尾帧
+      <input type="checkbox" id="enableImage" /> 上传参考图 / 首尾帧
     </label>
     <div id="imageFields" style="display:none;margin-top:0.8rem;">
       <div class="form-group">
-        <label>参考图片（多选，元素图/参考图）</label>
-        <input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp" multiple style="padding:0.5rem;font-size:0.8rem;" />
+        <label>参考图片（多选）</label>
+        <input type="file" id="imageInput" accept="image/*" multiple style="padding:0.5rem;font-size:0.8rem;" />
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>首帧</label>
-          <input type="file" id="startFrameInput" accept="image/png,image/jpeg,image/webp" style="padding:0.5rem;font-size:0.8rem;" />
+          <input type="file" id="startFrameInput" accept="image/*" style="padding:0.5rem;font-size:0.8rem;" />
         </div>
         <div class="form-group">
           <label>尾帧</label>
-          <input type="file" id="endFrameInput" accept="image/png,image/jpeg,image/webp" style="padding:0.5rem;font-size:0.8rem;" />
+          <input type="file" id="endFrameInput" accept="image/*" style="padding:0.5rem;font-size:0.8rem;" />
         </div>
       </div>
     </div>
   </div>
 
   <div class="form-group">
-    <label>视频描述 (Prompt)</label>
+    <label>视频描述</label>
     <textarea id="prompt" placeholder="A cat running in the park"></textarea>
   </div>
 
@@ -213,7 +197,7 @@ video { width: 100%; border-radius: 10px; }
 </div>
 
 <div class="card" id="historyCard">
-  <h3>📋 历史记录 <span id="historyCount" style="font-weight:normal;font-size:0.75rem;color:#555;"></span></h3>
+  <h3>📋 历史记录 <span id="historyCount"></span></h3>
   <div id="historyList"></div>
   <div id="historyEmpty" style="text-align:center;padding:1rem;color:#555;font-size:0.85rem;">暂无记录</div>
 </div>
@@ -222,38 +206,33 @@ video { width: 100%; border-radius: 10px; }
 
 <script>
 const API_BASE = 'https://api.vectorengine.cn';
-
-const MODELS = {
-  'veo_3_1-fast-4K': { desc: '快速版 · 4K · 支持参考图' },
-  'veo_3_1-fast': { desc: '快速版 · 支持参考图' },
-  'veo3.1-fast-components': { desc: '快速版 + 元素图/首尾帧' },
-  'veo_3_1-lite-4K': { desc: '轻量版 · 4K · 纯文本' },
-  'veo_3_1-lite': { desc: '轻量版 · 纯文本' }
-};
-
 const $ = id => document.getElementById(id);
 
-// 模型描述更新
+// 模型描述
+const MODELS = {
+  'veo_3_1-fast-4K': '快速版 · 4K · 支持参考图',
+  'veo_3_1-fast': '快速版 · 支持参考图',
+  'veo3.1-fast-components': '快速版 + 元素图/首尾帧',
+  'veo_3_1-lite-4K': '轻量版 · 4K · 纯文本',
+  'veo_3_1-lite': '轻量版 · 纯文本'
+};
 const modelSelect = $('modelSelect');
 const modelDesc = $('modelDesc');
-modelSelect.addEventListener('change', function() {
-  const m = MODELS[this.value];
-  modelDesc.textContent = this.value + ' - ' + (m ? m.desc : '');
+modelSelect.addEventListener('change', () => {
+  modelDesc.textContent = modelSelect.value + ' - ' + (MODELS[modelSelect.value] || '');
 });
 modelSelect.dispatchEvent(new Event('change'));
-const enableImage = document.getElementById('enableImage');
-const imageFields = document.getElementById('imageFields');
-if (enableImage) enableImage.addEventListener('change', function() {
-  imageFields.style.display = this.checked ? 'block' : 'none';
+
+// 图片开关
+$('enableImage').addEventListener('change', function() {
+  $('imageFields').style.display = this.checked ? 'block' : 'none';
 });
 
 // 历史记录
 function getHistory() {
   try { return JSON.parse(localStorage.getItem('veo_history') || '[]'); } catch { return []; }
 }
-function saveHistory(items) {
-  localStorage.setItem('veo_history', JSON.stringify(items));
-}
+function saveHistory(items) { localStorage.setItem('veo_history', JSON.stringify(items)); }
 function addHistory(item) {
   const items = getHistory();
   items.unshift(item);
@@ -263,35 +242,28 @@ function addHistory(item) {
 }
 function renderHistory() {
   const items = getHistory();
-  const el = $('historyList');
-  const empty = $('historyEmpty');
   $('historyCount').textContent = items.length > 0 ? '(' + items.length + ')' : '';
-  
   if (items.length === 0) {
-    el.innerHTML = '';
-    empty.style.display = 'block';
+    $('historyList').innerHTML = '';
+    $('historyEmpty').style.display = 'block';
     return;
   }
-  empty.style.display = 'none';
-  
-  el.innerHTML = items.map((item, i) => {
-    const time = new Date(item.time).toLocaleString();
-    return '<div class="history-item">' +
-      '<div class="history-thumb">' +
-        '<video src="' + item.url + '" muted preload="metadata"></video>' +
-      '</div>' +
+  $('historyEmpty').style.display = 'none';
+  $('historyList').innerHTML = items.map((item, i) =>
+    '<div class="history-item">' +
+      '<div class="history-thumb"><video src="' + item.url + '" muted preload="metadata"></video></div>' +
       '<div class="history-info">' +
         '<div class="hi-model">' + item.model + '</div>' +
         '<div class="hi-prompt">' + escHtml(item.prompt.slice(0, 60)) + '</div>' +
-        '<div class="hi-time">' + time + '</div>' +
+        '<div class="hi-time">' + new Date(item.time).toLocaleString() + '</div>' +
       '</div>' +
       '<div class="history-actions">' +
         '<button class="btn-sm" onclick="playHistory(' + i + ')">播放</button>' +
-        '<button class="btn-sm" onclick="copyUrl(' + i + ')">链接</button>' +
+        '<button class="btn-sm" onclick="navigator.clipboard.writeText(\'' + item.url + '\').then(()=>showMsg(\'success\',\'链接已复制\'))">链接</button>' +
         '<button class="btn-sm" onclick="deleteHistory(' + i + ')" style="color:#f87171;">删除</button>' +
       '</div>' +
-    '</div>';
-  }).join('');
+    '</div>'
+  ).join('');
 }
 function escHtml(s) {
   const d = document.createElement('div');
@@ -301,17 +273,9 @@ function escHtml(s) {
 function playHistory(i) {
   const item = getHistory()[i];
   if (!item) return;
-  const vc = $('videoContainer');
-  vc.innerHTML = '<video src="' + item.url + '" controls autoplay style="width:100%"></video>';
+  $('videoContainer').innerHTML = '<video src="' + item.url + '" controls autoplay style="width:100%"></video>';
   $('resultArea').classList.add('visible');
   $('resultArea').scrollIntoView({ behavior: 'smooth' });
-}
-function copyUrl(i) {
-  const item = getHistory()[i];
-  if (!item) return;
-  navigator.clipboard.writeText(item.url).then(() => {
-    showMsg('success', '链接已复制');
-  });
 }
 function deleteHistory(i) {
   const items = getHistory();
@@ -321,7 +285,7 @@ function deleteHistory(i) {
 }
 renderHistory();
 
-// 主流程
+// 生成视频 - 只调一次 create，等它返回
 $('generateBtn').addEventListener('click', async function() {
   const apiKey = $('apiKey').value.trim();
   const prompt = $('prompt').value.trim();
@@ -336,22 +300,13 @@ $('generateBtn').addEventListener('click', async function() {
   this.textContent = '生成中...';
 
   try {
-    showMsg('info', '正在提交请求...');
+    const body = { model, prompt, aspect_ratio: $('aspectSelect').value, enhance_prompt: true, enable_upsample: true };
 
-    const body = {
-      model: model,
-      prompt: prompt,
-      aspect_ratio: $('aspectSelect').value,
-      enhance_prompt: true,
-      enable_upsample: true
-    };
-
-    if (document.getElementById('enableImage').checked) {
-      const rf = document.getElementById('imageInput').files;
-      const sf = document.getElementById('startFrameInput').files[0];
-      const ef = document.getElementById('endFrameInput').files[0];
-      const hasImg = rf.length > 0 || sf || ef;
-      if (hasImg) {
+    if ($('enableImage').checked) {
+      const rf = $('imageInput').files;
+      const sf = $('startFrameInput').files[0];
+      const ef = $('endFrameInput').files[0];
+      if (rf.length > 0 || sf || ef) {
         body.images = [];
         for (const f of rf) body.images.push(await fileToBase64(f));
         if (sf) body.images.push(await fileToBase64(sf));
@@ -359,107 +314,51 @@ $('generateBtn').addEventListener('click', async function() {
       }
     }
 
+    showMsg('info', '正在生成视频，请等待...');
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 120000);
+
     const resp = await fetch(API_BASE + '/v1/video/create', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ' + apiKey
-      },
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'Bearer ' + apiKey },
       body: JSON.stringify(body)
     });
+    clearTimeout(timer);
 
     if (!resp.ok) {
-      let detail = '';
-      try { const err = await resp.json(); detail = err.message || JSON.stringify(err); }
-      catch { detail = await resp.text(); }
-      throw new Error(detail);
+      let errjson;
+      try { errjson = await resp.json(); } catch { throw new Error(await resp.text()); }
+      throw new Error(errjson.message || JSON.stringify(errjson));
     }
 
     const data = await resp.json();
-    console.log('Create response:', data);
+    console.log('Create:', JSON.stringify(data).slice(0, 400));
 
-    if (data.status === 'SUCCESS' && data.data && (data.data.video_url || data.data.detail?.download_url)) {
-      showVideo(data, model, prompt, apiKey);
-    } else if (data.status === 'SUCCESS' && data.data) {
-      // data.video_url 可能在 data 里面的 detail 或其他位置
-      showMsg('info', '返回数据：' + JSON.stringify(data).slice(0, 200));
+    // 成功拿到视频
+    const vu = data.video_url || data.data?.video_url || data.data?.detail?.download_url || '';
+    if (data.status === 'SUCCESS' && vu) {
+      $('videoContainer').innerHTML = '<video src="' + vu + '" controls autoplay style="width:100%"></video>';
+      $('resultArea').classList.add('visible');
+      $('resultArea').scrollIntoView({ behavior: 'smooth' });
+      addHistory({ url: vu, model, prompt: prompt || '(空)', time: Date.now() });
+      showMsg('success', '生成成功！');
     } else {
-      // status: pending - 等待后重试
-      showMsg('info', '任务已提交 (id: ' + (data.id || taskId) + ')，等待完成...');
-      await waitAndRetry(apiKey, data.id || taskId, model, prompt, body, 120);
+      // pending / 其他状态
+      showMsg('warning', '任务已提交，id: ' + (data.id || data.task_id || '') + '。请去后台查看结果。');
     }
-
   } catch (err) {
-    console.error(err);
-    showMsg('error', err.message);
+    if (err.name === 'AbortError') {
+      showMsg('warning', '请求超时（2分钟），任务仍在处理');
+    } else {
+      showMsg('error', err.message);
+    }
   }
 
   this.disabled = false;
   this.textContent = '生成视频';
 });
-
-function showVideo(data, model, prompt, apiKey) {
-  const videoUrl = data.data.video_url || data.data.detail?.download_url || '';
-  if (!videoUrl) {
-    showMsg('info', '返回：' + JSON.stringify(data).slice(0, 200));
-    return;
-  }
-  
-  const vc = $('videoContainer');
-  vc.innerHTML = '<video src="' + videoUrl + '" controls autoplay style="width:100%"></video>';
-  $('resultArea').classList.add('visible');
-  $('resultArea').scrollIntoView({ behavior: 'smooth' });
-  
-  addHistory({
-    url: videoUrl,
-    model: model,
-    prompt: prompt || '(空)',
-    time: Date.now()
-  });
-  
-  showMsg('success', '生成成功！');
-}
-
-async function waitAndRetry(apiKey, taskId, model, prompt, body, maxTry) {
-  // 第一次：等一段时间再调 create
-  await new Promise(r => setTimeout(r, 5000));
-  
-  for (let i = 0; i < maxTry; i++) {
-    try {
-      const resp = await fetch(API_BASE + '/v1/video/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer ' + apiKey
-        },
-        body: JSON.stringify(body)
-      });
-      if (!resp.ok) {
-        if (i % 10 === 0) showMsg('info', '等待中... (' + Math.round(i * 3 + 5) + 's)');
-        await new Promise(r => setTimeout(r, 3000));
-        continue;
-      }
-      const data = await resp.json();
-      console.log('Retry [' + i + ']:', JSON.stringify(data).slice(0, 200));
-      
-      if (data.status === 'SUCCESS' && data.data) {
-        const vu = data.data.video_url || data.data.detail?.download_url || '';
-        if (vu) {
-          showVideo(data, model, prompt, apiKey);
-          return;
-        }
-      }
-      
-      if (i % 10 === 0) showMsg('info', '生成中... (' + Math.round(i * 3 + 5) + 's)');
-    } catch(e) {
-      if (i > 5) throw e;
-    }
-    await new Promise(r => setTimeout(r, 3000));
-  }
-  showMsg('warning', '等待超时，请去后台查看任务状态: task_' + taskId.split(':').pop());
-}
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -475,8 +374,7 @@ function fileToBase64(file) {
           else { w = Math.round(w * max / h); h = max; }
         }
         canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         resolve(canvas.toDataURL(file.type, 0.7));
       };
       img.onerror = () => resolve(reader.result);
@@ -488,18 +386,11 @@ function fileToBase64(file) {
 }
 
 function showMsg(type, text) {
-  const el = $('messageArea');
-  el.innerHTML = '<div class="msg msg-' + type + '">' + text + '</div>';
+  $('messageArea').innerHTML = '<div class="msg msg-' + type + '">' + text + '</div>';
 }
 function clearMsg() { $('messageArea').innerHTML = ''; }
 
-// 恢复密钥
-try {
-  const saved = localStorage.getItem('ve_video_key');
-  if (saved) $('apiKey').value = saved;
-} catch(e) {}
-
-// 自动保存密钥
+try { const saved = localStorage.getItem('ve_video_key'); if (saved) $('apiKey').value = saved; } catch(e) {}
 $('apiKey').addEventListener('input', function() {
   try { localStorage.setItem('ve_video_key', this.value.trim()); } catch(e) {}
 });
