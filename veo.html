@@ -290,7 +290,7 @@
                 <span style="background:linear-gradient(135deg,#10a37f,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">VEO</span>
                 <span style="color:#b0b0d0;">视频生成</span>
             </h1>
-            <p>支持参考图、首尾帧 · 固定 8 秒时长</p>
+            <p>veo2/veo3 · 支持图片帧/元素图</p>
         </div>
     </header>
 
@@ -312,11 +312,18 @@
         <div class="form-group">
             <label>模型选择</label>
             <select id="modelSelect">
-                <option value="veo_3_1-fast-4K">veo_3_1-fast-4K - ¥0.43/次</option>
-                <option value="veo_3_1-fast" selected>veo_3_1-fast - ¥0.43/次</option>
+                <option value="veo2">veo2 - ¥0.43/次</option>
+                <option value="veo2-fast" selected>veo2-fast - ¥0.43/次</option>
+                <option value="veo2-fast-frames">veo2-fast-frames - ¥0.26/次</option>
+                <option value="veo2-fast-components">veo2-fast-components - ¥0.26/次</option>
+                <option value="veo2-pro">veo2-pro - ¥0.55/次</option>
+                <option value="veo3">veo3 - ¥0.55/次</option>
+                <option value="veo3-fast">veo3-fast - ¥0.43/次</option>
+                <option value="veo3-pro">veo3-pro - ¥0.55/次</option>
+                <option value="veo3-pro-frames">veo3-pro-frames - ¥0.55/次</option>
+                <option value="veo3-fast-frames">veo3-fast-frames - ¥0.43/次</option>
+                <option value="veo3-frames">veo3-frames - ¥0.50/次</option>
                 <option value="veo3.1-fast-components">veo3.1-fast-components - ¥0.26/次</option>
-                <option value="veo_3_1-lite-4K">veo_3_1-lite-4K - ¥0.55/次</option>
-                <option value="veo_3_1-lite">veo_3_1-lite - ¥0.50/次</option>
             </select>
         </div>
 
@@ -327,7 +334,7 @@
         <div class="form-group">
             <label class="toggle-label">
                 <input type="checkbox" id="enableImage" />
-                上传参考图
+                上传图片（帧/元素图）
             </label>
         </div>
 
@@ -366,11 +373,19 @@
         </div>
 
         <div class="form-row">
-            <div class="form-group">
-                <label>画面比例</label>
+            <div class="form-group" id="aspectGroup">
+                <label>画面比例（veo3 使用）</label>
                 <select id="aspectSelect">
                     <option value="16:9">16:9（横屏）</option>
                     <option value="9:16">9:16（竖屏）</option>
+                </select>
+            </div>
+            <div class="form-group" id="sizeGroup" style="display:none;">
+                <label>画面尺寸（veo2 使用）</label>
+                <select id="sizeSelect">
+                    <option value="1920x1080">1920×1080（全屏）</option>
+                    <option value="1280x720">1280×720（高清）</option>
+                    <option value="720x1280">720×1280（竖版）</option>
                 </select>
             </div>
             <div class="form-group">
@@ -463,30 +478,53 @@
     })();
 
     const MODELS = {
-        'veo_3_1-fast-4K': { 
-            name: 'VEO 3.1 Fast 4K', price: '¥0.43/次',
-            ref: true, startFrame: false, endFrame: false,
-            desc: '快速生成 · 支持参考图 · 4K 画质'
+        'veo2': { 
+            name: 'veo2', gen: 'veo2', frames: 0, components: false,
+            desc: 'veo2 基础版'
         },
-        'veo_3_1-fast': { 
-            name: 'VEO 3.1 Fast', price: '¥0.43/次',
-            ref: true, startFrame: false, endFrame: false,
-            desc: '快速生成 · 支持参考图'
+        'veo2-fast': { 
+            name: 'veo2-fast', gen: 'veo2', frames: 0, components: false,
+            desc: 'veo2 快速版'
+        },
+        'veo2-fast-frames': { 
+            name: 'veo2-fast-frames', gen: 'veo2', frames: 2, components: false,
+            desc: 'veo2 + 首尾帧（最多2张）'
+        },
+        'veo2-fast-components': { 
+            name: 'veo2-fast-components', gen: 'veo2', frames: 0, components: true,
+            desc: 'veo2 + 元素图（最多3张）'
+        },
+        'veo2-pro': { 
+            name: 'veo2-pro', gen: 'veo2', frames: 0, components: false,
+            desc: 'veo2 专业版'
+        },
+        'veo3': { 
+            name: 'veo3', gen: 'veo3', frames: 0, components: false,
+            desc: 'veo3 基础版 · 支持 16:9 / 9:16'
+        },
+        'veo3-fast': { 
+            name: 'veo3-fast', gen: 'veo3', frames: 0, components: false,
+            desc: 'veo3 快速版 · 支持 16:9 / 9:16'
+        },
+        'veo3-pro': { 
+            name: 'veo3-pro', gen: 'veo3', frames: 0, components: false,
+            desc: 'veo3 专业版 · 支持 16:9 / 9:16'
+        },
+        'veo3-pro-frames': { 
+            name: 'veo3-pro-frames', gen: 'veo3', frames: 1, components: false,
+            desc: 'veo3 + 首帧（最多1张）'
+        },
+        'veo3-fast-frames': { 
+            name: 'veo3-fast-frames', gen: 'veo3', frames: 0, components: false,
+            desc: 'veo3 快速 + 帧'
+        },
+        'veo3-frames': { 
+            name: 'veo3-frames', gen: 'veo3', frames: 0, components: false,
+            desc: 'veo3 帧'
         },
         'veo3.1-fast-components': { 
-            name: 'VEO 3.1 Fast Components', price: '¥0.26/次',
-            ref: true, startFrame: true, endFrame: true,
-            desc: '快速生成 · 支持参考图 + 首尾帧 · 性价比最高' 
-        },
-        'veo_3_1-lite-4K': { 
-            name: 'VEO 3.1 Lite 4K', price: '¥0.55/次',
-            ref: false, startFrame: false, endFrame: false,
-            desc: '轻量生成 · 不支持参考图 · 4K 画质'
-        },
-        'veo_3_1-lite': { 
-            name: 'VEO 3.1 Lite', price: '¥0.50/次',
-            ref: false, startFrame: false, endFrame: false,
-            desc: '轻量生成 · 不支持参考图'
+            name: 'veo3.1-fast-components', gen: 'veo3', frames: 0, components: true,
+            desc: 'veo3.1 + 元素图（最多3张） · 支持 16:9 / 9:16'
         }
     };
 
@@ -505,6 +543,8 @@
     const resultArea = $('resultArea');
     const videoContainer = $('videoContainer');
     const messageArea = $('messageArea');
+    const aspectSelect = $('aspectSelect');
+    const sizeSelect = $('sizeSelect');
 
     let refFiles = [];
     let startFrameFile = null;
@@ -516,19 +556,23 @@
         const m = MODELS[val];
         if (!m) return;
 
-        let html = `<strong>${m.name}</strong> · ${m.price}<br>`;
+        let html = `<strong>${m.name}</strong><br>`;
         html += m.desc + '<br>';
         
         const tags = [];
-        if (m.ref) tags.push('<span class="tag">🖼️ 参考图</span>');
-        if (m.startFrame) tags.push('<span class="tag">🎬 首帧</span>');
-        if (m.endFrame) tags.push('<span class="tag">🏁 尾帧</span>');
-        if (!m.ref && !m.startFrame) tags.push('<span class="tag">纯文本生成</span>');
+        if (m.components) tags.push('<span class="tag">🧩 元素图(≤3张)</span>');
+        if (m.frames > 0) tags.push(`<span class="tag">🎬 首尾帧(≤${m.frames}张)</span>`);
+        if (!m.components && m.frames === 0) tags.push('<span class="tag">纯文本生成</span>');
         html += tags.join(' ');
 
         modelInfo.innerHTML = html;
 
-        // 更新参考图可选择性
+        // veo2 / veo3 切换
+        const isVeo3 = val.startsWith('veo3');
+        $('aspectGroup').style.display = isVeo3 ? 'block' : 'none';
+        $('sizeGroup').style.display = isVeo3 ? 'none' : 'block';
+
+        // 重置图片上传状态
         enableImage.checked = false;
         refSection.classList.add('hide');
         refFiles = [];
@@ -541,8 +585,9 @@
         startFrameInput.value = '';
         endFrameInput.value = '';
 
-        // 只有支持参考图的模型才显示上传选项
-        if (!m.ref && !m.startFrame) {
+        // 只有带帧/frames/components的模型才显示图片上传选项
+        const supportsImages = m.frames > 0 || m.components;
+        if (!supportsImages) {
             enableImage.checked = false;
             enableImage.disabled = true;
             enableImage.parentElement.style.opacity = '0.4';
@@ -625,83 +670,103 @@
         generateBtn.disabled = true;
 
         try {
-            let resp;
+            // 构造请求体
+            const body = {
+                model: model,
+                prompt: prompt,
+                enhance_prompt: true,
+                enable_upsample: 'none'
+            };
+
+            // veo3 系列用 aspect_ratio，veo2 系列用 size
+            const isVeo3 = model.startsWith('veo3');
+            if (isVeo3) {
+                body.aspect_ratio = $('aspectSelect').value;
+            } else {
+                body.size = $('sizeSelect').value;
+            }
+
+            // 图片处理
             const hasRef = enableImage.checked && refFiles.length > 0;
             const hasStart = startFrameFile !== null;
             const hasEnd = endFrameFile !== null;
 
             if (hasRef || hasStart || hasEnd) {
-                // 用 multipart/form-data
-                const formData = new FormData();
-                formData.append('model', model);
-                formData.append('prompt', prompt);
-                formData.append('aspect_ratio', $('aspectSelect').value);
-                formData.append('duration', '8');
-
+                // 用 images 数组
+                body.images = [];
+                // 参考图/元素图
                 if (hasRef) {
-                    for (const f of refFiles) formData.append('image', f);
+                    for (const f of refFiles) {
+                        const b64 = await fileToBase64(f);
+                        body.images.push(b64);
+                    }
                 }
-                if (hasStart && m.startFrame) {
-                    formData.append('start_frame', startFrameFile);
+                // 首帧
+                if (hasStart) {
+                    const b64 = await fileToBase64(startFrameFile);
+                    body.images.push(b64);
                 }
-                if (hasEnd && m.endFrame) {
-                    formData.append('end_frame', endFrameFile);
+                // 尾帧
+                if (hasEnd) {
+                    const b64 = await fileToBase64(endFrameFile);
+                    body.images.push(b64);
                 }
 
                 showMsg('info', '⏳ 正在提交（含图片）...');
-                resp = await fetch(API_BASE + '/v1/video/generations', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + apiKey },
-                    body: formData
-                });
             } else {
-                const body = {
-                    model: model,
-                    prompt: prompt,
-                    aspect_ratio: $('aspectSelect').value,
-                    duration: 8
-                };
                 showMsg('info', '⏳ 正在生成视频...');
-                resp = await fetch(API_BASE + '/v1/video/generations', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-                    body: JSON.stringify(body)
-                });
             }
+
+            console.log('[VEO] request body:', JSON.stringify(body, null, 2));
+
+            const resp = await fetch(API_BASE + '/v1/video/generations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + apiKey
+                },
+                body: JSON.stringify(body)
+            });
+
+            console.log('[VEO] response status:', resp.status);
 
             if (!resp.ok) {
                 let detail = '';
-                try { const err = await resp.json(); detail = err.error?.message || JSON.stringify(err); }
+                try { const err = await resp.json(); detail = err.error?.message || err.message || JSON.stringify(err); }
                 catch { detail = await resp.text(); }
                 throw new Error('HTTP ' + resp.status + ': ' + detail);
             }
 
             const data = await resp.json();
-            console.log('[VEO]', data);
+            console.log('[VEO] response data:', data);
 
-            // 处理返回结果
-            const taskId = data.task_id || data.id || null;
-            if (taskId) {
-                showMsg('info', '⏳ 任务已提交，等待生成...');
-                const videoUrl = await pollTask(apiKey, taskId);
+            // 处理返回结果——可能直接返回视频url或返回task_id
+            let videoUrl = null;
+            if (data.data && data.data.length > 0) {
+                videoUrl = data.data[0].url || data.data[0].video_url || null;
+            }
+            if (!videoUrl) videoUrl = data.url || data.video_url || data.output?.video_url || data.output?.url || null;
+            
+            if (videoUrl) {
+                displayVideo(videoUrl);
+                showMsg('success', '✅ 视频生成完成！');
+            } else if (data.task_id || data.id) {
+                const taskId = data.task_id || data.id;
+                showMsg('info', '⏳ 任务已提交，等待生成... (task: ' + taskId + ')');
+                videoUrl = await pollTask(apiKey, taskId);
                 if (videoUrl) {
                     displayVideo(videoUrl);
                     showMsg('success', '✅ 视频生成完成！');
-                }
-            } else if (data.data && data.data.length > 0) {
-                const src = data.data[0].url || data.data[0].b64_json;
-                if (src) {
-                    displayVideo(src);
-                    showMsg('success', '✅ 视频生成完成！');
                 } else {
-                    throw new Error('未找到视频链接');
+                    showMsg('info', '任务仍在处理中，请稍后查看');
                 }
             } else {
-                throw new Error('API 返回为空');
+                throw new Error('API 返回结构未知:\n' + JSON.stringify(data).slice(0, 300));
             }
 
         } catch(err) {
-            console.error(err);
+            console.error('[VEO error]', err);
             showMsg('error', err.message || '请求失败');
         }
 
@@ -709,20 +774,35 @@
         generateBtn.disabled = false;
     }
 
+    // 文件转 base64
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
     async function pollTask(apiKey, taskId, maxAttempts = 60, interval = 3000) {
         for (let i = 0; i < maxAttempts; i++) {
             await sleep(interval);
             try {
                 const resp = await fetch(API_BASE + '/v1/video/status/' + taskId, {
-                    headers: { 'Authorization': 'Bearer ' + apiKey }
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer ' + apiKey 
+                    }
                 });
                 if (!resp.ok) continue;
                 const data = await resp.json();
-                const status = (data.status || data.state || '').toLowerCase();
+                console.log('[VEO poll]', data);
+                const status = (data.status || data.state || data.task_status || '').toLowerCase();
                 if (status === 'succeeded' || status === 'completed' || status === 'done') {
-                    return data.output?.url || data.url || data.data?.url || data.video_url || null;
+                    return data.output?.video_url || data.output?.url || data.video_url || data.url || data.data?.url || null;
                 } else if (status === 'failed' || status === 'error') {
-                    throw new Error('生成失败: ' + (data.error || ''));
+                    throw new Error('生成失败: ' + (data.error || data.message || ''));
                 }
                 if (i % 5 === 0) showMsg('info', '⏳ 生成中... (' + Math.round(i * interval / 1000) + 's)');
             } catch(e) {
