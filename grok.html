@@ -37,6 +37,40 @@ select option{background:#0c0c18;color:#e0e0e0}
 video{width:100%;border-radius:10px}
 .model-desc{background:rgba(16,163,127,.06);border:1px solid rgba(16,163,127,.1);border-radius:10px;padding:.6rem .9rem;margin-bottom:.8rem;font-size:.82rem}
 .status-text{font-size:.85rem;color:#93c5fd;margin-top:.5rem}
+
+/* ─── upload zone: shared across all pages ─── */
+input[type="file"] {
+    border: 2px dashed rgba(255,255,255,0.08) !important;
+    border-radius: 12px !important;
+    padding: 1.8rem 1rem !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    background: rgba(255,255,255,0.01) !important;
+    color: transparent !important;
+    min-height: 80px;
+    position: relative;
+}
+input[type="file"]:hover {
+    border-color: rgba(99,102,241,0.35) !important;
+    background: rgba(99,102,241,0.025) !important;
+}
+input[type="file"]::file-selector-button {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(99,102,241,0.3);
+    background: rgba(99,102,241,0.08);
+    color: rgba(255,255,255,0.7);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 0.5rem;
+}
+input[type="file"]::file-selector-button:hover {
+    background: rgba(99,102,241,0.15);
+    color: #fff;
+}
 .history-item{display:flex;gap:.8rem;padding:.8rem 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:center}
 .history-item:last-child{border-bottom:none}
 .history-thumb{width:80px;height:45px;border-radius:6px;background:rgba(255,255,255,.04);flex-shrink:0;overflow:hidden}
@@ -46,30 +80,6 @@ video{width:100%;border-radius:10px}
 .history-info .hi-prompt{font-size:.8rem;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .history-info .hi-time{font-size:.7rem;color:#555}
 .history-actions{display:flex;gap:.3rem}
-
-/* ─── upload zone remake ─── */
-.upload-zone{
-  border:1.5px dashed rgba(255,255,255,.1);
-  border-radius:10px;padding:1.5rem 1rem;
-  text-align:center;cursor:pointer;position:relative;
-  transition:all .25s;background:rgba(255,255,255,.02);
-}
-.upload-zone:hover{border-color:rgba(16,163,127,.4);background:rgba(16,163,127,.03)}
-.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
-.upload-zone .uz-icon{font-size:1.5rem;margin-bottom:.3rem;opacity:.5}
-.upload-zone .uz-text{font-size:.78rem;color:#666;line-height:1.4}
-.upload-zone .uz-text strong{color:#10a37f;font-weight:500}
-.upload-zone.has-files{border-color:rgba(16,163,127,.25);border-style:solid;padding:.75rem}
-.upload-zone.has-files .uz-icon,.upload-zone.has-files .uz-text{display:none}
-.uz-preview{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
-.uz-preview img{max-height:90px;border-radius:6px;display:block}
-.uz-url-input{margin-top:.6rem}
-.uz-url-input input{background:rgba(255,255,255,.03);font-size:.82rem;padding:.55rem .8rem}
-.uz-meta{display:flex;justify-content:space-between;align-items:center;margin-top:.5rem}
-.uz-meta .uz-count{font-size:.75rem;color:#555}
-.uz-meta .uz-clear{font-size:.7rem;color:#666;border:1px solid rgba(255,255,255,.06);padding:.15rem .5rem;border-radius:5px;cursor:pointer;background:none;transition:all .15s}
-.uz-meta .uz-clear:hover{background:rgba(255,255,255,.04);color:#a0a0a0}
-
 </style>
 </head>
 <body>
@@ -122,17 +132,17 @@ video{width:100%;border-radius:10px}
   </div>
   <div class="form-group" style="border:1px dashed rgba(255,255,255,.08);border-radius:10px;padding:1rem;">
     <label style="display:flex;align-items:center;gap:.4rem">
-      <input type="checkbox" id="enableImage" class="uz-checkbox" /> <span style="opacity:.7">垫图</span>
+      <input type="checkbox" id="enableImage" /> 垫图
     </label>
     <div id="imageFields" style="display:none;margin-top:.8rem">
       <div class="form-group">
         <label>上传图片（自动转 URL）</label>
-        <div class="upload-zone"><input type="file" id="imageFileInput" accept="image/*" multiple /><div class="uz-icon">🖼️</div><div class="uz-text">点击选择 <strong>参考图片</strong></div><div class="uz-preview" id="grokImgPreview"></div></div>
+        <input type="file" id="imageFileInput" accept="image/*" multiple style="padding:.5rem;font-size:.8rem" />
         <div style="font-size:.75rem;color:#666;margin-top:.3rem">垫图后视频尺寸跟着图片尺寸走</div>
       </div>
       <div class="form-group" style="margin-top:.5rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.06)">
         <label>或粘贴图片 URL</label>
-        <div class="uz-url-input"><input type="text" id="imageUrls" placeholder="或粘贴图片URL（多张用逗号分隔）" /></div>
+        <input type="text" id="imageUrls" placeholder="https://example.com/img.png" />
         <div style="font-size:.75rem;color:#666;margin-top:.3rem">多个 URL 用逗号分隔，填 URL 时忽略上方上传文件</div>
       </div>
     </div>
