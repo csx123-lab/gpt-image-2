@@ -140,6 +140,22 @@ video { width: 100%; border-radius: 10px; }
   </div>
 
   <div class="form-group">
+    <label>参考图片（可选，符合模型支持的类型）</label>
+    <input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp" multiple style="padding:0.5rem;font-size:0.8rem;" />
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>首帧（可选）</label>
+      <input type="file" id="startFrameInput" accept="image/png,image/jpeg,image/webp" style="padding:0.5rem;font-size:0.8rem;" />
+    </div>
+    <div class="form-group">
+      <label>尾帧（可选）</label>
+      <input type="file" id="endFrameInput" accept="image/png,image/jpeg,image/webp" style="padding:0.5rem;font-size:0.8rem;" />
+    </div>
+  </div>
+
+  <div class="form-group">
     <label>视频描述 (Prompt)</label>
     <textarea id="prompt" placeholder="A cat running in the park"></textarea>
   </div>
@@ -198,6 +214,19 @@ $('generateBtn').addEventListener('click', async function() {
       enable_upsample: '1'
     };
 
+    // 处理图片上传
+    const refFiles = $('imageInput').files;
+    const startFile = $('startFrameInput').files[0];
+    const endFile = $('endFrameInput').files[0];
+    const hasImages = refFiles.length > 0 || startFile || endFile;
+
+    if (hasImages) {
+      body.images = [];
+      for (const f of refFiles) body.images.push(await fileToBase64(f));
+      if (startFile) body.images.push(await fileToBase64(startFile));
+      if (endFile) body.images.push(await fileToBase64(endFile));
+    }
+
     console.log('Request:', JSON.stringify(body, null, 2));
     showMsg('info', '正在提交请求...');
 
@@ -249,7 +278,14 @@ $('generateBtn').addEventListener('click', async function() {
   this.textContent = '生成视频';
 });
 
-async function pollTask(apiKey, taskId, maxTry = 60) {
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}async function pollTask(apiKey, taskId, maxTry = 60) {
   for (let i = 0; i < maxTry; i++) {
     await new Promise(r => setTimeout(r, 3000));
     try {
