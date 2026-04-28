@@ -98,13 +98,18 @@ video{width:100%;border-radius:10px}
   </div>
   <div class="form-group" style="border:1px dashed rgba(255,255,255,.08);border-radius:10px;padding:1rem;">
     <label style="display:flex;align-items:center;gap:.4rem">
-      <input type="checkbox" id="enableImage" /> 垫图（图片 URL）
+      <input type="checkbox" id="enableImage" /> 垫图
     </label>
     <div id="imageFields" style="display:none;margin-top:.8rem">
       <div class="form-group">
-        <label>图片 URL（多张用逗号分隔）</label>
-        <input type="text" id="imageUrls" placeholder="https://example.com/img1.png, https://example.com/img2.png" />
+        <label>上传图片（自动转 URL）</label>
+        <input type="file" id="imageFileInput" accept="image/*" multiple style="padding:.5rem;font-size:.8rem" />
         <div style="font-size:.75rem;color:#666;margin-top:.3rem">垫图后视频尺寸跟着图片尺寸走</div>
+      </div>
+      <div class="form-group" style="margin-top:.5rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.06)">
+        <label>或粘贴图片 URL</label>
+        <input type="text" id="imageUrls" placeholder="https://example.com/img.png" />
+        <div style="font-size:.75rem;color:#666;margin-top:.3rem">多个 URL 用逗号分隔，填 URL 时忽略上方上传文件</div>
       </div>
     </div>
   </div>
@@ -173,8 +178,19 @@ $('generateBtn').onclick=async function(){
   try{
     const body={model,prompt,aspect_ratio:$('aspectSelect').value,size:$('sizeSelect').value};
     if($('enableImage').checked){
-      const urls=$('imageUrls').value.trim().split(',').map(s=>s.trim()).filter(Boolean);
-      if(urls.length>0)body.images=urls;
+      // 先检查是否有 URL
+      const urlText=$('imageUrls').value.trim();
+      const urlImages=urlText.split(',').map(s=>s.trim()).filter(Boolean);
+      if(urlImages.length>0){
+        body.images=urlImages;
+      } else {
+        // 上传文件 -> canvas 压缩 -> base64
+        const files=$('imageFileInput').files;
+        if(files.length>0){
+          body.images=[];
+          for(const f of files) body.images.push(await fileToBase64(f));
+        }
+      }
     }
 
     sm('info','提交任务...');
@@ -225,6 +241,28 @@ function sm(t,txt){$('messageArea').innerHTML='<div class="msg msg-'+t+'">'+txt+
 function clr(){$('messageArea').innerHTML='';$('statusText').textContent=''}
 try{const s=localStorage.getItem('gk_video_key');if(s)$('apiKey').value=s}catch(e){}
 $('apiKey').oninput=function(){try{localStorage.setItem('gk_video_key',this.value.trim())}catch(e){}};
+
+// 图片转 base64（canvas 压缩）
+function fileToBase64(file){
+  return new Promise((ok,no)=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const c=document.createElement('canvas');
+        let w=img.width,h=img.height,mx=1024;
+        if(w>mx||h>mx){if(w>h){h=Math.round(h*mx/w);w=mx}else{w=Math.round(w*mx/h);h=mx}}
+        c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        ok(c.toDataURL(file.type,.7));
+      };
+      img.onerror=()=>ok(r.result);
+      img.src=r.result;
+    };
+    r.onerror=no;
+    r.readAsDataURL(file);
+  });
+}
 </script>
 </body>
 </html>
