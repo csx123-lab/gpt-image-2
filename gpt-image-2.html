@@ -335,7 +335,7 @@
                 <div class="upload-area" id="uploadArea">
                     <input type="file" id="refImageInput" accept="image/png,image/jpeg,image/webp" multiple />
                     <div class="upload-icon">🖼️</div>
-                    <div class="upload-text">点击选择 <b>参考图片</b>（支持 Ctrl/Shift 多选）</div>
+                    <div class="upload-text">点击选择 <b>参考图片</b>（自动上传到图床）</div>
                     <div class="ref-preview" id="refPreviewArea"></div>
                 </div>
             </div>
@@ -442,6 +442,7 @@
     const clearRefBtn = $('clearRefBtn');
 
     const API_BASE = 'https://api.vectorengine.cn';
+    const IMG_HOST = 'https://imageproxy.zhongzhuan.chat/api/upload';
     let refImages = [];
     let abortController = null;
     let generatedImages = [];
@@ -452,32 +453,60 @@
         if (!toggleEdit.checked) { refImages = []; refPreviewArea.innerHTML = ''; uploadArea.classList.remove('has-image'); refImageInput.value = ''; refCount.textContent = '已选 0 张'; clearRefBtn.style.display = 'none'; }
     });
 
-    refImageInput.addEventListener('change', function(e) {
-        refImages = Array.from(e.target.files);
+    refImageInput.addEventListener('change', async function(e) {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+
+        // Auto-upload to image host
+        const refUrlInput = $('refImageUrl');
+        const uploadedUrls = [];
+
+        for (const file of files) {
+            uploadArea.classList.add('has-image');
+            refCount.textContent = '上传中...';
+            try {
+                const fd = new FormData();
+                fd.append('file', file);
+                const res = await fetch(IMG_HOST, { method: 'POST', body: fd });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                if (data.url) uploadedUrls.push(data.url);
+            } catch (err) {
+                console.error('上传失败:', file.name, err);
+                showMsg('error', file.name + ' 上传失败：' + (err.message || '未知错误'));
+            }
+        }
+
+        if (uploadedUrls.length > 0) {
+            const existing = refUrlInput.value.trim();
+            const newUrls = uploadedUrls.join(', ');
+            refUrlInput.value = existing ? existing + ', ' + newUrls : newUrls;
+        }
+
+        refCount.textContent = '已上传 ' + uploadedUrls.length + ' / ' + files.length + ' 张';
+        clearRefBtn.style.display = '';
+
+        // Show thumbnails
         refPreviewArea.innerHTML = '';
-        if (refImages.length === 0) { uploadArea.classList.remove('has-image'); refCount.textContent = '已选 0 张'; clearRefBtn.style.display = 'none'; return; }
-        uploadArea.classList.add('has-image');
-        // 显示最多前 6 张缩略图
-        for (let i = 0; i < Math.min(refImages.length, 6); i++) {
+        for (let i = 0; i < Math.min(files.length, 6); i++) {
             const img = document.createElement('img');
-            img.src = URL.createObjectURL(refImages[i]);
-            img.title = refImages[i].name;
+            img.src = URL.createObjectURL(files[i]);
+            img.title = files[i].name;
             refPreviewArea.appendChild(img);
         }
-        if (refImages.length > 6) {
+        if (files.length > 6) {
             const more = document.createElement('div');
-            more.style.cssText = 'display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:6px;background:rgba(255,255,255,0.05);color:#a0a0b8;font-size:0.8rem;';
-            more.textContent = '+' + (refImages.length - 6);
+            more.style.cssText = 'display:flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:6px;background:rgba(255,255,255,0.03);color:#888;font-size:0.75rem;';
+            more.textContent = '+' + (files.length - 6);
             refPreviewArea.appendChild(more);
         }
-        refCount.textContent = '已选 ' + refImages.length + ' 张';
-        clearRefBtn.style.display = '';
     });
 
     clearRefBtn.addEventListener('click', function() {
         refImages = [];
         refPreviewArea.innerHTML = '';
         refImageInput.value = '';
+        $('refImageUrl').value = '';
         uploadArea.classList.remove('has-image');
         refCount.textContent = '已选 0 张';
         clearRefBtn.style.display = 'none';
@@ -504,49 +533,29 @@
 
         try {
             let resp;
-            if (toggleEdit.checked && (refImages.length > 0 || $('refImageUrl').value.trim())) {
-                // 图生图
-                const refUrlInput = $('refImageUrl');
-                const imageUrls = refUrlInput.value.trim().split(',').map(s => s.trim()).filter(Boolean);
+            const refUrl = $('refImageUrl').value.trim();
+            const isEdit = toggleEdit.checked && refUrl;
 
-                if (imageUrls.length > 0) {
-                    // URL 模式: POST /v1/images/generations (JSON) 传 image 参数
-                    console.log('[generate] 使用图片URL:', imageUrls);
-                    showMsg('info', '⏳ 正在使用图片 URL 生成...');
-                    const url = API_BASE + '/v1/images/generations';
-                    const body = {
-                        model: model,
-                        prompt: prompt,
-                        n: parseInt(countSelect.value),
-                        size: sizeSelect.value,
-                        quality: qualitySelect.value,
-                        image: imageUrls
-                    };
-                    resp = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-                        body: JSON.stringify(body),
-                        signal: signal
-                    });
-                } else if (refImages.length > 0) {
-                    // 文件上传模式: POST /v1/images/edits (multipart/form-data)
-                    const url = API_BASE + '/v1/images/edits';
-                    const formData = new FormData();
-                    formData.append('model', model);
-                    formData.append('prompt', prompt);
-                    formData.append('image', refImages[0]);
-                    for (let i = 1; i < refImages.length; i++) {
-                        formData.append('image', refImages[i]);
-                    }
-                    console.log('[edits] 参考图数:', refImages.length);
-                    showMsg('info', '⏳ 正在编辑图片（' + refImages.length + ' 张参考图）...');
-                    resp = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Authorization': 'Bearer ' + apiKey },
-                        body: formData,
-                        signal: signal
-                    });
-                }
+            if (isEdit) {
+                // 图生图 - 用图床URL，走 JSON generations 接口
+                const imageUrls = refUrl.split(',').map(s => s.trim()).filter(Boolean);
+                console.log('[generate] 使用图床图片URL:', imageUrls);
+                showMsg('info', '⏳ 正在生成图片（图生图模式）...');
+                const url = API_BASE + '/v1/images/generations';
+                const body = {
+                    model: model,
+                    prompt: prompt,
+                    n: parseInt(countSelect.value),
+                    size: sizeSelect.value,
+                    quality: qualitySelect.value,
+                    image: imageUrls
+                };
+                resp = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+                    body: JSON.stringify(body),
+                    signal: signal
+                });
             } else {
                 // 文生图: POST /v1/images/generations (JSON)
                 const url = API_BASE + '/v1/images/generations';
