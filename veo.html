@@ -174,6 +174,29 @@ video { width: 100%; border-radius: 10px; }
     </select>
   </div>
 
+  <div class="form-group" id="imageGroup" style="border:1px dashed rgba(255,255,255,0.08);border-radius:10px;padding:1rem;">
+    <label style="display:flex;align-items:center;gap:0.4rem;">
+      <input type="checkbox" id="enableImage" />
+      上传参考图 / 首尾帧
+    </label>
+    <div id="imageFields" style="display:none;margin-top:0.8rem;">
+      <div class="form-group">
+        <label>参考图片（多选，元素图/参考图）</label>
+        <input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp" multiple style="padding:0.5rem;font-size:0.8rem;" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>首帧</label>
+          <input type="file" id="startFrameInput" accept="image/png,image/jpeg,image/webp" style="padding:0.5rem;font-size:0.8rem;" />
+        </div>
+        <div class="form-group">
+          <label>尾帧</label>
+          <input type="file" id="endFrameInput" accept="image/png,image/jpeg,image/webp" style="padding:0.5rem;font-size:0.8rem;" />
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="form-group">
     <label>视频描述 (Prompt)</label>
     <textarea id="prompt" placeholder="A cat running in the park"></textarea>
@@ -217,6 +240,11 @@ modelSelect.addEventListener('change', function() {
   modelDesc.textContent = this.value + ' - ' + (m ? m.desc : '');
 });
 modelSelect.dispatchEvent(new Event('change'));
+const enableImage = document.getElementById('enableImage');
+const imageFields = document.getElementById('imageFields');
+if (enableImage) enableImage.addEventListener('change', function() {
+  imageFields.style.display = this.checked ? 'block' : 'none';
+});
 
 // 历史记录
 function getHistory() {
@@ -317,6 +345,19 @@ $('generateBtn').addEventListener('click', async function() {
       enable_upsample: true
     };
 
+    if (document.getElementById('enableImage').checked) {
+      const rf = document.getElementById('imageInput').files;
+      const sf = document.getElementById('startFrameInput').files[0];
+      const ef = document.getElementById('endFrameInput').files[0];
+      const hasImg = rf.length > 0 || sf || ef;
+      if (hasImg) {
+        body.images = [];
+        for (const f of rf) body.images.push(await fileToBase64(f));
+        if (sf) body.images.push(await fileToBase64(sf));
+        if (ef) body.images.push(await fileToBase64(ef));
+      }
+    }
+
     const resp = await fetch(API_BASE + '/v1/video/create', {
       method: 'POST',
       headers: {
@@ -407,6 +448,32 @@ async function queryTask(apiKey, taskId, model, prompt, maxTry = 60) {
     }
   }
   showMsg('info', '超时，任务可能仍在处理');
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        const max = 1024;
+        if (w > max || h > max) {
+          if (w > h) { h = Math.round(h * max / w); w = max; }
+          else { w = Math.round(w * max / h); h = max; }
+        }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL(file.type, 0.7));
+      };
+      img.onerror = () => resolve(reader.result);
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function showMsg(type, text) {
