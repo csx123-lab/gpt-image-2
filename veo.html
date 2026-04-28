@@ -86,6 +86,7 @@ select option { background: #0c0c18; color: #e0e0e0; }
   margin-top: 0.8rem; font-size: 0.85rem;
 }
 .msg-error { color: #f87171; background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.12); }
+.msg-warning { color: #fbbf24; background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.12); }
 .msg-info { color: #93c5fd; background: rgba(147,197,253,0.06); border: 1px solid rgba(147,197,253,0.12); }
 .msg-success { color: #6ee7b7; background: rgba(110,231,183,0.06); border: 1px solid rgba(110,231,183,0.12); }
 
@@ -418,7 +419,7 @@ function showVideo(data, model, prompt, apiKey) {
   showMsg('success', '生成成功！');
 }
 
-async function queryTask(apiKey, taskId, model, prompt, maxTry = 60) {
+async function queryTask(apiKey, taskId, model, prompt, maxTry = 120) {
   for (let i = 0; i < maxTry; i++) {
     await new Promise(r => setTimeout(r, 3000));
     try {
@@ -431,23 +432,34 @@ async function queryTask(apiKey, taskId, model, prompt, maxTry = 60) {
         },
         body: JSON.stringify({ task_id: taskId })
       });
-      if (!resp.ok) continue;
+      if (!resp.ok) {
+        if (i % 10 === 0) showMsg('warning', '查询状态失败 (' + resp.status + ')，重试中...');
+        continue;
+      }
       const data = await resp.json();
-      console.log('Query response:', data);
+      console.log('Query response [' + i + ']:', JSON.stringify(data).slice(0, 300));
       
-      if (data.status === 'SUCCESS' && data.data) {
-        showVideo(data, model, prompt, apiKey);
-        return;
+      // 各种成功状态
+      const st = (data.status || '').toUpperCase();
+      if (st === 'SUCCESS' || st === 'COMPLETED' || st === 'DONE' || st === 'SUCCEEDED') {
+        if (data.data && (data.data.video_url || data.data.detail?.download_url)) {
+          showVideo(data, model, prompt, apiKey);
+          return;
+        }
       }
-      if (data.status === 'FAILED' || data.fail_reason) {
-        throw new Error('生成失败: ' + (data.fail_reason || ''));
+      
+      // 失败
+      if (st === 'FAILED' || st === 'FAILURE' || st === 'ERROR' || st === 'FAIL') {
+        throw new Error('生成失败: ' + (data.fail_reason || data.error || data.message || ''));
       }
+      
       if (i % 10 === 0) showMsg('info', '生成中... (' + Math.round(i * 3) + 's)');
     } catch(e) {
-      if (i > 3) throw e;
+      if (e.message && e.message.includes('生成失败')) throw e;
+      if (i > 5) throw e;
     }
   }
-  showMsg('info', '超时，任务可能仍在处理');
+  showMsg('warning', '等待超时（6分钟），任务可能仍在处理，task_id: ' + taskId);
 }
 
 function fileToBase64(file) {
