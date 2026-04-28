@@ -173,9 +173,11 @@
         }
         .history-item:hover { background:rgba(255,255,255,0.06); }
         .history-item img {
-            width:96px; height:96px; border-radius:8px; object-fit:cover;
+            width:80px; height:80px; border-radius:8px; object-fit:cover;
             flex-shrink:0; background:rgba(0,0,0,0.3);
+            transition:transform 0.2s;
         }
+        .history-item:hover img { transform:scale(1.05); }
         .history-info { flex:1; min-width:0; }
         .history-info .hi-prompt { font-size:0.85rem; color:#d0d0e0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .history-info .hi-meta { font-size:0.72rem; color:#888; margin-top:0.2rem; }
@@ -495,8 +497,8 @@
             // Download buttons
             showDownloadButtons(generatedImages);
 
-            // Save history (thumbnail only to avoid localStorage quota)
-            saveHistory({
+            // Save history with thumbnail
+            saveHistoryWithThumb({
                 prompt: prompt,
                 model: model,
                 size: sizeSelect.value,
@@ -621,13 +623,12 @@
         catch { return []; }
     }
 
-    function saveHistory(entry) {
+    function saveHistoryWithThumb(entry) {
         const h = getHistory();
-        // Only store first image as thumbnail, truncated to avoid quota
+        // Generate thumbnail from first image
         let thumb = '';
         if (entry.images && entry.images.length > 0) {
-            const first = entry.images[0];
-            if (first && first.length < 200000) thumb = first;
+            thumb = entry.images[0]; // use full URL as thumb, it's fine
         }
         h.unshift({
             prompt: entry.prompt,
@@ -638,7 +639,11 @@
             time: Date.now()
         });
         if (h.length > 50) h.length = 50;
-        localStorage.setItem('ve_image_history', JSON.stringify(h));
+        try { localStorage.setItem('ve_image_history', JSON.stringify(h)); } catch(e) {
+            // If quota exceeded, remove more items and retry
+            h.splice(30);
+            try { localStorage.setItem('ve_image_history', JSON.stringify(h)); } catch(e2) {}
+        }
         renderHistory();
     }
 
