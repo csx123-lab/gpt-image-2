@@ -517,10 +517,9 @@
 
         modelInfo.innerHTML = html;
 
-        // veo2 / veo3 切换
-        const isVeo3 = val.startsWith('veo3');
-        $('aspectGroup').style.display = isVeo3 ? 'block' : 'none';
-        $('sizeGroup').style.display = isVeo3 ? 'none' : 'block';
+        // 所有模型都是 VEO 3.1 系列，统一显示 aspect_ratio
+        $('aspectGroup').style.display = 'block';
+        $('sizeGroup').style.display = 'none';
 
         // 重置图片上传状态
         enableImage.checked = false;
@@ -624,17 +623,10 @@
             const body = {
                 model: model,
                 prompt: prompt,
+                aspect_ratio: $('aspectSelect').value,
                 enhance_prompt: true,
-                enable_upsample: 'none'
+                enable_upsample: '1'
             };
-
-            // veo3 系列用 aspect_ratio，veo2 系列用 size
-            const isVeo3 = model.startsWith('veo3');
-            if (isVeo3) {
-                body.aspect_ratio = $('aspectSelect').value;
-            } else {
-                body.size = $('sizeSelect').value;
-            }
 
             // 图片处理
             const hasRef = enableImage.checked && refFiles.length > 0;
