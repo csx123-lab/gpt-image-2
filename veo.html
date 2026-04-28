@@ -367,12 +367,10 @@
 
         <div class="form-row">
             <div class="form-group">
-                <label>尺寸</label>
-                <select id="sizeSelect">
-                    <option value="1920x1080">1920 × 1080</option>
-                    <option value="1280x720">1280 × 720</option>
-                    <option value="720x1280">720 × 1280（竖版）</option>
-                    <option value="1080x1920">1080 × 1920（竖版）</option>
+                <label>画面比例</label>
+                <select id="aspectSelect">
+                    <option value="16:9">16:9（横屏）</option>
+                    <option value="9:16">9:16（竖屏）</option>
                 </select>
             </div>
             <div class="form-group">
@@ -637,7 +635,7 @@
                 const formData = new FormData();
                 formData.append('model', model);
                 formData.append('prompt', prompt);
-                formData.append('size', $('sizeSelect').value);
+                formData.append('aspect_ratio', $('aspectSelect').value);
                 formData.append('duration', '8');
 
                 if (hasRef) {
@@ -661,7 +659,7 @@
                     model: model,
                     prompt: prompt,
                     n: 1,
-                    size: $('sizeSelect').value,
+                    aspect_ratio: $('aspectSelect').value,
                     duration: 8
                 };
                 showMsg('info', '⏳ 正在生成视频...');
