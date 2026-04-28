@@ -363,7 +363,7 @@ $('generateBtn').addEventListener('click', async function() {
     }
 
     showMsg('info', '任务已提交，查询进度中...');
-    showProgress(true, 0);
+    try { showProgress(true, 0); } catch(e) { console.log('progress err:', e); }
     pollTask(apiKey, taskId, model, prompt);
 
   } catch (err) {
@@ -398,14 +398,14 @@ async function pollTask(apiKey, taskId, model, prompt) {
       // 完成
       const st = (data.status || '').toLowerCase();
       if (st === 'completed' && data.video_url) {
-        showProgress(false);
+        try { showProgress(false); } catch(e) {}
         showVideo(data.video_url, model, prompt);
         return;
       }
 
       // 失败
       if (st === 'failed' || st === 'error') {
-        showProgress(false);
+        try { showProgress(false); } catch(e) {}
         const errMsg = data.error || (data.data && data.data.error && data.data.error.message) || data.fail_reason || st;
         showMsg('error', '生成失败: ' + errMsg);
         return;
@@ -418,7 +418,7 @@ async function pollTask(apiKey, taskId, model, prompt) {
     }
   }
 
-  showProgress(false);
+  try { showProgress(false); } catch(e) {}
   showMsg('warning', '等待超时，task_id: ' + taskId);
 }
 
