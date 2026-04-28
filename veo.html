@@ -379,13 +379,15 @@ $('generateBtn').addEventListener('click', async function() {
     const data = await resp.json();
     console.log('Create response:', data);
 
-    if (data.status === 'SUCCESS' && data.data) {
+    if (data.status === 'SUCCESS' && data.data && (data.data.video_url || data.data.detail?.download_url)) {
       showVideo(data, model, prompt, apiKey);
-    } else if (data.task_id) {
-      showMsg('info', '任务已提交，等待生成...');
-      await queryTask(apiKey, data.task_id, model, prompt);
+    } else if (data.status === 'SUCCESS' && data.data) {
+      // data.video_url 可能在 data 里面的 detail 或其他位置
+      showMsg('info', '返回数据：' + JSON.stringify(data).slice(0, 200));
     } else {
-      showMsg('info', '返回：' + JSON.stringify(data).slice(0, 200));
+      // status: pending - 等待后重试
+      showMsg('info', '任务已提交 (id: ' + (data.id || taskId) + ')，等待完成...');
+      await waitAndRetry(apiKey, data.id || taskId, model, prompt, body, 120);
     }
 
   } catch (err) {
@@ -419,47 +421,37 @@ function showVideo(data, model, prompt, apiKey) {
   showMsg('success', '生成成功！');
 }
 
-async function queryTask(apiKey, taskId, model, prompt, maxTry = 120) {
+async function waitAndRetry(apiKey, taskId, model, prompt, body, maxTry) {
   for (let i = 0; i < maxTry; i++) {
     await new Promise(r => setTimeout(r, 3000));
     try {
-      const resp = await fetch(API_BASE + '/v1/video/query', {
+      const resp = await fetch(API_BASE + '/v1/video/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Authorization': 'Bearer ' + apiKey
         },
-        body: JSON.stringify({ task_id: taskId })
+        body: JSON.stringify(body)
       });
-      if (!resp.ok) {
-        if (i % 10 === 0) showMsg('warning', '查询状态失败 (' + resp.status + ')，重试中...');
-        continue;
-      }
+      if (!resp.ok) continue;
       const data = await resp.json();
-      console.log('Query response [' + i + ']:', JSON.stringify(data).slice(0, 300));
+      console.log('Retry [' + i + ']:', JSON.stringify(data).slice(0, 200));
       
-      // 各种成功状态
-      const st = (data.status || '').toUpperCase();
-      if (st === 'SUCCESS' || st === 'COMPLETED' || st === 'DONE' || st === 'SUCCEEDED') {
-        if (data.data && (data.data.video_url || data.data.detail?.download_url)) {
+      if (data.status === 'SUCCESS' && data.data) {
+        const vu = data.data.video_url || data.data.detail?.download_url || '';
+        if (vu) {
           showVideo(data, model, prompt, apiKey);
           return;
         }
       }
       
-      // 失败
-      if (st === 'FAILED' || st === 'FAILURE' || st === 'ERROR' || st === 'FAIL') {
-        throw new Error('生成失败: ' + (data.fail_reason || data.error || data.message || ''));
-      }
-      
       if (i % 10 === 0) showMsg('info', '生成中... (' + Math.round(i * 3) + 's)');
     } catch(e) {
-      if (e.message && e.message.includes('生成失败')) throw e;
       if (i > 5) throw e;
     }
   }
-  showMsg('warning', '等待超时（6分钟），任务可能仍在处理，task_id: ' + taskId);
+  showMsg('warning', '等待超时（6分钟），task_id: ' + taskId);
 }
 
 function fileToBase64(file) {
