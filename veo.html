@@ -407,7 +407,8 @@ async function pollTask(apiKey, taskId, model, prompt) {
       // 失败
       if (st === 'failed' || st === 'error') {
         showProgress(false);
-        showMsg('error', '生成失败: ' + (data.error || data.fail_reason || st));
+        const errMsg = data.error || (data.data && data.data.error && data.data.error.message) || data.fail_reason || st;
+        showMsg('error', '生成失败: ' + errMsg);
         return;
       }
 
