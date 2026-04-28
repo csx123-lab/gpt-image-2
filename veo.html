@@ -199,10 +199,9 @@ video { width: 100%; border-radius: 10px; }
   </div>
 
   <button class="btn" id="generateBtn">生成视频</button>
-  <div id="messageArea">
-    <div class="progress-bar" id="progressBar" style="display:none;">
-      <div class="progress-bar-inner" id="progressInner"></div>
-    </div>
+  <div id="messageArea"></div>
+  <div class="progress-bar" id="progressBar" style="display:none;">
+    <div class="progress-bar-inner" id="progressInner"></div>
   </div>
 </div>
 
@@ -364,7 +363,7 @@ $('generateBtn').addEventListener('click', async function() {
     }
 
     showMsg('info', '任务已提交，查询进度中...');
-    showProgress(true);
+    showProgress(true, 0);
     pollTask(apiKey, taskId, model, prompt);
 
   } catch (err) {
