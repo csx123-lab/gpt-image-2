@@ -6,101 +6,174 @@
 <title>千亿AI - VEO 视频生成</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0a0a14;color:#e0e0e0;min-height:100vh}
-.container{max-width:600px;margin:0 auto;padding:2rem 1rem}
-header{text-align:center;margin-bottom:2rem}
-header h1{font-size:1.5rem;font-weight:700;margin-bottom:.3rem}
-header p{color:#666;font-size:.82rem}
-.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1rem}
-.card h3{font-size:.8rem;color:#7878a0;margin-bottom:1rem;font-weight:600}
-.form-group{margin-bottom:1rem}
-.form-group label{display:block;font-size:.8rem;color:#8888aa;margin-bottom:.3rem;font-weight:500}
-input,textarea,select{width:100%;padding:.7rem .9rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:#e0e0e0;font-size:.9rem;outline:none;font-family:inherit}
-textarea{resize:vertical;min-height:70px}
-input:focus,textarea:focus,select:focus{border-color:#10a37f;box-shadow:0 0 0 1px rgba(16,163,127,.2)}
-select{cursor:pointer}
-select option{background:#0c0c18;color:#e0e0e0}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC",sans-serif;
+  background:#07070d;min-height:100vh;color:#d0d0e0;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 500px 350px at 15% 20%,rgba(99,102,241,.15) 0,transparent 70%),
+    radial-gradient(ellipse 400px 350px at 85% 80%,rgba(6,182,212,.08) 0,transparent 70%),
+    radial-gradient(ellipse 300px 300px at 50% 50%,rgba(168,85,247,.04) 0,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+.container{max-width:900px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-index:1}
 
-/* ─── upload zone: shared across all pages ─── */
-input[type="file"] {
-    border: 2px dashed rgba(255,255,255,0.08) !important;
-    border-radius: 12px !important;
-    padding: 1.8rem 1rem !important;
-    text-align: center !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    background: rgba(255,255,255,0.01) !important;
-    color: transparent !important;
-    min-height: 80px;
-    position: relative;
+/* header */
+header{text-align:center;margin-bottom:2.5rem}
+header .logo{display:inline-flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
+header .logo-icon{
+  width:38px;height:38px;background:linear-gradient(135deg,#6366f1,#06b6d4);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;color:#fff;box-shadow:0 4px 15px rgba(99,102,241,.25);
+  font-weight:700;
 }
-input[type="file"]:hover {
-    border-color: rgba(99,102,241,0.35) !important;
-    background: rgba(99,102,241,0.025) !important;
+header h1{font-size:1.9rem;font-weight:700;background:linear-gradient(135deg,#818cf8,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-1px}
+header .subtitle{color:#555;font-size:.82rem;letter-spacing:.3px;margin-top:.15rem}
+header .badge-row{display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:.75rem}
+header .badge{
+  display:inline-flex;align-items:center;gap:.35rem;
+  padding:.2rem .7rem;border-radius:20px;
+  background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.12);
+  font-size:.65rem;color:#818cf8;font-weight:500;letter-spacing:.5px;
 }
-input[type="file"]::file-selector-button {
-    display: inline-block;
-    padding: 0.35rem 1rem;
-    border-radius: 8px;
-    border: 1px solid rgba(99,102,241,0.3);
-    background: rgba(99,102,241,0.08);
-    color: rgba(255,255,255,0.7);
-    font-size: 0.78rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-right: 0.5rem;
+header .badge .dot{width:5px;height:5px;border-radius:50%;background:#818cf8;animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* cards */
+.card{
+  background:rgba(255,255,255,.025);backdrop-filter:blur(20px) saturate(1.3);
+  -webkit-backdrop-filter:blur(20px) saturate(1.3);
+  border:1px solid rgba(255,255,255,.06);border-radius:16px;
+  padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 8px 32px rgba(0,0,0,.3);
 }
-input[type="file"]::file-selector-button:hover {
-    background: rgba(99,102,241,0.15);
-    color: #fff;
+.card-title{
+  font-size:.8rem;font-weight:600;color:#666680;
+  margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;
+  text-transform:uppercase;letter-spacing:.8px;
 }
-@media(max-width:500px){.form-row{grid-template-columns:1fr}}
-.btn{width:100%;padding:.8rem;border:none;border-radius:12px;background:linear-gradient(135deg,#10a37f,#06b6d4);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s}
-.btn:hover{opacity:.9}
+
+/* form */
+.form-group{margin-bottom:1.2rem}
+.form-group label{
+  display:block;font-size:.75rem;font-weight:600;color:#666680;
+  margin-bottom:.45rem;text-transform:uppercase;letter-spacing:.5px;
+}
+input,textarea,select{
+  width:100%;padding:.7rem 1rem;background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.07);border-radius:10px;
+  color:#d0d0e0;font-size:.9rem;outline:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;font-family:inherit;
+}
+textarea{resize:vertical;min-height:80px}
+input:focus,textarea:focus,select:focus{
+  border-color:rgba(99,102,241,.45);
+  box-shadow:0 0 0 3px rgba(99,102,241,.08),0 0 15px rgba(99,102,241,.03);
+  background:rgba(99,102,241,.025);
+}
+select{cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 1rem center;
+}
+select option{background:#0e0e18;color:#d0d0e0}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}}
+.form-desc{
+  background:rgba(99,102,241,.04);border:1px solid rgba(99,102,241,.08);
+  border-radius:10px;padding:.55rem .8rem;margin-bottom:1rem;font-size:.78rem;color:#8888a0;
+}
+
+/* buttons */
+.btn{width:100%;padding:.85rem;border:none;border-radius:10px;
+  background:linear-gradient(135deg,#6366f1,#06b6d4);color:#fff;
+  font-size:.95rem;font-weight:600;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;
+  position:relative;overflow:hidden;
+}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,.08) 50%,transparent 70%);transition:transform .5s;transform:translateX(-100%)}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 25px rgba(99,102,241,.3)}
+.btn:hover::after{transform:translateX(100%)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-.btn-sm{padding:.4rem .8rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.04);color:#8888aa;font-size:.75rem;cursor:pointer}
-.btn-sm:hover{background:rgba(255,255,255,.08);color:#c0c0d0}
-.msg{padding:.7rem .9rem;border-radius:10px;margin-top:.8rem;font-size:.85rem}
-.msg-error{color:#f87171;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.12)}
-.msg-warning{color:#fbbf24;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.12)}
-.msg-info{color:#93c5fd;background:rgba(147,197,253,.06);border:1px solid rgba(147,197,253,.12)}
-.msg-success{color:#6ee7b7;background:rgba(110,231,183,.06);border:1px solid rgba(110,231,183,.12)}
+.btn-sm{
+  display:inline-flex;align-items:center;gap:.35rem;
+  padding:.4rem .85rem;border-radius:8px;
+  border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);
+  color:#8888a0;font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-sm:hover{background:rgba(255,255,255,.05);color:#c0c0d0}
+
+/* upload zone */
+input[type="file"]{
+  border:2px dashed rgba(255,255,255,.06) !important;border-radius:12px !important;
+  padding:1.6rem 1rem !important;text-align:center !important;
+  cursor:pointer !important;transition:all .25s !important;
+  background:rgba(255,255,255,.008) !important;
+  color:transparent !important;min-height:80px;position:relative;
+}
+input[type="file"]:hover{border-color:rgba(99,102,241,.3) !important;background:rgba(99,102,241,.015) !important}
+input[type="file"]::file-selector-button{
+  display:inline-block;padding:.3rem .9rem;border-radius:8px;
+  border:1px solid rgba(99,102,241,.25);background:rgba(99,102,241,.06);
+  color:rgba(255,255,255,.65);font-size:.75rem;cursor:pointer;transition:all .15s;
+}
+input[type="file"]::file-selector-button:hover{background:rgba(99,102,241,.12);color:#fff}
+
+/* result area */
 .result-area{display:none}
 .result-area.visible{display:block}
-video{width:100%;border-radius:10px}
-.model-desc{background:rgba(16,163,127,.06);border:1px solid rgba(16,163,127,.1);border-radius:10px;padding:.6rem .9rem;margin-bottom:.8rem;font-size:.82rem}
-.history-item{display:flex;gap:.8rem;padding:.8rem 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:center}
-.history-item:last-child{border-bottom:none}
-.history-thumb{width:80px;height:45px;border-radius:6px;background:rgba(255,255,255,.04);flex-shrink:0;overflow:hidden}
-.history-thumb video,.history-thumb img{width:100%;height:100%;object-fit:cover}
-.history-info{flex:1;min-width:0}
-.history-info .hi-model{font-size:.75rem;color:#10a37f}
-.history-info .hi-prompt{font-size:.8rem;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.history-info .hi-time{font-size:.7rem;color:#555}
-.history-actions{display:flex;gap:.3rem}
+video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
+
+/* messages */
+.msg{border-radius:10px;padding:.65rem 1rem;margin-top:1rem;font-size:.82rem;white-space:pre-wrap;word-break:break-word}
+.msg-error{color:#f87171;background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.1)}
+.msg-info{color:#93c5fd;background:rgba(147,197,253,.04);border:1px solid rgba(147,197,253,.08)}
+.msg-success{color:#34d399;background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.1)}
+.msg-warning{color:#fbbf24;background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.1)}
+
 .status-text{font-size:.85rem;color:#93c5fd;margin-top:.5rem}
+
+/* history */
+.history-empty{text-align:center;padding:2rem;color:#444;font-size:.82rem}
+.history-item{display:flex;gap:.75rem;padding:.55rem;border-radius:8px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.03)}
+.history-item:hover{background:rgba(255,255,255,.03)}
+.history-item img,.history-thumb{width:72px;height:72px;border-radius:6px;object-fit:cover;flex-shrink:0;background:rgba(0,0,0,.3)}
+.history-thumb{height:45px;overflow:hidden}
+.history-item:hover img,.history-item:hover .history-thumb{transform:scale(1.05);transition:transform .2s}
+.history-info{flex:1;min-width:0}
+.history-info .hi-prompt,.history-info .hi-label{font-size:.8rem;color:#b0b0c0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-info .hi-meta,.history-info .hi-time{font-size:.68rem;color:#555;margin-top:.15rem}
+.history-actions{display:flex;gap:.3rem}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.12)}
+
+/* model desc */
+.model-desc{background:rgba(99,102,241,.04);border:1px solid rgba(99,102,241,.08);border-radius:10px;padding:.55rem .8rem;margin-bottom:1rem;font-size:.78rem;color:#8888a0}
+
+/* key row */
+.key-row{display:flex;gap:.5rem}
+.key-row input{flex:1}
 </style>
 </head>
 <body>
 <div class="container">
 
 <header>
-  <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.5rem">
-    <svg width="28" height="28" viewBox="0 0 34 34" fill="none">
-      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10a37f"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
-      <rect x="2" y="2" width="30" height="30" rx="8" fill="url(#g)" opacity=".12"/>
-      <rect x="2" y="2" width="30" height="30" rx="8" stroke="url(#g)" stroke-width="1.2" opacity=".4"/>
-      <path d="M10 17l5 5 9-9" stroke="url(#g)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span style="font-weight:800;font-size:1.1rem;background:linear-gradient(135deg,#10a37f,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">千亿AI</span>
-  </div>
-  <h1>VEO 视频生成</h1>
-  <p>AI 视频生成 · 支持参考图</p>
-</header>
+    <div class="logo">
+      <div class="logo-icon">✦</div>
+      <h1>VEO</h1>
+    </div>
+    <div class="subtitle">AI 视频生成 · 支持参考图</div>
+    <div class="badge-row">
+      <span class="badge"><span class="dot"></span>千亿AI · Video Gen</span>
+    </div>
+  </header>
 
 <div class="card">
-  <h3>生成设置</h3>
+  <div class="card-title">⚙️ 视频生成设置</div>
   <div class="form-group">
     <label>API 密钥</label>
     <input type="password" id="apiKey" placeholder="输入密钥" />
@@ -115,7 +188,7 @@ video{width:100%;border-radius:10px}
       <option value="veo_3_1-lite">veo_3_1-lite</option>
     </select>
   </div>
-  <div class="model-desc" id="modelDesc"></div>
+  <div class="form-desc" id="modelDesc"></div>
   <div class="form-group">
     <label>画面比例</label>
     <select id="aspectSelect">
@@ -123,9 +196,9 @@ video{width:100%;border-radius:10px}
       <option value="9:16">9:16（竖屏）</option>
     </select>
   </div>
-  <div style="border:1px dashed rgba(255,255,255,.08);border-radius:10px;padding:1rem;margin-bottom:1rem">
+  <div style="margin-bottom:1rem">
     <label style="display:flex;align-items:center;gap:.4rem">
-      <input type="checkbox" id="enableImage" /> 上传参考图 / 首尾帧
+      <input type="checkbox" id="enableImage" style="accent-color:#6366f1;width:15px;height:15px" /> 上传参考图 / 首尾帧
     </label>
     <div id="imageFields" style="display:none;margin-top:.8rem">
       <div class="form-group"><label>参考图片</label><input type="file" id="imageInput" accept="image/*" multiple style="padding:.5rem;font-size:.8rem" /></div>
@@ -145,12 +218,12 @@ video{width:100%;border-radius:10px}
 </div>
 
 <div class="card result-area" id="resultArea">
-  <h3>生成结果</h3>
+  <div class="card-title">🎬 生成结果</div>
   <div id="videoContainer"></div>
 </div>
 
 <div class="card" id="historyCard">
-  <h3>历史记录 <span id="historyCount"></span></h3>
+  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0"><span>📜 历史记录</span><span id="historyCount"></span></div>
   <div id="historyList"></div>
   <div style="text-align:center;padding:1rem;color:#555;font-size:.85rem" id="historyEmpty">暂无记录</div>
 </div>
@@ -163,6 +236,9 @@ const $=id=>document.getElementById(id);
 const MODELS={'veo_3_1-fast-4K':'快速版 · 4K · 支持参考图','veo_3_1-fast':'快速版 · 支持参考图','veo3.1-fast-components':'快速版 + 元素图/首尾帧','veo_3_1-lite-4K':'轻量版 · 4K · 纯文本','veo_3_1-lite':'轻量版 · 纯文本'};
 $('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MODELS[$('modelSelect').value]||'')};
 $('modelSelect').dispatchEvent(new Event('change'));
+
+function testKey(){const k=$('apiKey').value.trim();if(!k){showMsg('error','请输入密钥');return}showMsg('info','验证中...');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{showMsg('success','密钥有效')}).catch(()=>{showMsg('error','密钥无效')})}
+
 $('enableImage').onchange=function(){$('imageFields').style.display=this.checked?'block':'none'};
 
 // 历史
