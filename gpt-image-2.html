@@ -664,21 +664,26 @@
         for (const entry of h) {
             const item = document.createElement('div');
             item.className = 'history-item';
-            const thumbSrc = entry.thumb || (entry.images && entry.images.length > 0 ? entry.images[0] : '');
+            const firstImg = entry.images && entry.images.length > 0 ? entry.images[0] : '';
+            const thumbSrc = entry.thumb || firstImg;
+            const hasThumb = !!thumbSrc;
             const meta = (entry.model || '') + ' · ' + (entry.size || '') + ' · ' + (entry.images ? entry.images.length : 0) + '张';
             const time = new Date(entry.time).toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
 
             item.innerHTML =
-                '<img src="' + thumbSrc + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' +
+                '<img src="' + thumbSrc + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" style="' + (hasThumb ? '' : 'display:none') + '" />' +
+                '<div class="history-thumb-placeholder" style="' + (hasThumb ? 'display:none' : 'width:80px;height:80px;border-radius:8px;background:rgba(255,255,255,0.03);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#444;') + '">🖼</div>' +
                 '<div class="history-info">' +
                 '  <div class="hi-prompt">' + escHtml(entry.prompt || '') + '</div>' +
                 '  <div class="hi-meta">' + escHtml(meta) + ' · ' + time + '</div>' +
                 '</div>';
 
             item.addEventListener('click', function() {
+                const imgs = entry.images || [];
+                if (!imgs.length) return;
                 imageGallery.innerHTML = '';
-                generatedImages = entry.images || [];
-                for (const src of generatedImages) {
+                generatedImages = imgs;
+                for (const src of imgs) {
                     const w = document.createElement('div');
                     w.className = 'image-wrapper';
                     const img = document.createElement('img');
