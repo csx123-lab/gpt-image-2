@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPT Image 2 - AI 图片生成器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { text-align: center; margin-bottom: 2.5rem; }
+        header h1 {
+            font-size: 2.2rem; font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        header p { color: #a0a0b8; font-size: 1rem; }
+
+        .card {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-title { font-size:1rem; color:#a0a0b8; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display:block; font-size:0.85rem; color:#b0b0c8; margin-bottom:0.4rem; }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        input:focus, textarea:focus, select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
+        }
+        select {
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0a0b8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 1rem center;
+        }
+        select option { background: #1a1a2e; color: #e0e0e0; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width:600px) { .form-row { grid-template-columns: 1fr; } }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+        }
+        .btn-primary:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 25px rgba(102,126,234,0.35); }
+        .btn-primary:disabled { opacity:0.6; cursor:not-allowed; }
+
+        .spinner {
+            display: none;
+            width: 20px; height: 20px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        .btn-primary.loading .spinner { display: inline-block; }
+        .btn-primary.loading .btn-text { display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .result-area { display: none; }
+        .result-area.visible { display: block; }
+
+        .image-wrapper {
+            width: 100%;
+            max-width: 512px;
+            margin: 1rem auto;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .image-wrapper img { width: 100%; height: auto; display: block; }
+        .image-label { padding:0.4rem 0.75rem; font-size:0.8rem; color:#a0a0b8; background:rgba(0,0,0,0.5); text-align:center; }
+
+        .msg {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .msg-error { color:#f87171; background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.2); }
+        .msg-info { color:#93c5fd; background:rgba(147,197,253,0.1); border:1px solid rgba(147,197,253,0.2); }
+        .msg-success { color:#6ee7b7; background:rgba(110,231,183,0.1); border:1px solid rgba(110,231,183,0.2); }
+
+        .model-tip { font-size:0.8rem; color:#888; margin-top:0.3rem; }
+        .model-tip a { color:#667eea; }
+
+        .footer { text-align:center; padding:2rem 0 1rem; color:#666; font-size:0.8rem; }
+
+        .btn-test {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #a0a0b8;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .btn-test:hover { background:rgba(255,255,255,0.12); color:#e0e0e0; }
+        .btn-test .spinner-sm {
+            display:none; width:14px; height:14px;
+            border:2px solid rgba(255,255,255,0.2); border-top-color:#fff;
+            border-radius:50%; animation:spin 0.7s linear infinite;
+        }
+        .btn-test.loading .spinner-sm { display:inline-block; }
+        .key-status { font-size:0.8rem; margin-top:0.3rem; }
+        .key-status.valid { color:#6ee7b7; }
+        .key-status.invalid { color:#f87171; }
+
+        /* Upload / ref image */
+        .upload-area {
+            border: 2px dashed rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: border-color 0.2s;
+        }
+        .upload-area:hover { border-color: #667eea; background: rgba(102,126,234,0.05); }
+        .upload-area input[type="file"] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer;
+        }
+        .upload-area .upload-icon { font-size:2rem; }
+        .upload-area .upload-text { font-size:0.85rem; color:#888; }
+        .upload-area.has-image { border-color: #667eea; border-style: solid; padding: 0.5rem; }
+        .upload-area.has-image .upload-icon,
+        .upload-area.has-image .upload-text { display: none; }
+
+        .history-empty { text-align:center; padding:2rem; color:#666; font-size:0.85rem; }
+        .history-item {
+            display:flex; gap:0.75rem; padding:0.6rem; border-radius:8px;
+            cursor:pointer; transition:background 0.2s;
+            border-bottom:1px solid rgba(255,255,255,0.05);
+        }
+        .history-item:hover { background:rgba(255,255,255,0.06); }
+        .history-item img {
+            width:96px; height:96px; border-radius:8px; object-fit:cover;
+            flex-shrink:0; background:rgba(0,0,0,0.3);
+        }
+        .history-info { flex:1; min-width:0; }
+        .history-info .hi-prompt { font-size:0.85rem; color:#d0d0e0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .history-info .hi-meta { font-size:0.72rem; color:#888; margin-top:0.2rem; }
+
+        .ref-preview { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; }
+        .ref-preview img { max-height:100px; border-radius:6px; display:block; }
+
+        .toggle-label {
+            display:flex; align-items:center; gap:0.5rem; cursor:pointer;
+            font-size:0.85rem; color:#b0b0c8;
+        }
+        .toggle-label input[type="checkbox"] { width:18px; height:18px; accent-color:#667eea; cursor:pointer; }
+        .ref-section { display:none; }
+        .ref-section.visible { display:block; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>🎨 GPT Image 2</h1>
+        <p>基于 VectorEngine（api.vectorengine.cn）的 AI 图片生成 / 编辑</p>
+    </header>
+
+    <!-- Settings -->
+    <div class="card">
+        <div class="card-title"><span class="icon">⚙️</span> 图片生成设置</div>
+
+        <div class="form-group">
+            <label for="apiKey">API 密钥</label>
+            <div style="display:flex; gap:0.5rem;">
+                <input type="password" id="apiKey" placeholder="sk- 输入你的 VectorEngine API 密钥" style="flex:1;" />
+                <button class="btn-test" id="testKeyBtn" type="button">
+                    <span class="spinner-sm"></span>
+                    <span class="btn-test-text">验证</span>
+                </button>
+            </div>
+            <div class="key-status" id="keyStatus"></div>
+            <div class="model-tip">在 <a href="https://web.vectorengine.cn/" target="_blank">向量引擎控制台</a> 获取</div>
+        </div>
+
+        <div class="form-group">
+            <label class="toggle-label">
+                <input type="checkbox" id="toggleEdit" />
+                🖼️ 图生图 / 编辑模式
+            </label>
+        </div>
+
+        <div class="ref-section" id="refSection">
+            <div class="form-group">
+                <label>参考图片（可多选）</label>
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="refImageInput" accept="image/png,image/jpeg,image/webp" multiple />
+                    <div class="upload-icon">🖼️</div>
+                    <div class="upload-text">点击选择多张图片（支持 Ctrl/Shift 多选）</div>
+                    <div class="ref-preview" id="refPreviewArea"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
+                    <span id="refCount" style="font-size:0.8rem;color:#888;">已选 0 张</span>
+                    <button type="button" id="clearRefBtn" style="display:none;background:none;border:1px solid rgba(255,255,255,0.15);color:#a0a0b8;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">清空</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="prompt">图片描述（Prompt）</label>
+            <textarea id="prompt" placeholder="描述你想要生成的图片..."></textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="model">模型</label>
+                <select id="model">
+                    <option value="gpt-image-2-all">🎯 GPT Image 2-All</option>
+                    <option value="gpt-image-1">🎯 GPT Image 1</option>
+                    <option value="dall-e-3">🖼️ DALL-E 3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="size">尺寸</label>
+                <select id="size">
+                    <option value="1024x1024">1024 × 1024（方形）</option>
+                    <option value="1024x1536">1024 × 1536（竖版）</option>
+                    <option value="1536x1024">1536 × 1024（横版）</option>
+                    <option value="2048x2048">2048 × 2048（2K）</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="quality">画质</label>
+                <select id="quality">
+                    <option value="standard">标准（standard）</option>
+                    <option value="high">高清（high）</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="outputCount">数量</label>
+                <select id="outputCount">
+                    <option value="1">1 张</option>
+                    <option value="2">2 张</option>
+                    <option value="4">4 张</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-primary" id="generateBtn" type="button">
+            <span class="btn-text">✨ 生成图片</span>
+            <span class="spinner"></span>
+        </button>
+
+        <div id="messageArea"></div>
+    </div>
+
+    <!-- Result -->
+    <div class="card result-area" id="resultArea">
+        <div class="card-title"><span class="icon">🎯</span> 生成结果</div>
+        <div id="imageGallery"></div>
+        <div class="image-actions" id="imageActions" style="display:none;justify-content:center;gap:0.75rem;margin-top:1rem;"></div>
+    </div>
+
+    <!-- History -->
+    <div class="card" id="historyCard">
+        <div class="card-title" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
+            <span><span class="icon">📜</span> 历史记录</span>
+            <button id="clearHistoryBtn" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#a0a0b8;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">清空</button>
+        </div>
+        <div id="historyList" style="max-height:400px;overflow-y:auto;"></div>
+    </div>
+
+    <div class="footer">
+        <p>Powered by VectorEngine · <a href="https://api.vectorengine.cn" target="_blank" style="color:#667eea;">api.vectorengine.cn</a></p>
+        <p style="margin-top:0.5rem;color:#555;font-size:0.75rem;">使用自己的 API 密钥 · 数据仅存储于浏览器本地</p>
+    </div>
+</div>
+
+<script>
+(function() {
+    const $ = (id) => document.getElementById(id);
+
+    const apiKeyInput = $('apiKey');
+    const promptInput = $('prompt');
+    const modelSelect = $('model');
+    const sizeSelect = $('size');
+    const qualitySelect = $('quality');
+    const countSelect = $('outputCount');
+    const generateBtn = $('generateBtn');
+    const resultArea = $('resultArea');
+    const imageGallery = $('imageGallery');
+    const messageArea = $('messageArea');
+    const testKeyBtn = $('testKeyBtn');
+    const keyStatus = $('keyStatus');
+    const toggleEdit = $('toggleEdit');
+    const refSection = $('refSection');
+    const refImageInput = $('refImageInput');
+    const refPreviewArea = $('refPreviewArea');
+    const uploadArea = $('uploadArea');
+    const refCount = $('refCount');
+    const clearRefBtn = $('clearRefBtn');
+
+    const API_BASE = 'https://api.vectorengine.cn';
+    let refImages = [];
+    let abortController = null;
+    let generatedImages = [];
+
+    // === Edit mode toggle ===
+    toggleEdit.addEventListener('change', function() {
+        refSection.classList.toggle('visible', toggleEdit.checked);
+        if (!toggleEdit.checked) { refImages = []; refPreviewArea.innerHTML = ''; uploadArea.classList.remove('has-image'); refImageInput.value = ''; refCount.textContent = '已选 0 张'; clearRefBtn.style.display = 'none'; }
+    });
+
+    refImageInput.addEventListener('change', function(e) {
+        refImages = Array.from(e.target.files);
+        refPreviewArea.innerHTML = '';
+        if (refImages.length === 0) { uploadArea.classList.remove('has-image'); refCount.textContent = '已选 0 张'; clearRefBtn.style.display = 'none'; return; }
+        uploadArea.classList.add('has-image');
+        // 显示最多前 6 张缩略图
+        for (let i = 0; i < Math.min(refImages.length, 6); i++) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(refImages[i]);
+            img.title = refImages[i].name;
+            refPreviewArea.appendChild(img);
+        }
+        if (refImages.length > 6) {
+            const more = document.createElement('div');
+            more.style.cssText = 'display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:6px;background:rgba(255,255,255,0.05);color:#a0a0b8;font-size:0.8rem;';
+            more.textContent = '+' + (refImages.length - 6);
+            refPreviewArea.appendChild(more);
+        }
+        refCount.textContent = '已选 ' + refImages.length + ' 张';
+        clearRefBtn.style.display = '';
+    });
+
+    clearRefBtn.addEventListener('click', function() {
+        refImages = [];
+        refPreviewArea.innerHTML = '';
+        refImageInput.value = '';
+        uploadArea.classList.remove('has-image');
+        refCount.textContent = '已选 0 张';
+        clearRefBtn.style.display = 'none';
+    });
+
+    // === Generate ===
+    generateBtn.addEventListener('click', generateImage);
+
+    async function generateImage() {
+        const apiKey = apiKeyInput.value.trim();
+        const prompt = promptInput.value.trim();
+        const model = modelSelect.value;
+
+        if (!apiKey) { showMsg('error', '请输入 API 密钥'); return; }
+        if (!prompt) { showMsg('error', '请输入图片描述'); return; }
+
+        if (abortController) abortController.abort();
+        clearMessages();
+        resultArea.classList.remove('visible');
+        setLoading(true);
+
+        abortController = new AbortController();
+        const signal = abortController.signal;
+
+        try {
+            let resp;
+            if (toggleEdit.checked && refImages.length > 0) {
+                // 图生图: POST /v1/images/edits (multipart/form-data)
+                // 以第一张图为主图，其余作为附加参考
+                const url = API_BASE + '/v1/images/edits';
+                const formData = new FormData();
+                formData.append('model', model);
+                formData.append('prompt', prompt);
+                formData.append('image', refImages[0]);
+                for (let i = 1; i < refImages.length; i++) {
+                    formData.append('image', refImages[i]);
+                }
+                console.log('[edits] 参考图数:', refImages.length);
+                showMsg('info', '⏳ 正在编辑图片（' + refImages.length + ' 张参考图）...');
+                resp = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + apiKey },
+                    body: formData,
+                    signal: signal
+                });
+            } else {
+                // 文生图: POST /v1/images/generations (JSON)
+                const url = API_BASE + '/v1/images/generations';
+                const body = {
+                    model: model,
+                    prompt: prompt,
+                    n: parseInt(countSelect.value),
+                    size: sizeSelect.value,
+                    quality: qualitySelect.value
+                };
+                console.log('[generate] 开始请求:', url, JSON.stringify(body));
+                showMsg('info', '⏳ 正在生成 ' + body.n + ' 张图片...');
+                resp = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+                    body: JSON.stringify(body),
+                    signal: signal
+                });
+            }
+
+            console.log('[response] 状态:', resp.status);
+
+            if (!resp.ok) {
+                let detail = '';
+                let errJson = null;
+                try { errJson = await resp.json(); detail = errJson.error?.message || JSON.stringify(errJson); }
+                catch { detail = await resp.text(); }
+                // 打印完整错误以便调试
+                console.error('[response] 错误详情:', errJson || detail);
+                throw new Error('HTTP ' + resp.status + ': ' + detail);
+            }
+
+            const data = await resp.json();
+            console.log('[response] 数据:', data);
+
+            if (!data.data || data.data.length === 0) {
+                throw new Error('API 返回为空:\n' + JSON.stringify(data).slice(0, 300));
+            }
+
+            // Render images
+            imageGallery.innerHTML = '';
+            generatedImages = [];
+
+            for (let i = 0; i < data.data.length; i++) {
+                const imgData = data.data[i];
+                let src = null;
+
+                if (imgData.b64_json) {
+                    src = 'data:image/png;base64,' + imgData.b64_json;
+                } else if (imgData.url) {
+                    src = imgData.url;
+                }
+
+                if (src) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'image-wrapper';
+
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.alt = '图片 ' + (i + 1);
+                    img.onerror = function() { console.error('图片加载失败:', src.substring(0,100)); };
+
+                    const label = document.createElement('div');
+                    label.className = 'image-label';
+                    label.textContent = '图片 ' + (i + 1) + '/' + data.data.length;
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(label);
+                    imageGallery.appendChild(wrapper);
+
+                    generatedImages.push(src);
+                }
+            }
+
+            resultArea.classList.add('visible');
+            setLoading(false);
+            showMsg('success', '✅ 成功生成 ' + data.data.length + ' 张图片！');
+
+            // Download buttons
+            showDownloadButtons(generatedImages);
+
+            // Save history (thumbnail only to avoid localStorage quota)
+            saveHistory({
+                prompt: prompt,
+                model: model,
+                size: sizeSelect.value,
+                images: generatedImages
+            });
+
+        } catch (err) {
+            if (err.name === 'AbortError') {
+                showMsg('info', '请求已取消');
+            } else {
+                console.error('[error]', err);
+                showMsg('error', err.message || '请求失败');
+            }
+            setLoading(false);
+        }
+    }
+
+    // === Test API Key ===
+    testKeyBtn.addEventListener('click', testApiKey);
+
+    async function testApiKey() {
+        const key = apiKeyInput.value.trim();
+        if (!key) { keyStatus.textContent = '❌ 请输入 API 密钥'; keyStatus.className = 'key-status invalid'; return; }
+
+        testKeyBtn.classList.add('loading');
+        keyStatus.textContent = '⏳ 验证中...';
+        keyStatus.className = 'key-status';
+
+        try {
+            const resp = await fetch('https://api.vectorengine.cn/v1/models', {
+                headers: { 'Authorization': 'Bearer ' + key }
+            });
+
+            if (resp.ok) {
+                const data = await resp.json();
+                const count = data.data ? data.data.length : '?';
+                keyStatus.textContent = '✅ 密钥有效！（可用模型数：' + count + '）';
+                keyStatus.className = 'key-status valid';
+                localStorage.setItem('ve_api_key', key);
+            } else {
+                const errData = await resp.json().catch(() => ({}));
+                const msg = errData.error?.message || 'HTTP ' + resp.status;
+                keyStatus.textContent = '❌ ' + msg;
+                keyStatus.className = 'key-status invalid';
+            }
+        } catch (err) {
+            keyStatus.textContent = '❌ 网络错误：' + err.message;
+            keyStatus.className = 'key-status invalid';
+        }
+
+        testKeyBtn.classList.remove('loading');
+    }
+
+    // === Messages ===
+    function showMsg(type, text) {
+        const div = document.createElement('div');
+        div.className = 'msg msg-' + type;
+        div.textContent = text;
+        messageArea.innerHTML = '';
+        messageArea.appendChild(div);
+    }
+
+    function clearMessages() { messageArea.innerHTML = ''; }
+
+    function setLoading(v) {
+        generateBtn.classList.toggle('loading', v);
+        generateBtn.disabled = v;
+    }
+
+    // === Download buttons ===
+    const imageActions = $('imageActions');
+
+    function showDownloadButtons(images) {
+        if (!images || images.length === 0) { imageActions.style.display = 'none'; return; }
+        imageActions.innerHTML = '';
+
+        imageActions.style.display = 'flex';
+
+        const btnAll = document.createElement('button');
+        btnAll.className = 'btn-test';
+        btnAll.style.cssText = 'padding:0.5rem 1.2rem;font-size:0.85rem;';
+        btnAll.textContent = '⬇️ 全部下载';
+        btnAll.addEventListener('click', function() {
+            images.forEach(function(src, i) {
+                const a = document.createElement('a');
+                a.href = src;
+                a.download = 'ai-image-' + (i + 1) + '.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        });
+
+        const btnCopy = document.createElement('button');
+        btnCopy.className = 'btn-test';
+        btnCopy.style.cssText = 'padding:0.5rem 1.2rem;font-size:0.85rem;';
+        btnCopy.textContent = '📋 复制第一张';
+        btnCopy.addEventListener('click', async function() {
+            try {
+                const resp = await fetch(images[0]);
+                const blob = await resp.blob();
+                await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+                btnCopy.textContent = '✅ 已复制';
+                setTimeout(function() { btnCopy.textContent = '📋 复制第一张'; }, 2000);
+            } catch {
+                await navigator.clipboard.writeText(images[0]);
+                btnCopy.textContent = '✅ 已复制链接';
+                setTimeout(function() { btnCopy.textContent = '📋 复制第一张'; }, 2000);
+            }
+        });
+
+        imageActions.appendChild(btnAll);
+        imageActions.appendChild(btnCopy);
+    }
+
+    // === History ===
+    const historyList = $('historyList');
+    const clearHistoryBtn = $('clearHistoryBtn');
+
+    function getHistory() {
+        try { return JSON.parse(localStorage.getItem('ve_image_history') || '[]'); }
+        catch { return []; }
+    }
+
+    function saveHistory(entry) {
+        const h = getHistory();
+        // Only store first image as thumbnail, truncated to avoid quota
+        let thumb = '';
+        if (entry.images && entry.images.length > 0) {
+            const first = entry.images[0];
+            if (first && first.length < 200000) thumb = first;
+        }
+        h.unshift({
+            prompt: entry.prompt,
+            model: entry.model,
+            size: entry.size,
+            images: entry.images,
+            thumb: thumb,
+            time: Date.now()
+        });
+        if (h.length > 50) h.length = 50;
+        localStorage.setItem('ve_image_history', JSON.stringify(h));
+        renderHistory();
+    }
+
+    function clearHistory() {
+        localStorage.removeItem('ve_image_history');
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const h = getHistory();
+        historyList.innerHTML = '';
+
+        if (h.length === 0) {
+            historyList.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+            return;
+        }
+
+        for (const entry of h) {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            const thumbSrc = entry.thumb || (entry.images && entry.images.length > 0 ? entry.images[0] : '');
+            const meta = (entry.model || '') + ' · ' + (entry.size || '') + ' · ' + (entry.images ? entry.images.length : 0) + '张';
+            const time = new Date(entry.time).toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+
+            item.innerHTML =
+                '<img src="' + thumbSrc + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' +
+                '<div class="history-info">' +
+                '  <div class="hi-prompt">' + escHtml(entry.prompt || '') + '</div>' +
+                '  <div class="hi-meta">' + escHtml(meta) + ' · ' + time + '</div>' +
+                '</div>';
+
+            item.addEventListener('click', function() {
+                imageGallery.innerHTML = '';
+                generatedImages = entry.images || [];
+                for (const src of generatedImages) {
+                    const w = document.createElement('div');
+                    w.className = 'image-wrapper';
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.alt = '';
+                    w.appendChild(img);
+                    imageGallery.appendChild(w);
+                }
+                showDownloadButtons(generatedImages);
+                resultArea.classList.add('visible');
+                resultArea.scrollIntoView({ behavior:'smooth', block:'start' });
+            });
+
+            historyList.appendChild(item);
+        }
+    }
+
+    function escHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    clearHistoryBtn.addEventListener('click', function() {
+        if (confirm('确定清空所有历史记录？')) clearHistory();
+    });
+
+    // === LocalStorage ===
+    const savedKey = localStorage.getItem('ve_api_key');
+    if (savedKey) apiKeyInput.value = savedKey;
+    apiKeyInput.addEventListener('input', function() {
+        localStorage.setItem('ve_api_key', apiKeyInput.value.trim());
+    });
+
+    if (savedKey) setTimeout(testApiKey, 500);
+
+    renderHistory();
+
+    console.log('✅ GPT Image 2 页面已加载');
+})();
+</script>
+</body>
+</html>
