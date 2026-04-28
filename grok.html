@@ -74,10 +74,7 @@ video{width:100%;border-radius:10px}
   <div class="form-group">
     <label>模型</label>
     <select id="modelSelect">
-      <option value="grok-video-3" selected>grok-video-3</option>
-      <option value="grok-video-2">grok-video-2</option>
-      <option value="grok-video-1">grok-video-1</option>
-      <option value="grok-video-3-10s">grok-video-3-10s</option>
+      <option value="grok-video-3-10s" selected>grok-video-3-10s</option>
       <option value="grok-videos">grok-videos</option>
     </select>
   </div>
@@ -136,7 +133,7 @@ video{width:100%;border-radius:10px}
 <script>
 const API='https://api.vectorengine.cn';
 const $=id=>document.getElementById(id);
-const MODEL_DESC={'grok-video-3':'最新版','grok-video-2':'旧版','grok-video-1':'基础版','grok-video-3-10s':'10秒版','grok-videos':'grok-videos'};
+const MODEL_DESC={'grok-video-3-10s':'10秒版','grok-videos':'视频生成'};
 $('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MODEL_DESC[$('modelSelect').value]||'')};
 $('modelSelect').dispatchEvent(new Event('change'));
 $('enableImage').onchange=function(){$('imageFields').style.display=this.checked?'block':'none'};
