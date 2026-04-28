@@ -151,7 +151,7 @@ select option{background:#0e0e18;color:#e0e0e0}
 
 /* ─── result ─── */
 .result-area{display:none}
-.result-area.visible{display:block}
+.result-area.visible{display:block}.image-actions{display:none;justify-content:center;gap:.75rem;margin-top:1rem}.image-actions.show{display:flex}
 
 .image-wrapper{
   max-width:512px;margin:.75rem auto;
@@ -199,7 +199,7 @@ select option{background:#0e0e18;color:#e0e0e0}
 .ref-preview{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
 .ref-preview img{max-height:100px;border-radius:6px;display:block}
 
-.toggle-label{display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.82rem;color:#8888a8}
+.btn-sm{background:none;border:1px solid rgba(255,255,255,.08);color:#888;padding:.25rem .6rem;border-radius:6px;cursor:pointer;font-size:.72rem;transition:all .15s}.btn-sm:hover{background:rgba(255,255,255,.04);color:#c0c0c0}.toggle-label{display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.82rem;color:#8888a8}
 .toggle-label input[type="checkbox"]{width:16px;height:16px;accent-color:#10a37f;cursor:pointer}
 .ref-section{display:none}
 .ref-section.visible{display:block}
@@ -257,14 +257,13 @@ select option{background:#0e0e18;color:#e0e0e0}
                     <div class="upload-text">点击选择多张图片（支持 Ctrl/Shift 多选）</div>
                     <div class="ref-preview" id="refPreviewArea"></div>
                 </div>
-                </div>
-                <div style="margin-top:0.5rem;">
-                    <input type="text" id="refImageUrl" placeholder="或粘贴图片URL（支持多张，用逗号分隔）" style="font-size:0.85rem;width:100%;" />
-                </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
-                    <span id="refCount" style="font-size:0.8rem;color:#888;">已选 0 张</span>
-                    <button type="button" id="clearRefBtn" style="display:none;background:none;border:1px solid rgba(255,255,255,0.15);color:#a0a0b8;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">清空</button>
-                </div>
+            </div>
+            <div style="margin-top:0.75rem;">
+                <input type="text" id="refImageUrl" placeholder="或粘贴图片URL（支持多张，用逗号分隔）" />
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
+                <span id="refCount" style="font-size:0.78rem;color:#666;">已选 0 张</span>
+                <button type="button" id="clearRefBtn" class="btn-sm" style="display:none;">清空</button>
             </div>
         </div>
 
@@ -324,7 +323,7 @@ select option{background:#0e0e18;color:#e0e0e0}
         <div class="card-title"><span class="icon">🎯</span> 生成结果</div>
 <div class="glow-line"></div>
         <div id="imageGallery"></div>
-        <div class="image-actions" id="imageActions" style="display:none;justify-content:center;gap:0.75rem;margin-top:1rem;"></div>
+        <div class="image-actions" id="imageActions"></div>
     </div>
 
     <!-- History -->
@@ -336,8 +335,6 @@ select option{background:#0e0e18;color:#e0e0e0}
         <div id="historyList" style="max-height:400px;overflow-y:auto;"></div>
     </div>
 
-    </div>
-</div>
 
 <script>
 (function() {
@@ -625,10 +622,9 @@ select option{background:#0e0e18;color:#e0e0e0}
     const imageActions = $('imageActions');
 
     function showDownloadButtons(images) {
-        if (!images || images.length === 0) { imageActions.style.display = 'none'; return; }
+        if (!images || images.length === 0) { imageActions.classList.remove('show'); return; }
         imageActions.innerHTML = '';
-
-        imageActions.style.display = 'flex';
+        imageActions.classList.add('show');
 
         const btnAll = document.createElement('button');
         btnAll.className = 'btn-test';
