@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VEO 视频生成</title>
+    <title>VEO 瑙嗛鐢熸垚</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         #particles-canvas {
@@ -268,7 +268,7 @@
                         <path d="M10 17l5 5 9-9" stroke="url(#vlogo)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <div style="display:flex;flex-direction:column;gap:0;">
-                        <span style="font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,#10a37f,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1.5px;">千亿AI</span>
+                        <span style="font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,#10a37f,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1.5px;">鍗冧嚎AI</span>
                         <span style="font-size:0.6rem;color:#555;letter-spacing:2.5px;text-transform:uppercase;font-weight:300;">QianYi AI</span>
                     </div>
                 </div>
@@ -288,29 +288,29 @@
                     <polygon points="12,8 24,16 12,24" fill="url(#veoLogo)"/>
                 </svg>
                 <span style="background:linear-gradient(135deg,#10a37f,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">VEO</span>
-                <span style="color:#b0b0d0;">视频生成</span>
+                <span style="color:#b0b0d0;">瑙嗛鐢熸垚</span>
             </h1>
-            <p>支持参考图、首尾帧 · 固定 8 秒时长</p>
+            <p>鏀寔鍙傝€冨浘銆侀灏惧抚 路 鍥哄畾 8 绉掓椂闀?/p>
         </div>
     </header>
 
-    <!-- 设置卡片 -->
+    <!-- 璁剧疆鍗＄墖 -->
     <div class="card">
         <div class="card-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7878a0" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-            视频生成设置
+            瑙嗛鐢熸垚璁剧疆
         </div>
         <div class="form-group">
-            <label>API 密钥</label>
+            <label>API 瀵嗛挜</label>
             <div style="display:flex;gap:0.5rem;">
-                <input type="password" id="apiKey" placeholder="sk- 输入密钥" style="flex:1;" />
-                <button class="btn-test" id="testKeyBtn">验证</button>
+                <input type="password" id="apiKey" placeholder="sk- 杈撳叆瀵嗛挜" style="flex:1;" />
+                <button class="btn-test" id="testKeyBtn">楠岃瘉</button>
             </div>
             <div class="key-status" id="keyStatus"></div>
         </div>
 
         <div class="form-group">
-            <label>模型选择</label>
+            <label>妯″瀷閫夋嫨</label>
             <select id="modelSelect">
                 <option value="veo2">veo2</option>
                 <option value="veo2-fast" selected>veo2-fast</option>
@@ -326,71 +326,71 @@
             </select>
         </div>
 
-        <!-- 模型能力说明 -->
+        <!-- 妯″瀷鑳藉姏璇存槑 -->
         <div class="model-info" id="modelInfo"></div>
 
-        <!-- 参考图 -->
+        <!-- 鍙傝€冨浘 -->
         <div class="form-group">
             <label class="toggle-label">
                 <input type="checkbox" id="enableImage" />
-                上传图片（帧/元素图）
+                涓婁紶鍥剧墖锛堝抚/鍏冪礌鍥撅級
             </label>
         </div>
 
         <div class="hide" id="refSection">
             <div class="form-group">
-                <label>参考图片（第一张为主图，其余为附加参考）</label>
+                <label>鍙傝€冨浘鐗囷紙绗竴寮犱负涓诲浘锛屽叾浣欎负闄勫姞鍙傝€冿級</label>
                 <div class="upload-area" id="uploadArea">
                     <input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp" multiple />
-                    <div class="upload-text">点击选择多张图片</div>
+                    <div class="upload-text">鐐瑰嚮閫夋嫨澶氬紶鍥剧墖</div>
                     <div class="ref-preview" id="refPreview"></div>
                 </div>
             </div>
 
-            <!-- 首帧 -->
+            <!-- 棣栧抚 -->
             <div class="form-row">
                 <div class="form-group">
-                    <label>首帧 (start_frame) - 可选</label>
+                    <label>棣栧抚 (start_frame) - 鍙€?/label>
                     <div class="upload-area" id="startFrameArea" style="padding:1rem;">
                         <input type="file" id="startFrameInput" accept="image/png,image/jpeg,image/webp" />
-                        <div class="upload-text" id="startFrameText">选择首帧图片</div>
+                        <div class="upload-text" id="startFrameText">閫夋嫨棣栧抚鍥剧墖</div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>尾帧 (end_frame) - 可选</label>
+                    <label>灏惧抚 (end_frame) - 鍙€?/label>
                     <div class="upload-area" id="endFrameArea" style="padding:1rem;">
                         <input type="file" id="endFrameInput" accept="image/png,image/jpeg,image/webp" />
-                        <div class="upload-text" id="endFrameText">选择尾帧图片</div>
+                        <div class="upload-text" id="endFrameText">閫夋嫨灏惧抚鍥剧墖</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="form-group">
-            <label>视频描述 (Prompt)</label>
-            <textarea id="prompt" placeholder="描述视频内容..."></textarea>
+            <label>瑙嗛鎻忚堪 (Prompt)</label>
+            <textarea id="prompt" placeholder="鎻忚堪瑙嗛鍐呭..."></textarea>
         </div>
 
         <div class="form-row">
             <div class="form-group" id="aspectGroup">
-                <label>画面比例（veo3 使用）</label>
+                <label>鐢婚潰姣斾緥锛坴eo3 浣跨敤锛?/label>
                 <select id="aspectSelect">
-                    <option value="16:9">16:9（横屏）</option>
-                    <option value="9:16">9:16（竖屏）</option>
+                    <option value="16:9">16:9锛堟í灞忥級</option>
+                    <option value="9:16">9:16锛堢珫灞忥級</option>
                 </select>
             </div>
             <div class="form-group" id="sizeGroup" style="display:none;">
-                <label>画面尺寸（veo2 使用）</label>
+                <label>鐢婚潰灏哄锛坴eo2 浣跨敤锛?/label>
                 <select id="sizeSelect">
-                    <option value="1920x1080">1920×1080（全屏）</option>
-                    <option value="1280x720">1280×720（高清）</option>
-                    <option value="720x1280">720×1280（竖版）</option>
+                    <option value="1920x1080">1920脳1080锛堝叏灞忥級</option>
+                    <option value="1280x720">1280脳720锛堥珮娓咃級</option>
+                    <option value="720x1280">720脳1280锛堢珫鐗堬級</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>时长</label>
+                <label>鏃堕暱</label>
                 <select id="durationSelect">
-                    <option value="8">8 秒</option>
+                    <option value="8">8 绉?/option>
                 </select>
             </div>
         </div>
@@ -398,18 +398,18 @@
         <button class="btn-primary" id="generateBtn">
             <span class="btn-text">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:2px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                生成视频
+                鐢熸垚瑙嗛
             </span>
             <span class="spinner"></span>
         </button>
         <div id="messageArea"></div>
     </div>
 
-    <!-- 结果 -->
+    <!-- 缁撴灉 -->
     <div class="card result-area" id="resultArea">
         <div class="card-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7878a0" stroke-width="1.8" stroke-linecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-            生成结果
+            鐢熸垚缁撴灉
         </div>
         <div id="videoContainer"></div>
         <div class="image-actions" id="videoActions"></div>
@@ -420,7 +420,7 @@
 (function() {
     const API_BASE = 'https://api.vectorengine.cn';
 
-    // ─── Particles ───
+    // 鈹€鈹€鈹€ Particles 鈹€鈹€鈹€
     (function initParticles() {
         const canvas = document.getElementById('particles-canvas');
         if (!canvas) return;
@@ -477,17 +477,17 @@
     })();
 
     const MODELS = {
-        'veo2': { desc: 'veo2 基础版', gen: 'veo2', frames: 0, components: false },
-        'veo2-fast': { desc: 'veo2 快速版', gen: 'veo2', frames: 0, components: false },
-        'veo2-fast-frames': { desc: 'veo2 + 首尾帧（最多2张）', gen: 'veo2', frames: 2, components: false },
-        'veo2-fast-components': { desc: 'veo2 + 元素图（最多3张）', gen: 'veo2', frames: 0, components: true },
-        'veo2-pro': { desc: 'veo2 专业版', gen: 'veo2', frames: 0, components: false },
-        'veo3': { desc: 'veo3 基础版 · 16:9/9:16', gen: 'veo3', frames: 0, components: false },
-        'veo3-fast': { desc: 'veo3 快速版 · 16:9/9:16', gen: 'veo3', frames: 0, components: false },
-        'veo3-pro': { desc: 'veo3 专业版 · 16:9/9:16', gen: 'veo3', frames: 0, components: false },
-        'veo3-pro-frames': { desc: 'veo3 + 首帧（最多1张）', gen: 'veo3', frames: 1, components: false },
-        'veo3-fast-frames': { desc: 'veo3 快速帧版', gen: 'veo3', frames: 0, components: false },
-        'veo3-frames': { desc: 'veo3 帧版', gen: 'veo3', frames: 0, components: false }
+        'veo2': { desc: 'veo2 鍩虹鐗?, gen: 'veo2', frames: 0, components: false },
+        'veo2-fast': { desc: 'veo2 蹇€熺増', gen: 'veo2', frames: 0, components: false },
+        'veo2-fast-frames': { desc: 'veo2 + 棣栧熬甯э紙鏈€澶?寮狅級', gen: 'veo2', frames: 2, components: false },
+        'veo2-fast-components': { desc: 'veo2 + 鍏冪礌鍥撅紙鏈€澶?寮狅級', gen: 'veo2', frames: 0, components: true },
+        'veo2-pro': { desc: 'veo2 涓撲笟鐗?, gen: 'veo2', frames: 0, components: false },
+        'veo3': { desc: 'veo3 鍩虹鐗?路 16:9/9:16', gen: 'veo3', frames: 0, components: false },
+        'veo3-fast': { desc: 'veo3 蹇€熺増 路 16:9/9:16', gen: 'veo3', frames: 0, components: false },
+        'veo3-pro': { desc: 'veo3 涓撲笟鐗?路 16:9/9:16', gen: 'veo3', frames: 0, components: false },
+        'veo3-pro-frames': { desc: 'veo3 + 棣栧抚锛堟渶澶?寮狅級', gen: 'veo3', frames: 1, components: false },
+        'veo3-fast-frames': { desc: 'veo3 蹇€熷抚鐗?, gen: 'veo3', frames: 0, components: false },
+        'veo3-frames': { desc: 'veo3 甯х増', gen: 'veo3', frames: 0, components: false }
     };
 
     const $ = id => document.getElementById(id);
@@ -512,7 +512,7 @@
     let startFrameFile = null;
     let endFrameFile = null;
 
-    // 更新模型信息
+    // 鏇存柊妯″瀷淇℃伅
     function updateModelInfo() {
         const val = modelSelect.value;
         const m = MODELS[val];
@@ -522,32 +522,31 @@
         html += m.desc + '<br>';
         
         const tags = [];
-        if (m.components) tags.push('<span class="tag">🧩 元素图(≤3张)</span>');
-        if (m.frames > 0) tags.push(`<span class="tag">🎬 首尾帧(≤${m.frames}张)</span>`);
-        if (!m.components && m.frames === 0) tags.push('<span class="tag">纯文本生成</span>');
+        if (m.components) tags.push('<span class="tag">馃З 鍏冪礌鍥?鈮?寮?</span>');
+        if (m.frames > 0) tags.push(`<span class="tag">馃幀 棣栧熬甯?鈮?{m.frames}寮?</span>`);
+        if (!m.components && m.frames === 0) tags.push('<span class="tag">绾枃鏈敓鎴?/span>');
         html += tags.join(' ');
 
         modelInfo.innerHTML = html;
 
-        // veo2 / veo3 切换
+        // veo2 / veo3 鍒囨崲
         const isVeo3 = val.startsWith('veo3');
         $('aspectGroup').style.display = isVeo3 ? 'block' : 'none';
         $('sizeGroup').style.display = isVeo3 ? 'none' : 'block';
 
-        // 重置图片上传状态
-        enableImage.checked = false;
+        // 閲嶇疆鍥剧墖涓婁紶鐘舵€?        enableImage.checked = false;
         refSection.classList.add('hide');
         refFiles = [];
         startFrameFile = null;
         endFrameFile = null;
         refPreview.innerHTML = '';
-        startFrameText.textContent = '选择首帧图片';
-        endFrameText.textContent = '选择尾帧图片';
+        startFrameText.textContent = '閫夋嫨棣栧抚鍥剧墖';
+        endFrameText.textContent = '閫夋嫨灏惧抚鍥剧墖';
         imageInput.value = '';
         startFrameInput.value = '';
         endFrameInput.value = '';
 
-        // 只有带帧/frames/components的模型才显示图片上传选项
+        // 鍙湁甯﹀抚/frames/components鐨勬ā鍨嬫墠鏄剧ず鍥剧墖涓婁紶閫夐」
         const supportsImages = m.frames > 0 || m.components;
         if (!supportsImages) {
             enableImage.checked = false;
@@ -562,7 +561,7 @@
     modelSelect.addEventListener('change', updateModelInfo);
     updateModelInfo();
 
-    // 上传参考图
+    // 涓婁紶鍙傝€冨浘
     enableImage.addEventListener('change', function() {
         refSection.classList.toggle('hide', !this.checked);
     });
@@ -579,42 +578,42 @@
 
     startFrameInput.addEventListener('change', function(e) {
         startFrameFile = e.target.files[0] || null;
-        startFrameText.textContent = startFrameFile ? '✅ ' + startFrameFile.name : '选择首帧图片';
+        startFrameText.textContent = startFrameFile ? '鉁?' + startFrameFile.name : '閫夋嫨棣栧抚鍥剧墖';
     });
 
     endFrameInput.addEventListener('change', function(e) {
         endFrameFile = e.target.files[0] || null;
-        endFrameText.textContent = endFrameFile ? '✅ ' + endFrameFile.name : '选择尾帧图片';
+        endFrameText.textContent = endFrameFile ? '鉁?' + endFrameFile.name : '閫夋嫨灏惧抚鍥剧墖';
     });
 
-    // 验证密钥
+    // 楠岃瘉瀵嗛挜
     $('testKeyBtn').addEventListener('click', async function() {
         const key = $('apiKey').value.trim();
         const ks = $('keyStatus');
-        if (!key) { ks.textContent = '❌ 请输入密钥'; ks.className = 'key-status invalid'; return; }
+        if (!key) { ks.textContent = '鉂?璇疯緭鍏ュ瘑閽?; ks.className = 'key-status invalid'; return; }
         this.classList.add('loading');
-        ks.textContent = '⏳ 验证中...';
+        ks.textContent = '鈴?楠岃瘉涓?..';
         ks.className = 'key-status';
         try {
             const resp = await fetch(API_BASE + '/v1/models', {
                 headers: { 'Authorization': 'Bearer ' + key }
             });
             if (resp.ok) {
-                ks.textContent = '✅ 密钥有效';
+                ks.textContent = '鉁?瀵嗛挜鏈夋晥';
                 ks.className = 'key-status valid';
                 localStorage.setItem('ve_video_key', key);
             } else {
-                ks.textContent = '❌ 无效密钥';
+                ks.textContent = '鉂?鏃犳晥瀵嗛挜';
                 ks.className = 'key-status invalid';
             }
         } catch(e) {
-            ks.textContent = '❌ 网络错误';
+            ks.textContent = '鉂?缃戠粶閿欒';
             ks.className = 'key-status invalid';
         }
         this.classList.remove('loading');
     });
 
-    // 生成视频
+    // 鐢熸垚瑙嗛
     generateBtn.addEventListener('click', generateVideo);
 
     async function generateVideo() {
@@ -623,8 +622,8 @@
         const model = modelSelect.value;
         const m = MODELS[model];
 
-        if (!apiKey) { showMsg('error', '请输入 API 密钥'); return; }
-        if (!prompt) { showMsg('error', '请输入视频描述'); return; }
+        if (!apiKey) { showMsg('error', '璇疯緭鍏?API 瀵嗛挜'); return; }
+        if (!prompt) { showMsg('error', '璇疯緭鍏ヨ棰戞弿杩?); return; }
 
         clearMessages();
         resultArea.classList.remove('visible');
@@ -632,7 +631,7 @@
         generateBtn.disabled = true;
 
         try {
-            // 构造请求体
+            // 鏋勯€犺姹備綋
             const body = {
                 model: model,
                 prompt: prompt,
@@ -640,7 +639,7 @@
                 enable_upsample: '1'
             };
 
-            // veo3 系列用 aspect_ratio，veo2 系列用 size
+            // veo3 绯诲垪鐢?aspect_ratio锛寁eo2 绯诲垪鐢?size
             const isVeo3 = model.startsWith('veo3');
             if (isVeo3) {
                 body.aspect_ratio = $('aspectSelect').value;
@@ -648,40 +647,39 @@
                 body.size = $('sizeSelect').value;
             }
 
-            // 图片处理
+            // 鍥剧墖澶勭悊
             const hasRef = enableImage.checked && refFiles.length > 0;
             const hasStart = startFrameFile !== null;
             const hasEnd = endFrameFile !== null;
 
             if (hasRef || hasStart || hasEnd) {
-                // 用 images 数组
+                // 鐢?images 鏁扮粍
                 body.images = [];
-                // 参考图/元素图
-                if (hasRef) {
+                // 鍙傝€冨浘/鍏冪礌鍥?                if (hasRef) {
                     for (const f of refFiles) {
                         const b64 = await fileToBase64(f);
                         body.images.push(b64);
                     }
                 }
-                // 首帧
+                // 棣栧抚
                 if (hasStart) {
                     const b64 = await fileToBase64(startFrameFile);
                     body.images.push(b64);
                 }
-                // 尾帧
+                // 灏惧抚
                 if (hasEnd) {
                     const b64 = await fileToBase64(endFrameFile);
                     body.images.push(b64);
                 }
 
-                showMsg('info', '⏳ 正在提交（含图片）...');
+                showMsg('info', '鈴?姝ｅ湪鎻愪氦锛堝惈鍥剧墖锛?..');
             } else {
-                showMsg('info', '⏳ 正在生成视频...');
+                showMsg('info', '鈴?姝ｅ湪鐢熸垚瑙嗛...');
             }
 
             console.log('[VEO] request body:', JSON.stringify(body, null, 2));
 
-            const resp = await fetch(API_BASE + '/v1/video/generations', {
+            const resp = await fetch(API_BASE + '/v1/video/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -703,7 +701,7 @@
             const data = await resp.json();
             console.log('[VEO] response data:', data);
 
-            // 处理返回结果——可能直接返回视频url或返回task_id
+            // 澶勭悊杩斿洖缁撴灉鈥斺€斿彲鑳界洿鎺ヨ繑鍥炶棰憉rl鎴栬繑鍥瀟ask_id
             let videoUrl = null;
             if (data.data && data.data.length > 0) {
                 videoUrl = data.data[0].url || data.data[0].video_url || null;
@@ -712,31 +710,31 @@
             
             if (videoUrl) {
                 displayVideo(videoUrl);
-                showMsg('success', '✅ 视频生成完成！');
+                showMsg('success', '鉁?瑙嗛鐢熸垚瀹屾垚锛?);
             } else if (data.task_id || data.id) {
                 const taskId = data.task_id || data.id;
-                showMsg('info', '⏳ 任务已提交，等待生成... (task: ' + taskId + ')');
+                showMsg('info', '鈴?浠诲姟宸叉彁浜わ紝绛夊緟鐢熸垚... (task: ' + taskId + ')');
                 videoUrl = await pollTask(apiKey, taskId);
                 if (videoUrl) {
                     displayVideo(videoUrl);
-                    showMsg('success', '✅ 视频生成完成！');
+                    showMsg('success', '鉁?瑙嗛鐢熸垚瀹屾垚锛?);
                 } else {
-                    showMsg('info', '任务仍在处理中，请稍后查看');
+                    showMsg('info', '浠诲姟浠嶅湪澶勭悊涓紝璇风◢鍚庢煡鐪?);
                 }
             } else {
-                throw new Error('API 返回结构未知:\n' + JSON.stringify(data).slice(0, 300));
+                throw new Error('API 杩斿洖缁撴瀯鏈煡:\n' + JSON.stringify(data).slice(0, 300));
             }
 
         } catch(err) {
             console.error('[VEO error]', err);
-            showMsg('error', err.message || '请求失败');
+            showMsg('error', err.message || '璇锋眰澶辫触');
         }
 
         generateBtn.classList.remove('loading');
         generateBtn.disabled = false;
     }
 
-    // 文件转 base64
+    // 鏂囦欢杞?base64
     function fileToBase64(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -764,14 +762,14 @@
                 if (status === 'succeeded' || status === 'completed' || status === 'done') {
                     return data.output?.video_url || data.output?.url || data.video_url || data.url || data.data?.url || null;
                 } else if (status === 'failed' || status === 'error') {
-                    throw new Error('生成失败: ' + (data.error || data.message || ''));
+                    throw new Error('鐢熸垚澶辫触: ' + (data.error || data.message || ''));
                 }
-                if (i % 5 === 0) showMsg('info', '⏳ 生成中... (' + Math.round(i * interval / 1000) + 's)');
+                if (i % 5 === 0) showMsg('info', '鈴?鐢熸垚涓?.. (' + Math.round(i * interval / 1000) + 's)');
             } catch(e) {
                 if (i > 5) throw e;
             }
         }
-        showMsg('info', '⏳ 已超时，可能仍在后台处理中');
+        showMsg('info', '鈴?宸茶秴鏃讹紝鍙兘浠嶅湪鍚庡彴澶勭悊涓?);
         return null;
     }
 
@@ -797,7 +795,7 @@
 
         const btnDl = document.createElement('button');
         btnDl.className = 'btn-test';
-        btnDl.textContent = '⬇️ 下载';
+        btnDl.textContent = '猬囷笍 涓嬭浇';
         btnDl.addEventListener('click', () => {
             const a = document.createElement('a');
             a.href = url; a.download = 'veo-video.mp4';
@@ -806,11 +804,11 @@
 
         const btnCopy = document.createElement('button');
         btnCopy.className = 'btn-test';
-        btnCopy.textContent = '📋 复制链接';
+        btnCopy.textContent = '馃搵 澶嶅埗閾炬帴';
         btnCopy.addEventListener('click', () => {
             navigator.clipboard.writeText(url).then(() => {
-                btnCopy.textContent = '✅ 已复制';
-                setTimeout(() => btnCopy.textContent = '📋 复制链接', 2000);
+                btnCopy.textContent = '鉁?宸插鍒?;
+                setTimeout(() => btnCopy.textContent = '馃搵 澶嶅埗閾炬帴', 2000);
             });
         });
 
@@ -828,10 +826,10 @@
 
     function clearMessages() { messageArea.innerHTML = ''; }
 
-    // 恢复保存的密钥
-    const saved = localStorage.getItem('ve_video_key');
+    // 鎭㈠淇濆瓨鐨勫瘑閽?    const saved = localStorage.getItem('ve_video_key');
     if (saved) $('apiKey').value = saved;
 })();
 </script>
 </body>
 </html>
+
