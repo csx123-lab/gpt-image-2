@@ -317,6 +317,10 @@
                     <span class="spinner-sm"></span>
                     <span class="btn-secondary-text">验证</span>
                 </button>
+                <button class="btn-secondary" id="quotaBtn" type="button">
+                    <span class="spinner-sm"></span>
+                    <span class="btn-secondary-text">查额度</span>
+                </button>
             </div>
             <div class="key-status" id="keyStatus"></div>
             <div class="model-tip">向千亿AI获取</div>
@@ -864,6 +868,49 @@
 
     console.log('✅ GPT Image 2 页面已加载');
 })();
+
+// Footer API Key 额度查询（全局函数）
+window.checkFooterQuota = function() {
+    const key = document.getElementById('footerApiKey').value.trim();
+    const result = document.getElementById('footerQuotaResult');
+    if (!key) { result.textContent = '❌ 请输入 API Key'; return; }
+    result.textContent = '⏳ 查询中...';
+    const queries = [
+        { name: 'chaxun.wlai.vip', url: 'https://chaxun.wlai.vip/?key=' + encodeURIComponent(key) },
+        { name: 'key.tpkcur.click', url: 'https://key.tpkcur.click/?key=' + encodeURIComponent(key) }
+    ];
+    let done = 0;
+    let lines = [];
+    queries.forEach((q, idx) => {
+        fetch(q.url, { mode: 'cors' })
+            .then(r => r.text().catch(() => ''))
+            .then(text => { lines[idx] = q.name + ': ' + (text.substring(0, 200).replace(/\n/g, ' ') || '未返回数据'); })
+            .catch(() => { lines[idx] = q.name + ': ❌ 查询失败'; })
+            .finally(() => { done++; if (done === queries.length) result.innerHTML = lines.join('<br>'); });
+    });
+    setTimeout(() => { if (done < queries.length) result.innerHTML += '<br>⏳ 部分请求超时，请手动访问查询地址'; }, 10000);
+};
 </script>
+
+<!-- API Key 额度查询 Footer -->
+<div class="card" style="margin-top:2.5rem;">
+    <div class="card-title"><span class="icon">📊</span> API Key 额度查询</div>
+    <div class="form-group">
+        <label>查询地址</label>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            <a href="https://chaxun.wlai.vip/" target="_blank" rel="noopener" class="btn-sm">chaxun.wlai.vip ↗</a>
+            <a href="https://key.tpkcur.click/" target="_blank" rel="noopener" class="btn-sm">key.tpkcur.click ↗</a>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>API Key</label>
+        <div class="key-row">
+            <input type="password" id="footerApiKey" placeholder="sk-" />
+            <button class="btn-sm" onclick="checkFooterQuota()">查额度</button>
+        </div>
+    </div>
+    <div id="footerQuotaResult" style="font-size:.82rem;color:#8888a0;margin-top:.5rem;"></div>
+</div>
+
 </body>
 </html>
