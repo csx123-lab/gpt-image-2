@@ -433,11 +433,11 @@ function showVideo(url, model, prompt) {
 
 // 进度条
 function showProgress(show, pct) {
-  const bar = $('progressBar');
-  const inner = $('progressInner');
-  if (!show) { bar.style.display = 'none'; return; }
-  bar.style.display = 'block';
-  inner.style.width = (pct || 0) + '%';
+  const bar = document.getElementById('progressBar');
+  const inner = document.getElementById('progressInner');
+  if (!bar || !inner) return;
+  bar.style.display = show ? 'block' : 'none';
+  if (show) inner.style.width = (pct || 0) + '%';
 }
 
 // 图片转 base64
