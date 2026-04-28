@@ -418,6 +418,11 @@
                     <button type="button" id="clearRefBtn" style="display:none;background:none;border:1px solid rgba(255,255,255,0.15);color:#a0a0b8;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">清空</button>
                 </div>
             </div>
+            <div class="form-group" style="margin-top:0.5rem;padding-top:0.8rem;border-top:1px solid rgba(255,255,255,0.06);">
+                <label>或粘贴图片 URL（推荐，速度快）</label>
+                <input type="text" id="refImageUrl" placeholder="https://example.com/image.png" style="font-size:0.85rem;" />
+                <div style="font-size:0.75rem;color:#666;margin-top:0.3rem;">填入 URL 后将忽略上方上传的文件，多个 URL 用逗号分隔</div>
+            </div>
         </div>
 
         <div class="form-group">
@@ -659,24 +664,46 @@
         try {
             let resp;
             if (toggleEdit.checked && refImages.length > 0) {
-                // 图生图: POST /v1/images/edits (multipart/form-data)
-                // 以第一张图为主图，其余作为附加参考
-                const url = API_BASE + '/v1/images/edits';
-                const formData = new FormData();
-                formData.append('model', model);
-                formData.append('prompt', prompt);
-                formData.append('image', refImages[0]);
-                for (let i = 1; i < refImages.length; i++) {
-                    formData.append('image', refImages[i]);
+                // 图生图
+                const refUrlInput = $('refImageUrl');
+                const imageUrls = refUrlInput.value.trim().split(',').map(s => s.trim()).filter(Boolean);
+
+                if (imageUrls.length > 0) {
+                    // 用 URL 模式: POST /v1/images/generations (JSON)
+                    console.log('[generate] 使用图片URL:', imageUrls);
+                    showMsg('info', '⏳ 使用图片 URL 生成中...');
+                    resp = await fetch(API_BASE + '/v1/images/generations', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+                        body: JSON.stringify({
+                            model: model,
+                            prompt: prompt,
+                            n: parseInt(countSelect.value),
+                            size: sizeSelect.value,
+                            quality: qualitySelect.value,
+                            image: imageUrls
+                        }),
+                        signal: signal
+                    });
+                } else {
+                    // 用文件上传: POST /v1/images/edits (multipart/form-data)
+                    const url = API_BASE + '/v1/images/edits';
+                    const formData = new FormData();
+                    formData.append('model', model);
+                    formData.append('prompt', prompt);
+                    formData.append('image', refImages[0]);
+                    for (let i = 1; i < refImages.length; i++) {
+                        formData.append('image', refImages[i]);
+                    }
+                    console.log('[edits] 参考图数:', refImages.length);
+                    showMsg('info', '⏳ 正在编辑图片（' + refImages.length + ' 张参考图）...');
+                    resp = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + apiKey },
+                        body: formData,
+                        signal: signal
+                    });
                 }
-                console.log('[edits] 参考图数:', refImages.length);
-                showMsg('info', '⏳ 正在编辑图片（' + refImages.length + ' 张参考图）...');
-                resp = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + apiKey },
-                    body: formData,
-                    signal: signal
-                });
             } else {
                 // 文生图: POST /v1/images/generations (JSON)
                 const url = API_BASE + '/v1/images/generations';
