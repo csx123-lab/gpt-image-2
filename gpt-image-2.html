@@ -325,6 +325,26 @@
 
         /* ─── Selection ─── */
         ::selection { background: rgba(102,126,234,0.25); color: #fff; }
+
+        /* ─── 生成日志 ─── */
+        .log-card { margin-top: 1rem; }
+        .log-card .card-title { cursor: pointer; user-select: none; }
+        .log-card .card-title:hover { opacity: 0.8; }
+        .log-body { max-height: 300px; overflow-y: auto; }
+        .log-empty { text-align:center; color:#555; font-size:0.8rem; padding:1rem; }
+        .log-item { padding:0.45rem 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.8rem; }
+        .log-item:last-child { border-bottom:none; }
+        .log-time { color:#666; font-size:0.7rem; }
+        .log-status.ok { color:#34d399; }
+        .log-status.fail { color:#f87171; }
+        .log-meta { color:#888; font-size:0.72rem; margin:0.1rem 0; }
+        .log-prompt { color:#b0b0c8; font-size:0.78rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .log-url { display:inline-block; color:#60a5fa; cursor:pointer; font-size:0.7rem; word-break:break-all; line-height:1.4; }
+        .log-url:hover { text-decoration:underline; color:#93c5fd; }
+        .log-actions { display:flex; gap:0.5rem; margin-bottom:0.3rem; }
+        .log-actions button { background:none; border:1px solid rgba(255,255,255,0.12); color:#8888aa; padding:0.15rem 0.5rem; border-radius:4px; cursor:pointer; font-size:0.72rem; }
+        .log-actions button:hover { color:#c0c0d8; border-color:rgba(255,255,255,0.2); }
+        .log-badge { font-size:0.68rem; color:#666; }
     </style>
 </head>
 <body>
@@ -504,6 +524,23 @@
     <div class="footer">
     </div>
 </div>
+
+    <!-- 生成日志 -->
+    <div class="card log-card">
+        <div class="card-title" id="logTitle" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
+            <span style="display:flex;align-items:center;gap:0.4rem;">
+                📋 生成日志
+                <span class="log-badge" id="logBadge"></span>
+            </span>
+            <div class="log-actions">
+                <button id="clearLogBtn">清空</button>
+                <button id="exportLogBtn">导出</button>
+            </div>
+        </div>
+        <div class="log-body" id="logBody">
+            <div id="logList"></div>
+        </div>
+    </div>
 
 <script>
 (function() {
@@ -775,6 +812,7 @@
                     imageGallery.appendChild(wrapper);
 
                     generatedImages.push(src);
+                    if (imgData.url) apiUrls.push(imgData.url);
                 }
             }
 
@@ -793,6 +831,18 @@
                 images: generatedImages
             });
 
+            // 写生成日志（只存 API 返回的 URL，不存 base64）
+            if (apiUrls.length > 0) {
+                addLog({
+                    time: Date.now(),
+                    prompt: prompt,
+                    model: model,
+                    size: sizeSelect.value,
+                    images: apiUrls,
+                    success: true
+                });
+            }
+
         } catch (err) {
             if (err.name === 'AbortError') {
                 showMsg('info', '请求已取消');
@@ -803,6 +853,90 @@
             setLoading(false);
         }
     }
+
+    // === 生成日志 ===
+    const LOG_KEY = 've_gen_log';
+
+    function getLog() {
+        try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); } catch { return []; }
+    }
+
+    function addLog(entry) {
+        var h = getLog();
+        h.unshift(entry);
+        if (h.length > 200) h.length = 200;
+        try { localStorage.setItem(LOG_KEY, JSON.stringify(h)); } catch(e) { h.splice(100); try { localStorage.setItem(LOG_KEY, JSON.stringify(h)); } catch(e2) {} }
+        renderLog();
+    }
+
+    function renderLog() {
+        var logList = document.getElementById('logList');
+        var logBadge = document.getElementById('logBadge');
+        if (!logList) return;
+        var h = getLog();
+        if (logBadge) logBadge.textContent = h.length > 0 ? (h.length + ' 条') : '';
+        if (h.length === 0) {
+            logList.innerHTML = '<div class="log-empty">暂无生成日志</div>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < h.length; i++) {
+            var e = h[i];
+            var time = e.time ? new Date(e.time).toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }) : '--';
+            var promptShort = (e.prompt || '').substring(0, 60);
+            var images = e.images || [];
+            var urlHtml = '';
+            for (var j = 0; j < images.length; j++) {
+                var url = images[j];
+                urlHtml += '<div class="log-url" onclick="copyUrl(\'' + url.replace(/'/g, "\\'") + '\')">📎 ' + url.substring(0, 60) + (url.length > 60 ? '...' : '') + '</div>';
+            }
+            html += '<div class="log-item">' +
+                '<span class="log-time">' + time + '</span> ' +
+                '<span class="log-status ' + (e.success ? 'ok' : 'fail') + '">' + (e.success ? '✅' : '❌') + '</span>' +
+                '<div class="log-prompt">' + escHtml(promptShort) + '</div>' +
+                '<div class="log-meta">' + escHtml(e.model || '') + ' · ' + escHtml(e.size || '') + ' · ' + images.length + ' 张</div>' +
+                urlHtml +
+                '</div>';
+        }
+        logList.innerHTML = html;
+    }
+
+    document.getElementById('clearLogBtn').addEventListener('click', function() {
+        if (confirm('确定清空所有生成日志？')) {
+            localStorage.removeItem(LOG_KEY);
+            renderLog();
+        }
+    });
+
+    document.getElementById('exportLogBtn').addEventListener('click', function() {
+        var h = getLog();
+        if (h.length === 0) { alert('暂无日志可导出'); return; }
+        var text = '千亿AI 生成日志\n导出时间: ' + new Date().toLocaleString('zh-CN') + '\n共 ' + h.length + ' 条\n' + '='.repeat(50) + '\n\n';
+        for (var i = 0; i < h.length; i++) {
+            var e = h[i];
+            text += '#' + (i+1) + ' | ' + (e.success ? '完成' : '失败') + '\n';
+            text += '  时间: ' + new Date(e.time).toLocaleString('zh-CN') + '\n';
+            text += '  描述: ' + (e.prompt || '') + '\n';
+            text += '  模型: ' + (e.model || '') + ' | 尺寸: ' + (e.size || '') + '\n';
+            if (e.images && e.images.length > 0) {
+                text += '  图片URL:\n';
+                for (var j = 0; j < e.images.length; j++) {
+                    text += '    ' + (j+1) + '. ' + e.images[j] + '\n';
+                }
+            }
+            text += '\n';
+        }
+        var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 've-gen-log-' + new Date().toISOString().slice(0, 10) + '.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+    });
+
+    setTimeout(renderLog, 200);
 
     // === Test API Key ===
     testKeyBtn.addEventListener('click', testApiKey);
@@ -1003,6 +1137,22 @@
     renderHistory();
 
     console.log('✅ GPT Image 2 页面已加载');
+
+    // 全局：日志复制 URL
+    window.copyUrl = function(url) {
+        navigator.clipboard.writeText(url).then(function() {
+            showMsg('info', '✅ URL 已复制到剪贴板');
+        }).catch(function() {
+            // fallback
+            var ta = document.createElement('textarea');
+            ta.value = url;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showMsg('info', '✅ URL 已复制到剪贴板');
+        });
+    };
 })();
 </script>
 </body>
