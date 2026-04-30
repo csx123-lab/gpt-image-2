@@ -293,12 +293,6 @@ window.addEventListener('message', function(ev) {
     } catch(e) {}
   }
 
-  if (msg.type === 've_takeover_request') {
-    // 收到 iframe 的请求参数，由父页面代为发起 fetch 并持久化
-    console.log('[index] 收到接管请求:', msg.fetchParams ? msg.fetchParams.prompt.substring(0,30) : '');
-    parentDoFetch(msg.fetchParams);
-  }
-
   if (msg.type === 've_page_leaving') {
     var task = msg.pending;
     if (task && task.status === 'pending' && task.fetchParams) {

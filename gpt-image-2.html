@@ -830,7 +830,7 @@
         };
         markTaskPending(taskInfo);
 
-        // === 同步写日志 + 通知父页面（在 fetch 发出前，iframe 一定存活） ===
+        // === 同步写日志（在 fetch 发出前，iframe 一定存活） ===
         addLog({
             time: Date.now(),
             prompt: prompt,
@@ -839,23 +839,6 @@
             status: 'pending',
             success: false
         });
-        // 立即把请求参数发给父页面，让父页面代为等待结果
-        try {
-            parent.postMessage({
-                type: 've_takeover_request',
-                fetchParams: {
-                    url: requestUrl,
-                    body: requestBody,
-                    apiKey: apiKey,
-                    prompt: prompt,
-                    model: model,
-                    size: sizeSelect.value,
-                    time: taskInfo.time
-                }
-            }, '*');
-        } catch(e) {
-            console.warn('[generate] 通知父页面接管失败:', e);
-        }
 
         try {
             let resp;
