@@ -228,6 +228,15 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
   <div style="text-align:center;padding:1rem;color:#555;font-size:.85rem" id="historyEmpty">暂无记录</div>
 </div>
 
+<!-- 生成日志 -->
+<div class="card log-card">
+    <div class="card-title" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
+        <span style="display:flex;align-items:center;gap:0.4rem;">📋 生成日志 <span class="log-badge" id="veLogBadge"></span></span>
+        <div class="log-actions"><button id="veClearLogBtn" class="btn-sm">清空</button><button id="veExportLogBtn" class="btn-sm">导出</button></div>
+    </div>
+    <div class="log-body" id="veLogBody"><div id="veLogList"></div></div>
+</div>
+
 </div>
 
 <script>
@@ -350,6 +359,17 @@ function showVid(url,model,prompt){
   $('resultArea').scrollIntoView({behavior:'smooth'});
   ah({u:url,m:model,p:prompt||'(空)',t:Date.now()});
   sm('success','生成成功！');
+  // 存日志
+  try{
+    var h=JSON.parse(localStorage.getItem('ve_vid_log')||'[]');
+    h.unshift({url:url,m:model,p:prompt||'(空)',time:Date.now(),success:true});
+    if(h.length>200)h.length=200;
+    localStorage.setItem('ve_vid_log',JSON.stringify(h));
+  }catch(e){}
+  setTimeout(function(){
+    var ls=document.getElementById('veLogList');
+    if(ls&&window.veRenderLog)window.veRenderLog();
+  },100);
 }
 
 // 图片压缩转base64
@@ -381,6 +401,32 @@ function clr(){$('messageArea').innerHTML='';$('statusText').textContent=''}
 // 密钥保存
 try{const s=localStorage.getItem('ve_video_key');if(s)$('apiKey').value=s}catch(e){}
 $('apiKey').oninput=function(){try{localStorage.setItem('ve_video_key',this.value.trim())}catch(e){}};
+
+// 日志面板渲染
+var veLogKey='ve_vid_log';
+window.veRenderLog=function(){
+  var ls=document.getElementById('veLogList'),lb=document.getElementById('veLogBadge');
+  if(!ls)return;
+  var h=[];try{h=JSON.parse(localStorage.getItem(veLogKey)||'[]')}catch(e){}
+  if(lb)lb.textContent=h.length>0?(h.length+'条'):'';
+  if(!h.length){ls.innerHTML='<div class="log-empty">暂无日志</div>';return}
+  var html='';
+  for(var i=0;i<h.length;i++){
+    var e=h[i],t=e.time?new Date(e.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'--',u=e.url||'';
+    html+='<div class="log-item"><span class="log-time">'+t+'</span><span class="log-status ok">✅</span><div class="log-prompt">'+(e.p||'').substring(0,60)+'</div><div class="log-meta">'+(e.m||'')+'</div><div class="log-url" onclick="veCopyUrl(\''+u.replace(/'/g,"\\'")+'\')">📎 '+u.substring(0,60)+(u.length>60?'...':'')+'</div></div>';
+  }
+  ls.innerHTML=html;
+};
+document.getElementById('veClearLogBtn').onclick=function(){if(confirm('清空所有日志？')){localStorage.removeItem(veLogKey);window.veRenderLog()}};
+document.getElementById('veExportLogBtn').onclick=function(){
+  var h=[];try{h=JSON.parse(localStorage.getItem(veLogKey)||'[]')}catch(e){}
+  if(!h.length){alert('暂无日志');return}
+  var txt='千亿AI VEO生成日志\n导出时间:'+new Date().toLocaleString()+'\n共'+h.length+'条\n\n';
+  for(var i=0;i<h.length;i++){var e=h[i];txt+='#'+(i+1)+' | '+(e.success?'完成':'失败')+'\n  时间:'+new Date(e.time).toLocaleString()+'\n  描述:'+(e.p||'')+'\n  模型:'+(e.m||'')+'\n  URL:'+(e.url||'')+'\n\n'}
+  var b=new Blob([txt],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ve-vid-log-'+new Date().toISOString().slice(0,10)+'.txt';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+};
+window.veCopyUrl=function(u){navigator.clipboard.writeText(u).then(function(){alert('URL已复制')}).catch(function(){var t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('URL已复制')})};
+setTimeout(window.veRenderLog,200);
 </script>
 </body>
 </html>
