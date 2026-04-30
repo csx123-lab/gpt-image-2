@@ -285,6 +285,38 @@
         .history-info .hi-prompt { font-size: .8rem; color: #b0b0c0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .history-info .hi-meta { font-size: .68rem; color: #555; margin-top: .15rem; }
 
+        /* ─── log ─── */
+        .log-item {
+            padding: .55rem .65rem;
+            border-bottom: 1px solid rgba(255,255,255,.03);
+            font-size: .76rem;
+            line-height: 1.55;
+            color: #999;
+            word-break: break-all;
+        }
+        .log-item:hover { background: rgba(255,255,255,.015); }
+        .log-item .log-time { color: #555; font-size: .68rem; font-family: monospace; }
+        .log-item .log-prompt { color: #b0b0c0; }
+        .log-item .log-status { display: inline-block; padding: .05rem .35rem; border-radius: 4px; font-size: .65rem; font-weight: 600; }
+        .log-item .log-status.ok { color: #34d399; background: rgba(52,211,153,.08); }
+        .log-item .log-status.fail { color: #f87171; background: rgba(248,113,113,.08); }
+        .log-item .log-status.pending { color: #fbbf24; background: rgba(251,191,36,.08); }
+        .log-item .log-url {
+            display: inline-block;
+            color: #818cf8;
+            font-size: .68rem;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+        .log-item .log-url:hover { text-decoration: underline; }
+        .log-empty { text-align: center; padding: 2rem; color: #444; font-size: .82rem; }
+        .log-item .log-meta { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .15rem; }
+        .log-item .log-meta span { color: #555; font-size: .65rem; }
+
         /* ─── scrollbar ─── */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -419,6 +451,18 @@
         <div id="historyList" style="max-height:400px;overflow-y:auto;"></div>
     </div>
 
+    <!-- 生成日志（持久化，不依赖页面存活） -->
+    <div class="card" id="logCard">
+        <div class="card-title" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
+            <span><span class="icon">📋</span> 生成日志 <span id="logBadge" style="font-size:.65rem;color:#666;font-weight:400;"></span></span>
+            <div style="display:flex;gap:.4rem;">
+                <button id="exportLogBtn" class="btn-secondary">导出</button>
+                <button id="clearLogBtn" class="btn-secondary">清空</button>
+            </div>
+        </div>
+        <div id="logList" style="max-height:500px;overflow-y:auto;margin-top:.5rem;"></div>
+    </div>
+
 </div>
 
 <script>
@@ -450,6 +494,108 @@
     let refImages = [];
     let abortController = null;
     let generatedImages = [];
+
+    // === 生成日志（持久化到 localStorage，不依赖页面存活） ===
+    const LOG_KEY = 've_gen_log';
+
+    function getLog() {
+        try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); } catch { return []; }
+    }
+
+    function addLog(entry) {
+        var h = getLog();
+        h.unshift(entry);
+        if (h.length > 200) h.length = 200;
+        try { localStorage.setItem(LOG_KEY, JSON.stringify(h)); } catch(e) { h.splice(100); try { localStorage.setItem(LOG_KEY, JSON.stringify(h)); } catch(e2) {} }
+        try { renderLog(); } catch(e) { /* 页面可能已销毁 */ }
+    }
+
+    function renderLog() {
+        var logList = document.getElementById('logList');
+        var logBadge = document.getElementById('logBadge');
+        if (!logList) return;
+        var h = getLog();
+        if (logBadge) logBadge.textContent = h.length > 0 ? (h.length + ' 条') : '';
+        if (h.length === 0) {
+            logList.innerHTML = '<div class="log-empty">暂无生成日志</div>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < h.length; i++) {
+            var e = h[i];
+            var time = e.time ? new Date(e.time).toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' }) : '--';
+            var statusClass = e.success ? 'ok' : (e.status === 'pending' ? 'pending' : 'fail');
+            var statusText = e.success ? '✅ 完成' : (e.status === 'pending' ? '⏳ 进行中' : '❌ 失败');
+            var promptShort = (e.prompt || '').substring(0, 80);
+            var images = e.images || [];
+            var urlHtml = '';
+            if (images.length > 0) {
+                urlHtml = '<div style="margin-top:.15rem;">';
+                for (var j = 0; j < images.length; j++) {
+                    var url = images[j];
+                    var isData = url.indexOf('data:') === 0;
+                    var shortUrl = isData ? 'data:image (base64, ' + Math.round((url.length * 3/4) / 1024) + 'KB)' : url.substring(0, 80) + (url.length > 80 ? '...' : '');
+                    urlHtml += '<span class="log-url" title="' + url.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" onclick="navigator.clipboard.writeText(\'' + url.replace(/'/g, "\\'") + '\').then(function(){this.textContent=\'✅ 已复制\'; setTimeout(function(){this.textContent=\'' + shortUrl.replace(/'/g, "\\'") + '\'},1500).bind(this)})">📎 ' + shortUrl + '</span>';
+                    if (j < images.length - 1) urlHtml += '<br>';
+                }
+                urlHtml += '</div>';
+            }
+            var metaHtml = '<div class="log-meta">';
+            if (e.model) metaHtml += '<span>📦 ' + e.model + '</span>';
+            if (e.size) metaHtml += '<span>📐 ' + e.size + '</span>';
+            if (images.length > 0) metaHtml += '<span>🖼 ' + images.length + '张</span>';
+            if (e.error) metaHtml += '<span style="color:#f87171;">⚠ ' + escHtml((e.error || '').substring(0, 60)) + '</span>';
+            metaHtml += '</div>';
+
+            html += '<div class="log-item">' +
+                '<span class="log-time">' + time + '</span> ' +
+                '<span class="log-status ' + statusClass + '">' + statusText + '</span>' +
+                '<div class="log-prompt">' + escHtml(promptShort) + '</div>' +
+                metaHtml +
+                urlHtml +
+                '</div>';
+        }
+        logList.innerHTML = html;
+    }
+
+    document.getElementById('clearLogBtn').addEventListener('click', function() {
+        if (confirm('确定清空所有生成日志？')) {
+            localStorage.removeItem(LOG_KEY);
+            renderLog();
+        }
+    });
+
+    document.getElementById('exportLogBtn').addEventListener('click', function() {
+        var h = getLog();
+        if (h.length === 0) { alert('暂无日志可导出'); return; }
+        var text = '千亿AI - 生成日志\n导出时间: ' + new Date().toLocaleString('zh-CN') + '\n共 ' + h.length + ' 条\n' + '='.repeat(50) + '\n\n';
+        for (var i = 0; i < h.length; i++) {
+            var e = h[i];
+            text += '#' + (i+1) + ' | ' + (e.success ? '✅成功' : (e.status === 'pending' ? '⏳进行中' : '❌失败')) + '\n';
+            text += '  时间: ' + new Date(e.time).toLocaleString('zh-CN') + '\n';
+            text += '  描述: ' + (e.prompt || '') + '\n';
+            text += '  模型: ' + (e.model || '') + ' | 尺寸: ' + (e.size || '') + '\n';
+            if (e.images && e.images.length > 0) {
+                text += '  图片URL:\n';
+                for (var j = 0; j < e.images.length; j++) {
+                    text += '    ' + (j+1) + '. ' + e.images[j] + '\n';
+                }
+            }
+            if (e.error) text += '  错误: ' + e.error + '\n';
+            text += '\n';
+        }
+        var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 've-gen-log-' + new Date().toISOString().slice(0, 10) + '.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+    });
+
+    // 页面加载时渲染日志
+    setTimeout(renderLog, 100);
 
     // === Edit mode toggle ===
     toggleEdit.addEventListener('change', function() {
@@ -516,6 +662,114 @@
         clearRefBtn.style.display = 'none';
     });
 
+    // === 跨页面持久化: 生成开始/完成时写 sessionStorage 兜底 ===
+    function markTaskPending(task) {
+        try { sessionStorage.setItem('ve_pending_task', JSON.stringify(task)); } catch(e) {}
+    }
+
+    function markTaskComplete() {
+        try { sessionStorage.removeItem('ve_pending_task'); } catch(e) {}
+    }
+
+    // 页面加载时检测：是否有完成的遗留任务未展示
+    function checkPendingTask() {
+        try {
+            const pending = sessionStorage.getItem('ve_pending_task');
+            if (!pending) return;
+            const task = JSON.parse(pending);
+            if (task.status === 'completed' && task.images && task.images.length > 0) {
+                // 恢复结果
+                imageGallery.innerHTML = '';
+                generatedImages = task.images;
+                for (const src of task.images) {
+                    const w = document.createElement('div');
+                    w.className = 'image-wrapper';
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.alt = '';
+                    w.appendChild(img);
+                    imageGallery.appendChild(w);
+                }
+                showDownloadButtons(generatedImages);
+                resultArea.classList.add('visible');
+                showMsg('info', '📸 检测到上次切换页面时完成的生成结果，已恢复显示\n（"' + (task.prompt || '').substring(0, 60) + '..."）');
+                // 同时确保在 localStorage 历史中也存在
+                const h = getHistory();
+                const hasHistory = h.some(function(e) {
+                    return e.time === task.time && JSON.stringify(e.images) === JSON.stringify(task.images);
+                });
+                if (!hasHistory) {
+                    saveHistoryInternal({
+                        prompt: task.prompt,
+                        model: task.model,
+                        size: task.size,
+                        images: task.images,
+                        time: task.time
+                    });
+                }
+                markTaskComplete();
+            }
+        } catch(e) { console.warn('[checkPendingTask]', e); }
+    }
+
+    // 保存历史（内部版，可指定时间戳）
+    function saveHistoryInternal(entry) {
+        const h = getHistory();
+        let thumb = '';
+        if (entry.images && entry.images.length > 0) {
+            thumb = entry.images[0];
+        }
+        h.unshift({
+            prompt: entry.prompt,
+            model: entry.model,
+            size: entry.size,
+            images: entry.images,
+            thumb: thumb,
+            time: entry.time || Date.now()
+        });
+        if (h.length > 50) h.length = 50;
+        // 先写 localStorage（这是最核心的持久化操作，必须在 DOM 操作之前）
+        try { localStorage.setItem('ve_image_history', JSON.stringify(h)); } catch(e) {
+            h.splice(30);
+            try { localStorage.setItem('ve_image_history', JSON.stringify(h)); } catch(e2) {}
+        }
+        // 再尝试渲染 DOM（如果页面已被销毁，这个可能失败，不要让它影响前面的写入）
+        try { renderHistory(); } catch(e) { console.warn('[saveHistoryInternal] renderHistory 跳过（页面可能已销毁）', e); }
+    }
+
+    // 监听 index.html 发来的"即将切换页面"消息
+    window.addEventListener('message', function(ev) {
+        if (ev.data && ev.data.type === 'pageWillSwitch') {
+            // 如果当前有 pending 任务，通知父页面保存（即使还没完成，父页面也会代管 fetch）
+            try {
+                const pending = sessionStorage.getItem('ve_pending_task');
+                if (pending) {
+                    const task = JSON.parse(pending);
+                    // 附加 API 请求参数，让父页面可以代为发起 fetch
+                    if (task.status === 'pending' && task.fetchParams) {
+                        parent.postMessage({
+                            type: 've_page_leaving',
+                            pending: task
+                        }, '*');
+                        console.log('[pageWillSwitch] 父页面代管 fetch，prompt:', (task.prompt || '').substring(0, 30));
+                    } else if (task.status === 'completed') {
+                        // 已经完成但还没渲染的，直接让父页面保存
+                        parent.postMessage({
+                            type: 've_save_result',
+                            prompt: task.prompt,
+                            model: task.model,
+                            size: task.size,
+                            images: task.images,
+                            time: task.time
+                        }, '*');
+                    }
+                }
+            } catch(e) {
+                console.warn('[pageWillSwitch]', e);
+            }
+        }
+    });
+
     // === Generate ===
     generateBtn.addEventListener('click', generateImage);
 
@@ -534,6 +788,46 @@
 
         abortController = new AbortController();
         const signal = abortController.signal;
+
+        // === 生成开始时记录 pending 任务到 sessionStorage ===
+        const refUrl = $('refImageUrl').value.trim();
+        const isEdit = toggleEdit.checked && refUrl;
+        const requestUrl = API_BASE + '/v1/images/generations';
+        const requestBody = isEdit ? {
+            model: model, prompt: prompt,
+            n: parseInt(countSelect.value), size: sizeSelect.value,
+            quality: qualitySelect.value,
+            image: refUrl.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
+        } : {
+            model: model, prompt: prompt,
+            n: parseInt(countSelect.value), size: sizeSelect.value,
+            quality: qualitySelect.value
+        };
+        const taskInfo = {
+            prompt: prompt,
+            model: model,
+            size: sizeSelect.value,
+            n: parseInt(countSelect.value),
+            quality: qualitySelect.value,
+            time: Date.now(),
+            status: 'pending',
+            fetchParams: {
+                url: requestUrl,
+                body: requestBody,
+                apiKey: apiKey
+            }
+        };
+        markTaskPending(taskInfo);
+
+        // === 写日志：记录生成开始（立即写入 localStorage，不依赖页面存活） ===
+        addLog({
+            time: Date.now(),
+            prompt: prompt,
+            model: model,
+            size: sizeSelect.value,
+            status: 'pending',
+            success: false
+        });
 
         try {
             let resp;
@@ -599,37 +893,84 @@
                 throw new Error('API 返回为空:\n' + JSON.stringify(data).slice(0, 300));
             }
 
-            // Render images
+            // === 立即保存到 localStorage 历史（即使页面即将被切换也执行） ===
+            // 先收集图片 URL
+            const images = [];
+            for (let i = 0; i < data.data.length; i++) {
+                const imgData = data.data[i];
+                if (imgData.b64_json) {
+                    images.push('data:image/png;base64,' + imgData.b64_json);
+                } else if (imgData.url) {
+                    images.push(imgData.url);
+                }
+            }
+
+            if (images.length > 0) {
+                // === 核心：立即持久化（双重保证） ===
+                // 1. 先自己写 localStorage（如果 iframe 上下文还在）
+                saveHistoryInternal({
+                    prompt: prompt,
+                    model: model,
+                    size: sizeSelect.value,
+                    images: images,
+                    time: taskInfo.time
+                });
+
+                // === 写日志：记录生成成功结果（localStorage 写入，不依赖页面存活） ===
+                addLog({
+                    time: Date.now(),
+                    prompt: prompt,
+                    model: model,
+                    size: sizeSelect.value,
+                    images: images,
+                    status: 'completed',
+                    success: true
+                });
+
+                // 2. 更新 sessionStorage（切换回来时可以恢复显示）
+                taskInfo.status = 'completed';
+                taskInfo.images = images;
+                markTaskPending(taskInfo);
+
+                // 3. 通过 postMessage 让 index.html 也保存一次（iframe 被销毁时这可能是唯一有效的方式）
+                try {
+                    parent.postMessage({
+                        type: 've_save_result',
+                        prompt: prompt,
+                        model: model,
+                        size: sizeSelect.value,
+                        images: images,
+                        time: taskInfo.time
+                    }, '*');
+                } catch(e) {
+                    console.warn('[generate] postMessage to parent failed:', e);
+                }
+            }
+
+            // Render images（只有页面还在时才有意义）
             imageGallery.innerHTML = '';
             generatedImages = [];
-
             for (let i = 0; i < data.data.length; i++) {
                 const imgData = data.data[i];
                 let src = null;
-
                 if (imgData.b64_json) {
                     src = 'data:image/png;base64,' + imgData.b64_json;
                 } else if (imgData.url) {
                     src = imgData.url;
                 }
-
                 if (src) {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'image-wrapper';
-
                     const img = document.createElement('img');
                     img.src = src;
                     img.alt = '图片 ' + (i + 1);
                     img.onerror = function() { console.error('图片加载失败:', src.substring(0,100)); };
-
                     const label = document.createElement('div');
                     label.className = 'image-label';
                     label.textContent = '图片 ' + (i + 1) + '/' + data.data.length;
-
                     wrapper.appendChild(img);
                     wrapper.appendChild(label);
                     imageGallery.appendChild(wrapper);
-
                     generatedImages.push(src);
                 }
             }
@@ -641,13 +982,8 @@
             // Download buttons
             showDownloadButtons(generatedImages);
 
-            // Save history with thumbnail
-            saveHistoryWithThumb({
-                prompt: prompt,
-                model: model,
-                size: sizeSelect.value,
-                images: generatedImages
-            });
+            // 清理 pending 标记（正常完成无需恢复）
+            markTaskComplete();
 
         } catch (err) {
             if (err.name === 'AbortError') {
@@ -656,6 +992,20 @@
                 console.error('[error]', err);
                 showMsg('error', err.message || '请求失败');
             }
+            // 清理 pending 标记（失败了不用恢复）
+            markTaskComplete();
+
+            // === 写日志：记录生成失败 ===
+            addLog({
+                time: Date.now(),
+                prompt: prompt,
+                model: model,
+                size: sizeSelect.value,
+                status: 'failed',
+                success: false,
+                error: (err.message || '未知错误').substring(0, 200)
+            });
+
             setLoading(false);
         }
     }
@@ -865,6 +1215,16 @@
     if (savedKey) setTimeout(testApiKey, 500);
 
     renderHistory();
+
+    // 检查是否有因切换页面遗留的已完成任务
+    checkPendingTask();
+
+    // 页面卸载前最后一道防线：保存 pending 状态
+    window.addEventListener('beforeunload', function() {
+        // 如果还在 loading（有 pending 任务），sessionStorage 已经保存了，无需额外操作
+        // 如果已完成但页面即将销毁，localStorage 已经保存了
+        // beforeunload 在这里作为兜底触发点
+    });
 
     console.log('✅ GPT Image 2 页面已加载');
 })();
