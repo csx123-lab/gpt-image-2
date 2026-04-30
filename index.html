@@ -203,13 +203,63 @@ function saveHistory(entry) {
 // 跟踪由父页面代管的 pending fetch（iframe 被切走后，父页面代为等待）
 var parentManagedFetch = null;
 
-// 从 iframe 收到「请代为保存结果」的请求
+// 父页面代为发起 fetch 并保存结果
+function parentDoFetch(fetchParams) {
+    if (!fetchParams || !fetchParams.url || !fetchParams.apiKey) return;
+    if (parentManagedFetch) {
+        try { parentManagedFetch.abort(); } catch(e) {}
+    }
+    var ac = new AbortController();
+    parentManagedFetch = ac;
+    fetch(fetchParams.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + fetchParams.apiKey },
+        body: JSON.stringify(fetchParams.body),
+        signal: ac.signal
+    }).then(function(resp) {
+        if (!resp.ok) return null;
+        return resp.json();
+    }).then(function(data) {
+        if (!data || !data.data || !data.data.length) return;
+        var images = [];
+        for (var i = 0; i < data.data.length; i++) {
+            var imgData = data.data[i];
+            if (imgData.b64_json) images.push('data:image/png;base64,' + imgData.b64_json);
+            else if (imgData.url) images.push(imgData.url);
+        }
+        if (images.length > 0) {
+            saveHistory({
+                prompt: fetchParams.prompt,
+                model: fetchParams.model,
+                size: fetchParams.size,
+                images: images,
+                time: fetchParams.time
+            });
+            try {
+                sessionStorage.setItem(PENDING_KEY, JSON.stringify({
+                    status: 'completed',
+                    prompt: fetchParams.prompt,
+                    model: fetchParams.model,
+                    size: fetchParams.size,
+                    images: images,
+                    time: fetchParams.time
+                }));
+            } catch(e) {}
+            console.log('[index] 父页面代为保存生成结果成功');
+        }
+    }).catch(function(err) {
+        if (err.name !== 'AbortError') {
+            console.warn('[index] 父页面代管 fetch 失败:', err);
+        }
+    });
+}
+
+// 从 iframe 收到消息
 window.addEventListener('message', function(ev) {
   if (!ev.data || !ev.data.type) return;
   var msg = ev.data;
 
   if (msg.type === 've_save_result') {
-    // iframe 在即将被销毁前，把 fetch 结果发过来由父页面持久化
     console.log('[index] 收到 iframe 保存请求:', msg.prompt ? msg.prompt.substring(0,30) : '');
     saveHistory({
       prompt: msg.prompt,
@@ -218,7 +268,6 @@ window.addEventListener('message', function(ev) {
       images: msg.images,
       time: msg.time
     });
-    // 标记 pending 为 completed（这样下次切回 gpt-image-2 时可以恢复）
     try {
       sessionStorage.setItem(PENDING_KEY, JSON.stringify({
         status: 'completed',
@@ -231,72 +280,17 @@ window.addEventListener('message', function(ev) {
     } catch(e) {}
   }
 
-  if (msg.type === 've_task_completed') {
-    try {
-      sessionStorage.setItem(PENDING_KEY, JSON.stringify({
-        status: 'completed',
-        prompt: msg.prompt,
-        model: msg.model,
-        size: msg.size,
-        images: msg.images,
-        time: msg.time
-      }));
-    } catch(e) {}
+  if (msg.type === 've_takeover_request') {
+    // 收到 iframe 的请求参数，由父页面代为发起 fetch 并持久化
+    console.log('[index] 收到接管请求:', msg.fetchParams ? msg.fetchParams.prompt.substring(0,30) : '');
+    parentDoFetch(msg.fetchParams);
   }
 
   if (msg.type === 've_page_leaving') {
-    // iframe 即将被销毁，把 pending 信息传过来，让父页面代为等结果
     var task = msg.pending;
-    if (task && task.status === 'pending' && task.apiKey && task.url && task.body) {
-      console.log('[index] iframe 正在生成中，父页面代为等待结果');
-      // 如果之前已经有代管的 fetch，取消它
-      if (parentManagedFetch) {
-        try { parentManagedFetch.abort(); } catch(e) {}
-      }
-      var ac = new AbortController();
-      parentManagedFetch = ac;
-      // 在父页面层面重新发起 fetch
-      fetch(task.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + task.apiKey },
-        body: JSON.stringify(task.body),
-        signal: ac.signal
-      }).then(function(resp) {
-        if (!resp.ok) return null;
-        return resp.json();
-      }).then(function(data) {
-        if (!data || !data.data || !data.data.length) return;
-        var images = [];
-        for (var i = 0; i < data.data.length; i++) {
-          var imgData = data.data[i];
-          if (imgData.b64_json) images.push('data:image/png;base64,' + imgData.b64_json);
-          else if (imgData.url) images.push(imgData.url);
-        }
-        if (images.length > 0) {
-          saveHistory({
-            prompt: task.prompt,
-            model: task.model,
-            size: task.size,
-            images: images,
-            time: task.time
-          });
-          try {
-            sessionStorage.setItem(PENDING_KEY, JSON.stringify({
-              status: 'completed',
-              prompt: task.prompt,
-              model: task.model,
-              size: task.size,
-              images: images,
-              time: task.time
-            }));
-          } catch(e) {}
-          console.log('[index] 父页面代为保存生成结果成功');
-        }
-      }).catch(function(err) {
-        if (err.name !== 'AbortError') {
-          console.warn('[index] 父页面代管 fetch 失败:', err);
-        }
-      });
+    if (task && task.status === 'pending' && task.fetchParams) {
+      console.log('[index] iframe 即将销毁，父页面代管 fetch');
+      parentDoFetch(task.fetchParams);
     }
   }
 });

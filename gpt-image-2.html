@@ -506,8 +506,13 @@
         var h = getLog();
         h.unshift(entry);
         if (h.length > 200) h.length = 200;
+        // 纯写 localStorage，不碰 DOM（iframe 销毁后 DOM 操作会导致整个 microtask 被抛弃）
         try { localStorage.setItem(LOG_KEY, JSON.stringify(h)); } catch(e) { h.splice(100); try { localStorage.setItem(LOG_KEY, JSON.stringify(h)); } catch(e2) {} }
-        try { renderLog(); } catch(e) { /* 页面可能已销毁 */ }
+        // DOM 渲染单独包 try/catch，不影响上面的写入
+        try {
+            var logList = document.getElementById('logList');
+            if (logList) renderLog();
+        } catch(e) {}
     }
 
     function renderLog() {
@@ -819,7 +824,7 @@
         };
         markTaskPending(taskInfo);
 
-        // === 写日志：记录生成开始（立即写入 localStorage，不依赖页面存活） ===
+        // === 同步写日志 + 通知父页面（在 fetch 发出前，iframe 一定存活） ===
         addLog({
             time: Date.now(),
             prompt: prompt,
@@ -828,6 +833,23 @@
             status: 'pending',
             success: false
         });
+        // 立即把请求参数发给父页面，让父页面代为等待结果
+        try {
+            parent.postMessage({
+                type: 've_takeover_request',
+                fetchParams: {
+                    url: requestUrl,
+                    body: requestBody,
+                    apiKey: apiKey,
+                    prompt: prompt,
+                    model: model,
+                    size: sizeSelect.value,
+                    time: taskInfo.time
+                }
+            }, '*');
+        } catch(e) {
+            console.warn('[generate] 通知父页面接管失败:', e);
+        }
 
         try {
             let resp;
