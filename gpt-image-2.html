@@ -783,6 +783,7 @@
             // Render images
             imageGallery.innerHTML = '';
             generatedImages = [];
+            const apiUrls = [];
 
             for (let i = 0; i < data.data.length; i++) {
                 const imgData = data.data[i];
@@ -832,16 +833,14 @@
             });
 
             // 写生成日志（只存 API 返回的 URL，不存 base64）
-            if (apiUrls.length > 0) {
-                addLog({
-                    time: Date.now(),
-                    prompt: prompt,
-                    model: model,
-                    size: sizeSelect.value,
-                    images: apiUrls,
-                    success: true
-                });
-            }
+            addLog({
+                time: Date.now(),
+                prompt: prompt,
+                model: model,
+                size: sizeSelect.value,
+                images: apiUrls,
+                success: true
+            });
 
         } catch (err) {
             if (err.name === 'AbortError') {
