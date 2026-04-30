@@ -74,7 +74,6 @@ body{
   display:block;
 }
 
-/* 首页 */
 .home{
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
@@ -177,183 +176,29 @@ const pageMap = {
   'grok': 'grok.html'
 };
 
-// === 持久化层（在 index.html 层面，不会被 iframe 销毁影响） ===
-const PERSIST_KEY = 've_image_history';
-const PENDING_KEY = 've_pending_task';
-
-function saveHistory(entry) {
-  var h = [];
-  try { h = JSON.parse(localStorage.getItem(PERSIST_KEY) || '[]'); } catch(e) {}
-  // 过滤：只存普通 URL，跳过 base64
-  var safeImages = [];
-  var thumb = '';
-  if (entry.images && entry.images.length > 0) {
-    for (var i = 0; i < entry.images.length; i++) {
-      var img = entry.images[i];
-      if (img && img.indexOf('data:') !== 0) {
-        safeImages.push(img);
-      }
-    }
-    thumb = safeImages.length > 0 ? safeImages[0] : '';
-  }
-  h.unshift({
-    prompt: entry.prompt,
-    model: entry.model,
-    size: entry.size,
-    images: safeImages,
-    thumb: thumb,
-    time: entry.time || Date.now()
-  });
-  if (h.length > 50) h.length = 50;
-  try { localStorage.setItem(PERSIST_KEY, JSON.stringify(h)); } catch(e) {
-    h.splice(30);
-    try { localStorage.setItem(PERSIST_KEY, JSON.stringify(h)); } catch(e2) {}
-  }
-}
-
-// 跟踪由父页面代管的 pending fetch（iframe 被切走后，父页面代为等待）
-var parentManagedFetch = null;
-
-// 父页面代为发起 fetch 并保存结果
-function parentDoFetch(fetchParams) {
-    if (!fetchParams || !fetchParams.url || !fetchParams.apiKey) return;
-    if (parentManagedFetch) {
-        try { parentManagedFetch.abort(); } catch(e) {}
-    }
-    var ac = new AbortController();
-    parentManagedFetch = ac;
-    fetch(fetchParams.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + fetchParams.apiKey },
-        body: JSON.stringify(fetchParams.body),
-        signal: ac.signal
-    }).then(function(resp) {
-        if (!resp.ok) return null;
-        return resp.json();
-    }).then(function(data) {
-        if (!data || !data.data || !data.data.length) return;
-        var images = [];
-        for (var i = 0; i < data.data.length; i++) {
-            var imgData = data.data[i];
-            if (imgData.url) images.push(imgData.url);
-            // base64 跳过，不存 localStorage
-        }
-        if (images.length > 0) {
-            saveHistory({
-                prompt: fetchParams.prompt,
-                model: fetchParams.model,
-                size: fetchParams.size,
-                images: images,
-                time: fetchParams.time
-            });
-            try {
-                sessionStorage.setItem(PENDING_KEY, JSON.stringify({
-                    status: 'completed',
-                    prompt: fetchParams.prompt,
-                    model: fetchParams.model,
-                    size: fetchParams.size,
-                    images: images,
-                    time: fetchParams.time
-                }));
-            } catch(e) {}
-            console.log('[index] 父页面代为保存生成结果成功:', images.length, '张图片');
-        } else {
-            console.warn('[index] 父页面代管 fetch 返回了图片但都是 base64，未保存到历史');
-        }
-    }).catch(function(err) {
-        if (err.name !== 'AbortError') {
-            console.warn('[index] 父页面代管 fetch 失败:', err);
-        }
-    });
-}
-
-// 从 iframe 收到消息
-window.addEventListener('message', function(ev) {
-  if (!ev.data || !ev.data.type) return;
-  var msg = ev.data;
-
-  if (msg.type === 've_save_result') {
-    console.log('[index] 收到 iframe 保存请求:', msg.prompt ? msg.prompt.substring(0,30) : '');
-    saveHistory({
-      prompt: msg.prompt,
-      model: msg.model,
-      size: msg.size,
-      images: msg.images,
-      time: msg.time
-    });
-    try {
-      sessionStorage.setItem(PENDING_KEY, JSON.stringify({
-        status: 'completed',
-        prompt: msg.prompt,
-        model: msg.model,
-        size: msg.size,
-        images: msg.images,
-        time: msg.time
-      }));
-    } catch(e) {}
-  }
-
-  if (msg.type === 've_page_leaving') {
-    var task = msg.pending;
-    if (task && task.status === 'pending' && task.fetchParams) {
-      console.log('[index] iframe 即将销毁，父页面代管 fetch');
-      parentDoFetch(task.fetchParams);
-    }
-  }
-});
-
 function switchPage(el){
-  // 切换前检查是否有进行中的任务并转发给父页面保存
-  var currentIframe = document.querySelector('#contentArea iframe');
-  if (currentIframe) {
-    try {
-      currentIframe.contentWindow.postMessage({ type: 'pageWillSwitch' }, '*');
-    } catch(e) {}
-  }
-
-  document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
   el.classList.add('active');
-  var page = el.dataset.page;
-  var url = pageMap[page];
-  if (url) {
-    document.getElementById('contentArea').innerHTML = '<iframe src="' + url + '"></iframe>';
-    try { localStorage.setItem('qy_active_page', page); } catch(e) {}
+  var page=el.dataset.page;
+  var url=pageMap[page];
+  if(url){
+    document.getElementById('contentArea').innerHTML='<iframe src="'+url+'"></iframe>';
+    try{localStorage.setItem('qy_active_page',page)}catch(e){}
   }
-
-  // 切换后检查：是否有 completed 的遗留任务需要通知用户
-  try {
-    var pending = sessionStorage.getItem(PENDING_KEY);
-    if (pending) {
-      var task = JSON.parse(pending);
-      if (task.status === 'completed' && task.images && task.images.length > 0) {
-        // 确认历史中已有
-        var h = [];
-        try { h = JSON.parse(localStorage.getItem(PERSIST_KEY) || '[]'); } catch(e) {}
-        var exists = h.some(function(e) {
-          return e.time === task.time;
-        });
-        if (!exists) {
-          saveHistory(task);
-        }
-        alert('📸 检测到上次切换页面时完成的生成结果，已保存到历史记录。\n\n切换到 GPT Image 2 即可查看。');
-        sessionStorage.removeItem(PENDING_KEY);
-      }
-    }
-  } catch(e) {}
 }
 
 function switchPage2(page){
-  var el = document.querySelector('.nav-item[data-page="'+page+'"]');
-  if (el) switchPage(el);
+  var el=document.querySelector('.nav-item[data-page="'+page+'"]');
+  if(el) switchPage(el);
 }
 
-try {
-  var saved = localStorage.getItem('qy_active_page');
-  if (saved && pageMap[saved]) {
-    var el = document.querySelector('.nav-item[data-page="'+saved+'"]');
-    if (el) switchPage(el);
+try{
+  var saved=localStorage.getItem('qy_active_page');
+  if(saved&&pageMap[saved]){
+    var el=document.querySelector('.nav-item[data-page="'+saved+'"]');
+    if(el) switchPage(el);
   }
-} catch(e) {}
+}catch(e){}
 </script>
 <div style="position:fixed;bottom:0;left:0;width:220px;height:1px;background:linear-gradient(90deg,transparent,rgba(99,102,241,.15),transparent);pointer-events:none"></div>
 </body>

@@ -495,7 +495,7 @@
     let abortController = null;
     let generatedImages = [];
 
-    // === 生成日志（持久化到 localStorage，不依赖页面存活） ===
+    // === 生成日志（只存 API 返回的 URL，不存 base64） ===
     const LOG_KEY = 've_gen_log';
 
     function getLog() {
@@ -506,9 +506,7 @@
         var h = getLog();
         h.unshift(entry);
         if (h.length > 200) h.length = 200;
-        // 纯写 localStorage，不碰 DOM（iframe 销毁后 DOM 操作会导致整个 microtask 被抛弃）
         try { localStorage.setItem(LOG_KEY, JSON.stringify(h)); } catch(e) { h.splice(100); try { localStorage.setItem(LOG_KEY, JSON.stringify(h)); } catch(e2) {} }
-        // DOM 渲染单独包 try/catch，不影响上面的写入
         try {
             var logList = document.getElementById('logList');
             if (logList) renderLog();
@@ -529,7 +527,6 @@
         for (var i = 0; i < h.length; i++) {
             var e = h[i];
             var time = e.time ? new Date(e.time).toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' }) : '--';
-            var statusClass = e.success ? 'ok' : (e.status === 'pending' ? 'pending' : 'fail');
             var statusText = e.success ? '✅ 完成' : (e.status === 'pending' ? '⏳ 进行中' : '❌ 失败');
             var promptShort = (e.prompt || '').substring(0, 80);
             var images = e.images || [];
@@ -538,9 +535,8 @@
                 urlHtml = '<div style="margin-top:.15rem;">';
                 for (var j = 0; j < images.length; j++) {
                     var url = images[j];
-                    var isData = url.indexOf('data:') === 0;
-                    var shortUrl = isData ? 'data:image (base64, ' + Math.round((url.length * 3/4) / 1024) + 'KB)' : url.substring(0, 80) + (url.length > 80 ? '...' : '');
-                    urlHtml += '<span class="log-url" title="' + url.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" onclick="navigator.clipboard.writeText(\'' + url.replace(/'/g, "\\'") + '\').then(function(){this.textContent=\'✅ 已复制\'; setTimeout(function(){this.textContent=\'' + shortUrl.replace(/'/g, "\\'") + '\'},1500).bind(this)})">📎 ' + shortUrl + '</span>';
+                    var shortUrl = url.substring(0, 60) + (url.length > 60 ? '...' : '');
+                    urlHtml += '<span class="log-url" title="' + url.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" onclick="navigator.clipboard.writeText(\'' + url.replace(/'/g, "\\'") + '\').then(function(){this.textContent=\'✅ 已复制\'; var _this=this; setTimeout(function(){_this.textContent=\'' + shortUrl.replace(/'/g, "\\'") + '\'},1500)})">📎 ' + shortUrl + '</span>';
                     if (j < images.length - 1) urlHtml += '<br>';
                 }
                 urlHtml += '</div>';
@@ -554,7 +550,7 @@
 
             html += '<div class="log-item">' +
                 '<span class="log-time">' + time + '</span> ' +
-                '<span class="log-status ' + statusClass + '">' + statusText + '</span>' +
+                '<span class="log-status ' + (e.success ? 'ok' : (e.status === 'pending' ? 'pending' : 'fail')) + '">' + statusText + '</span>' +
                 '<div class="log-prompt">' + escHtml(promptShort) + '</div>' +
                 metaHtml +
                 urlHtml +
@@ -576,7 +572,7 @@
         var text = '千亿AI - 生成日志\n导出时间: ' + new Date().toLocaleString('zh-CN') + '\n共 ' + h.length + ' 条\n' + '='.repeat(50) + '\n\n';
         for (var i = 0; i < h.length; i++) {
             var e = h[i];
-            text += '#' + (i+1) + ' | ' + (e.success ? '✅成功' : (e.status === 'pending' ? '⏳进行中' : '❌失败')) + '\n';
+            text += '#' + (i+1) + ' | ' + (e.success ? '完成' : (e.status === 'pending' ? '进行中' : '失败')) + '\n';
             text += '  时间: ' + new Date(e.time).toLocaleString('zh-CN') + '\n';
             text += '  描述: ' + (e.prompt || '') + '\n';
             text += '  模型: ' + (e.model || '') + ' | 尺寸: ' + (e.size || '') + '\n';
@@ -599,7 +595,6 @@
         URL.revokeObjectURL(a.href);
     });
 
-    // 页面加载时渲染日志
     setTimeout(renderLog, 100);
 
     // === Edit mode toggle ===
@@ -667,120 +662,6 @@
         clearRefBtn.style.display = 'none';
     });
 
-    // === 跨页面持久化: 生成开始/完成时写 sessionStorage 兜底 ===
-    function markTaskPending(task) {
-        try { sessionStorage.setItem('ve_pending_task', JSON.stringify(task)); } catch(e) {}
-    }
-
-    function markTaskComplete() {
-        try { sessionStorage.removeItem('ve_pending_task'); } catch(e) {}
-    }
-
-    // 页面加载时检测：是否有完成的遗留任务未展示
-    function checkPendingTask() {
-        try {
-            const pending = sessionStorage.getItem('ve_pending_task');
-            if (!pending) return;
-            const task = JSON.parse(pending);
-            if (task.status === 'completed' && task.images && task.images.length > 0) {
-                // 恢复结果
-                imageGallery.innerHTML = '';
-                generatedImages = task.images;
-                for (const src of task.images) {
-                    const w = document.createElement('div');
-                    w.className = 'image-wrapper';
-                    const img = document.createElement('img');
-                    img.src = src;
-                    img.alt = '';
-                    w.appendChild(img);
-                    imageGallery.appendChild(w);
-                }
-                showDownloadButtons(generatedImages);
-                resultArea.classList.add('visible');
-                showMsg('info', '📸 检测到上次切换页面时完成的生成结果，已恢复显示\n（"' + (task.prompt || '').substring(0, 60) + '..."）');
-                // 同时确保在 localStorage 历史中也存在
-                const h = getHistory();
-                const hasHistory = h.some(function(e) {
-                    return e.time === task.time && JSON.stringify(e.images) === JSON.stringify(task.images);
-                });
-                if (!hasHistory) {
-                    saveHistoryInternal({
-                        prompt: task.prompt,
-                        model: task.model,
-                        size: task.size,
-                        images: task.images,
-                        time: task.time
-                    });
-                }
-                markTaskComplete();
-            }
-        } catch(e) { console.warn('[checkPendingTask]', e); }
-    }
-
-    // 保存历史（内部版，可指定时间戳）
-    function saveHistoryInternal(entry) {
-        const h = getHistory();
-        let thumb = '';
-        // 过滤：只保留普通 URL，跳过 base64（base64 太长会撑爆 localStorage）
-        const safeImages = [];
-        if (entry.images && entry.images.length > 0) {
-            for (let i = 0; i < entry.images.length; i++) {
-                const img = entry.images[i];
-                if (img && img.indexOf('data:') !== 0) {
-                    safeImages.push(img);
-                }
-            }
-            thumb = safeImages.length > 0 ? safeImages[0] : '';
-        }
-        h.unshift({
-            prompt: entry.prompt,
-            model: entry.model,
-            size: entry.size,
-            images: safeImages,
-            thumb: thumb,
-            time: entry.time || Date.now()
-        });
-        if (h.length > 50) h.length = 50;
-        try { localStorage.setItem('ve_image_history', JSON.stringify(h)); } catch(e) {
-            h.splice(30);
-            try { localStorage.setItem('ve_image_history', JSON.stringify(h)); } catch(e2) {}
-        }
-        try { renderHistory(); } catch(e) { console.warn('[saveHistoryInternal] renderHistory 跳过（页面可能已销毁）', e); }
-    }
-
-    // 监听 index.html 发来的"即将切换页面"消息
-    window.addEventListener('message', function(ev) {
-        if (ev.data && ev.data.type === 'pageWillSwitch') {
-            // 如果当前有 pending 任务，通知父页面保存（即使还没完成，父页面也会代管 fetch）
-            try {
-                const pending = sessionStorage.getItem('ve_pending_task');
-                if (pending) {
-                    const task = JSON.parse(pending);
-                    // 附加 API 请求参数，让父页面可以代为发起 fetch
-                    if (task.status === 'pending' && task.fetchParams) {
-                        parent.postMessage({
-                            type: 've_page_leaving',
-                            pending: task
-                        }, '*');
-                        console.log('[pageWillSwitch] 父页面代管 fetch，prompt:', (task.prompt || '').substring(0, 30));
-                    } else if (task.status === 'completed') {
-                        // 已经完成但还没渲染的，直接让父页面保存
-                        parent.postMessage({
-                            type: 've_save_result',
-                            prompt: task.prompt,
-                            model: task.model,
-                            size: task.size,
-                            images: task.images,
-                            time: task.time
-                        }, '*');
-                    }
-                }
-            } catch(e) {
-                console.warn('[pageWillSwitch]', e);
-            }
-        }
-    });
-
     // === Generate ===
     generateBtn.addEventListener('click', generateImage);
 
@@ -800,37 +681,6 @@
         abortController = new AbortController();
         const signal = abortController.signal;
 
-        // === 生成开始时记录 pending 任务到 sessionStorage ===
-        const refUrl = $('refImageUrl').value.trim();
-        const isEdit = toggleEdit.checked && refUrl;
-        const requestUrl = API_BASE + '/v1/images/generations';
-        const requestBody = isEdit ? {
-            model: model, prompt: prompt,
-            n: parseInt(countSelect.value), size: sizeSelect.value,
-            quality: qualitySelect.value,
-            image: refUrl.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
-        } : {
-            model: model, prompt: prompt,
-            n: parseInt(countSelect.value), size: sizeSelect.value,
-            quality: qualitySelect.value
-        };
-        const taskInfo = {
-            prompt: prompt,
-            model: model,
-            size: sizeSelect.value,
-            n: parseInt(countSelect.value),
-            quality: qualitySelect.value,
-            time: Date.now(),
-            status: 'pending',
-            fetchParams: {
-                url: requestUrl,
-                body: requestBody,
-                apiKey: apiKey
-            }
-        };
-        markTaskPending(taskInfo);
-
-        // === 同步写日志（在 fetch 发出前，iframe 一定存活） ===
         addLog({
             time: Date.now(),
             prompt: prompt,
@@ -904,64 +754,45 @@
                 throw new Error('API 返回为空:\n' + JSON.stringify(data).slice(0, 300));
             }
 
-            // === 立即保存到 localStorage 历史（即使页面即将被切换也执行） ===
-            // 先收集图片 URL（只存普通 URL，跳过 base64 以免撑爆 localStorage）
-            const allImages = [];
-            const safeImages = [];
+            const images = [];
+            const apiUrls = [];
             for (let i = 0; i < data.data.length; i++) {
                 const imgData = data.data[i];
                 if (imgData.b64_json) {
-                    allImages.push('data:image/png;base64,' + imgData.b64_json);
-                    // base64 不存 localStorage，但当前渲染可以用
+                    images.push('data:image/png;base64,' + imgData.b64_json);
                 } else if (imgData.url) {
-                    allImages.push(imgData.url);
-                    safeImages.push(imgData.url);
+                    images.push(imgData.url);
+                    apiUrls.push(imgData.url);
                 }
             }
 
-            if (allImages.length > 0) {
-                // === 核心：立即持久化（双重保证） ===
-                // 1. 先自己写 localStorage（只存普通 URL，跳过 base64）
-                saveHistoryInternal({
+            if (images.length > 0) {
+                // 保存历史记录（保持原样，存 base64 缩略图也能显示）
+                saveHistoryWithThumb({
                     prompt: prompt,
                     model: model,
                     size: sizeSelect.value,
-                    images: safeImages,
-                    time: taskInfo.time
+                    images: images
                 });
 
-                // === 写日志：记录生成成功结果（只存普通 URL） ===
-                addLog({
-                    time: Date.now(),
-                    prompt: prompt,
-                    model: model,
-                    size: sizeSelect.value,
-                    images: safeImages,
-                    status: 'completed',
-                    success: true
-                });
-
-                // 2. 更新 sessionStorage（切换回来时可以恢复显示）
-                taskInfo.status = 'completed';
-                taskInfo.images = safeImages;
-                markTaskPending(taskInfo);
-
-                // 3. 通过 postMessage 让 index.html 也保存一次
-                try {
-                    parent.postMessage({
-                        type: 've_save_result',
+                // 写日志：只存 API 返回的 URL
+                if (apiUrls.length > 0) {
+                    addLog({
+                        time: Date.now(),
                         prompt: prompt,
                         model: model,
                         size: sizeSelect.value,
-                        images: safeImages,
-                        time: taskInfo.time
-                    }, '*');
-                } catch(e) {
-                    console.warn('[generate] postMessage to parent failed:', e);
+                        images: apiUrls,
+                        status: 'completed',
+                        success: true
+                    });
                 }
             }
 
-            // Render images（当前页面渲染用 allImages，包含 base64）
+                }
+            }
+
+            // Render images
             imageGallery.innerHTML = '';
             generatedImages = [];
             for (let i = 0; i < data.data.length; i++) {
@@ -996,8 +827,7 @@
             // Download buttons
             showDownloadButtons(generatedImages);
 
-            // 清理 pending 标记（正常完成无需恢复）
-            markTaskComplete();
+
 
         } catch (err) {
             if (err.name === 'AbortError') {
@@ -1006,10 +836,7 @@
                 console.error('[error]', err);
                 showMsg('error', err.message || '请求失败');
             }
-            // 清理 pending 标记（失败了不用恢复）
-            markTaskComplete();
 
-            // === 写日志：记录生成失败 ===
             addLog({
                 time: Date.now(),
                 prompt: prompt,
@@ -1229,16 +1056,6 @@
     if (savedKey) setTimeout(testApiKey, 500);
 
     renderHistory();
-
-    // 检查是否有因切换页面遗留的已完成任务
-    checkPendingTask();
-
-    // 页面卸载前最后一道防线：保存 pending 状态
-    window.addEventListener('beforeunload', function() {
-        // 如果还在 loading（有 pending 任务），sessionStorage 已经保存了，无需额外操作
-        // 如果已完成但页面即将销毁，localStorage 已经保存了
-        // beforeunload 在这里作为兜底触发点
-    });
 
     console.log('✅ GPT Image 2 页面已加载');
 })();
