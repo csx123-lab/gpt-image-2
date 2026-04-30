@@ -1,367 +1,404 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GPT Image 2 - AI 图片生成器</title>
+    <title>千亿AI - AI 图片生成器</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ─── Particle canvas ─── */
+        #particles-canvas {
+            position: fixed; inset: 0;
+            width: 100%; height: 100%;
+            z-index: 0; pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
             background: #07070d;
             min-height: 100vh;
-            color: #d0d0e0;
+            color: #e0e0e0;
             overflow-x: hidden;
         }
-        /* ambient glow background */
+
+        /* Ambient glow */
         body::before {
             content: '';
             position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(ellipse 500px 350px at 15% 20%, rgba(99,102,241,.15) 0%, transparent 70%),
-                radial-gradient(ellipse 400px 350px at 85% 80%, rgba(6,182,212,.08) 0%, transparent 70%),
-                radial-gradient(ellipse 300px 300px at 50% 50%, rgba(168,85,247,.04) 0%, transparent 70%);
-            pointer-events: none;
+            top: -30%; left: -20%;
+            width: 60%; height: 60%;
+            background: radial-gradient(circle, rgba(102,126,234,0.08) 0%, transparent 70%);
             z-index: 0;
+            pointer-events: none;
         }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%; right: -20%;
+            width: 60%; height: 60%;
+            background: radial-gradient(circle, rgba(240,147,251,0.06) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
         .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
             position: relative;
             z-index: 1;
+            max-width: 840px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            animation: fadeIn 0.8s ease-out;
         }
 
-        /* ─── header ─── */
         header { text-align: center; margin-bottom: 2.5rem; }
-        header .logo {
-            display: inline-flex; align-items: center; gap: .6rem;
-            margin-bottom: .5rem;
-        }
-        header .logo-icon {
-            width: 38px; height: 38px;
-            background: linear-gradient(135deg, #6366f1, #06b6d4);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; color: #fff;
-            box-shadow: 0 4px 15px rgba(99,102,241,.25);
-        }
         header h1 {
-            font-size: 1.9rem; font-weight: 700;
-            background: linear-gradient(135deg, #818cf8, #22d3ee);
+            font-size: 2rem; font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
         }
-        header .subtitle {
-            color: #555; font-size: .82rem; letter-spacing: .3px;
-        }
-        header .badge-row {
-            display: flex; align-items: center; justify-content: center; gap: .5rem;
-            margin-top: .75rem;
-        }
-        header .badge {
-            display: inline-flex; align-items: center; gap: .35rem;
-            padding: .2rem .7rem; border-radius: 20px;
-            background: rgba(99,102,241,.08);
-            border: 1px solid rgba(99,102,241,.12);
-            font-size: .65rem; color: #818cf8; font-weight: 500;
-            letter-spacing: .5px;
-        }
-        header .badge .dot {
-            width: 5px; height: 5px; border-radius: 50%;
-            background: #818cf8;
-            animation: pulse-dot 2s infinite;
-        }
-        @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-        /* ─── cards ─── */
+        /* ─── Glass card ─── */
         .card {
-            background: rgba(255,255,255,.025);
-            backdrop-filter: blur(20px) saturate(1.3);
-            -webkit-backdrop-filter: blur(20px) saturate(1.3);
-            border: 1px solid rgba(255,255,255,.06);
-            border-radius: 16px;
-            padding: 1.5rem;
+            position: relative;
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(24px) saturate(1.2);
+            -webkit-backdrop-filter: blur(24px) saturate(1.2);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 2rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,.3);
+            box-shadow:
+                0 2px 0 0 rgba(255,255,255,0.02) inset,
+                0 8px 32px rgba(0,0,0,0.3);
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .card-title {
-            font-size: .8rem; font-weight: 600; color: #666680;
-            margin-bottom: 1.2rem; display: flex; align-items: center; gap: .5rem;
-            text-transform: uppercase; letter-spacing: .8px;
-        }
-        .card-divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(99,102,241,.15), transparent);
-            margin: -.2rem 0 1.2rem;
+        .card:hover {
+            border-color: rgba(255,255,255,0.1);
+            box-shadow:
+                0 2px 0 0 rgba(255,255,255,0.03) inset,
+                0 8px 40px rgba(0,0,0,0.35);
         }
 
-        /* ─── form ─── */
-        .form-group { margin-bottom: 1.2rem; }
+        /* Subtle top border glow on cards */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20%; right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(102,126,234,0.3), rgba(240,147,251,0.3), transparent);
+            border-radius: 50%;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            color: #7878a0;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .card-title .icon { opacity: 0.7; }
+
+        .form-group { margin-bottom: 1.25rem; }
         .form-group label {
-            display: block; font-size: .75rem; font-weight: 600; color: #666680;
-            margin-bottom: .45rem; text-transform: uppercase; letter-spacing: .5px;
+            display: block;
+            font-size: 0.8rem;
+            color: #8888aa;
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
         input, textarea, select {
             width: 100%;
-            padding: .7rem 1rem;
-            background: rgba(255,255,255,.035);
-            border: 1px solid rgba(255,255,255,.07);
-            border-radius: 10px;
-            color: #d0d0e0;
-            font-size: .9rem;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
             outline: none;
-            transition: border-color .2s, box-shadow .2s, background .2s;
+            transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
             font-family: inherit;
         }
         textarea { resize: vertical; min-height: 80px; }
+        input:hover, textarea:hover, select:hover {
+            border-color: rgba(255,255,255,0.14);
+            background: rgba(255,255,255,0.06);
+        }
         input:focus, textarea:focus, select:focus {
-            border-color: rgba(99,102,241,.45);
-            box-shadow: 0 0 0 3px rgba(99,102,241,.08), 0 0 15px rgba(99,102,241,.03);
-            background: rgba(99,102,241,.025);
+            border-color: #667eea;
+            background: rgba(102,126,234,0.04);
+            box-shadow: 0 0 0 1px rgba(102,126,234,0.25), 0 4px 20px rgba(102,126,234,0.06);
         }
         select {
             cursor: pointer; appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237878a0' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
             background-repeat: no-repeat; background-position: right 1rem center;
+            padding-right: 2.5rem;
         }
-        select option { background: #0e0e18; color: #d0d0e0; }
+        select option { background: #0c0c18; color: #e0e0e0; }
 
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         @media (max-width:600px) { .form-row { grid-template-columns: 1fr; } }
 
-        /* ─── buttons ─── */
+        /* ─── Primary button ─── */
         .btn-primary {
+            position: relative;
             width: 100%;
-            padding: .85rem;
+            padding: 0.9rem;
             border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #6366f1, #06b6d4);
-            color: #fff;
-            font-size: .95rem;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all .2s;
-            display: flex; align-items: center; justify-content: center; gap: .5rem;
-            position: relative;
+            transition: transform 0.15s, box-shadow 0.25s;
+            display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+            letter-spacing: 0.3px;
             overflow: hidden;
         }
-        .btn-primary::after {
+        .btn-primary::before {
             content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,.08) 50%, transparent 70%);
-            transition: transform .5s;
-            transform: translateX(-100%);
+            position: absolute;
+            top: 0; left: -100%;
+            width: 300%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+            transition: left 0.6s;
+        }
+        .btn-primary:hover:not(:disabled)::before {
+            left: 100%;
         }
         .btn-primary:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 25px rgba(99,102,241,.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102,126,234,0.35), 0 2px 0 rgba(255,255,255,0.1) inset;
         }
-        .btn-primary:hover::after { transform: translateX(100%); }
-        .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
 
         .spinner {
             display: none;
             width: 18px; height: 18px;
-            border: 2px solid rgba(255,255,255,.25);
+            border: 2px solid rgba(255,255,255,0.25);
             border-top-color: #fff;
             border-radius: 50%;
-            animation: spin .7s linear infinite;
+            animation: spin 0.7s linear infinite;
         }
         .btn-primary.loading .spinner { display: inline-block; }
         .btn-primary.loading .btn-text { display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .btn-secondary {
-            display: inline-flex; align-items: center; gap: .35rem;
-            padding: .4rem .85rem;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,.07);
-            background: rgba(255,255,255,.02);
-            color: #8888a0;
-            font-size: .75rem;
-            cursor: pointer;
-            transition: all .15s;
-            white-space: nowrap;
-        }
-        .btn-secondary:hover { background: rgba(255,255,255,.05); color: #c0c0d0; }
-        .btn-secondary .spinner-sm {
-            display: none; width: 14px; height: 14px;
-            border: 2px solid rgba(255,255,255,.15); border-top-color: #fff;
-            border-radius: 50%; animation: spin .7s linear infinite;
-        }
-        .btn-secondary.loading .spinner-sm { display: inline-block; }
-
-        /* ─── messages ─── */
-        .msg {
-            border-radius: 10px; padding: .65rem 1rem; margin-top: 1rem;
-            font-size: .82rem; white-space: pre-wrap; word-break: break-word;
-        }
-        .msg-error { color: #f87171; background: rgba(248,113,113,.05); border: 1px solid rgba(248,113,113,.1); }
-        .msg-info { color: #93c5fd; background: rgba(147,197,253,.04); border: 1px solid rgba(147,197,253,.08); }
-        .msg-success { color: #34d399; background: rgba(52,211,153,.05); border: 1px solid rgba(52,211,153,.1); }
-
-        .model-tip { font-size: .72rem; color: #555; margin-top: .25rem; }
-        .key-status { font-size: .75rem; margin-top: .25rem; }
-        .key-status.valid { color: #34d399; }
-        .key-status.invalid { color: #f87171; }
-
-        /* ─── result ─── */
         .result-area { display: none; }
-        .result-area.visible { display: block; }
+        .result-area.visible { display: block; animation: fadeIn 0.5s ease-out; }
 
         .image-wrapper {
-            max-width: 512px; margin: .75rem auto;
-            border-radius: 10px; overflow: hidden;
-            background: rgba(0,0,0,.4);
-            border: 1px solid rgba(255,255,255,.05);
-            box-shadow: 0 4px 20px rgba(0,0,0,.3);
-            transition: box-shadow .2s;
+            width: 100%;
+            max-width: 512px;
+            margin: 1rem auto;
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
         }
-        .image-wrapper:hover { box-shadow: 0 8px 30px rgba(0,0,0,.4); }
-        .image-wrapper img { width: 100%; height: auto; display: block; }
+        .image-wrapper img { width: 100%; height: auto; display: block; transition: opacity 0.4s; }
         .image-label {
-            padding: .3rem .75rem; font-size: .72rem; color: #666;
-            background: rgba(0,0,0,.5); text-align: center;
+            padding: 0.45rem 0.75rem;
+            font-size: 0.75rem;
+            color: #7878a0;
+            background: rgba(0,0,0,0.5);
+            text-align: center;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
-        .image-actions { display: none; justify-content: center; gap: .6rem; margin-top: 1rem; }
-        .image-actions.show { display: flex; }
 
-        /* ─── upload area ─── */
-        .upload-area {
-            border: 1.5px dashed rgba(255,255,255,.06);
+        .msg {
             border-radius: 12px;
-            padding: 1.8rem 1rem;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .msg-error { color:#f87171; background:rgba(248,113,113,0.06); border:1px solid rgba(248,113,113,0.12); }
+        .msg-info { color:#93c5fd; background:rgba(147,197,253,0.06); border:1px solid rgba(147,197,253,0.12); }
+        .msg-success { color:#6ee7b7; background:rgba(110,231,183,0.06); border:1px solid rgba(110,231,183,0.12); }
+
+        .model-tip { font-size:0.75rem; color:#555; margin-top:0.3rem; }
+
+        .footer { text-align:center; padding:2rem 0 1rem; color:#333; font-size:0.75rem; }
+
+        /* ─── Small button ─── */
+        .btn-test {
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.04);
+            color: #8888aa;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .btn-test:hover { background:rgba(255,255,255,0.09); color:#c0c0d0; border-color: rgba(255,255,255,0.12); }
+        .btn-test .spinner-sm {
+            display:none; width:14px; height:14px;
+            border:2px solid rgba(255,255,255,0.15); border-top-color:#fff;
+            border-radius:50%; animation:spin 0.7s linear infinite;
+        }
+        .btn-test.loading .spinner-sm { display:inline-block; }
+        .key-status { font-size:0.78rem; margin-top:0.3rem; }
+        .key-status.valid { color:#6ee7b7; }
+        .key-status.invalid { color:#f87171; }
+
+        /* ─── Upload area ─── */
+        .upload-area {
+            border: 1.5px dashed rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 1.5rem;
             text-align: center;
             cursor: pointer;
             position: relative;
-            transition: all .25s;
-            background: rgba(255,255,255,.008);
+            transition: all 0.25s;
         }
         .upload-area:hover {
-            border-color: rgba(99,102,241,.3);
-            background: rgba(99,102,241,.02);
+            border-color: rgba(102,126,234,0.35);
+            background: rgba(102,126,234,0.03);
         }
-        .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-        .upload-area .upload-icon { font-size: 1.6rem; margin-bottom: .3rem; opacity: .4; }
-        .upload-area .upload-text { font-size: .78rem; color: #555; line-height: 1.5; }
-        .upload-area .upload-text b { color: rgba(99,102,241,.55); font-weight: 500; }
-        .upload-area.has-image {
-            border-color: rgba(99,102,241,.15);
-            border-style: solid;
-            padding: .6rem;
+        .upload-area input[type="file"] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer;
         }
+        .upload-area .upload-icon { font-size:1.8rem; opacity: 0.6; }
+        .upload-area .upload-text { font-size:0.8rem; color:#666; }
+        .upload-area.has-image { border-color: rgba(102,126,234,0.3); border-style: solid; padding: 0.5rem; }
         .upload-area.has-image .upload-icon,
         .upload-area.has-image .upload-text { display: none; }
 
-        .ref-preview { display: flex; gap: .4rem; flex-wrap: wrap; justify-content: center; }
-        .ref-preview img { max-height: 72px; border-radius: 6px; display: block; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+        /* ─── History ─── */
+        .history-empty { text-align:center; padding:2rem; color:#555; font-size:0.8rem; }
+        .history-item {
+            display:flex; gap:0.75rem; padding:0.6rem; border-radius:10px;
+            cursor:pointer; transition:background 0.2s;
+            border-bottom:1px solid rgba(255,255,255,0.03);
+        }
+        .history-item:hover { background:rgba(255,255,255,0.04); }
+        .history-item img {
+            width:80px; height:80px; border-radius:10px; object-fit:cover;
+            flex-shrink:0; background:rgba(0,0,0,0.3);
+        }
+        .history-info { flex:1; min-width:0; }
+        .history-info .hi-prompt { font-size:0.82rem; color:#b0b0c8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .history-info .hi-meta { font-size:0.7rem; color:#666; margin-top:0.2rem; }
+
+        .ref-preview { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; }
+        .ref-preview img { max-height:100px; border-radius:8px; display:block; }
 
         .toggle-label {
-            display: flex; align-items: center; gap: .5rem; cursor: pointer;
-            font-size: .82rem; color: #737380;
+            display:flex; align-items:center; gap:0.5rem; cursor:pointer;
+            font-size:0.82rem; color:#8888aa;
+            font-weight: 500;
         }
-        .toggle-label input[type="checkbox"] { width: 15px; height: 15px; accent-color: #6366f1; cursor: pointer; }
-        .ref-section { display: none; }
-        .ref-section.visible { display: block; }
+        .toggle-label input[type="checkbox"] { width:16px; height:16px; accent-color:#667eea; cursor:pointer; border-radius:4px; }
+        .ref-section { display:none; }
+        .ref-section.visible { display:block; }
 
-        /* ─── history ─── */
-        .history-empty { text-align: center; padding: 2rem; color: #444; font-size: .82rem; }
-        .history-item {
-            display: flex; gap: .75rem; padding: .55rem; border-radius: 8px;
-            cursor: pointer; transition: background .15s;
-            border-bottom: 1px solid rgba(255,255,255,.03);
-        }
-        .history-item:hover { background: rgba(255,255,255,.03); }
-        .history-item img {
-            width: 72px; height: 72px; border-radius: 6px; object-fit: cover;
-            flex-shrink: 0; background: rgba(0,0,0,.3);
-            transition: transform .2s;
-        }
-        .history-item:hover img { transform: scale(1.05); }
-        .history-info { flex: 1; min-width: 0; }
-        .history-info .hi-prompt { font-size: .8rem; color: #b0b0c0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .history-info .hi-meta { font-size: .68rem; color: #555; margin-top: .15rem; }
-
-        /* ─── log ─── */
-        .log-item {
-            padding: .55rem .65rem;
-            border-bottom: 1px solid rgba(255,255,255,.03);
-            font-size: .76rem;
-            line-height: 1.55;
-            color: #999;
-            word-break: break-all;
-        }
-        .log-item:hover { background: rgba(255,255,255,.015); }
-        .log-item .log-time { color: #555; font-size: .68rem; font-family: monospace; }
-        .log-item .log-prompt { color: #b0b0c0; }
-        .log-item .log-status { display: inline-block; padding: .05rem .35rem; border-radius: 4px; font-size: .65rem; font-weight: 600; }
-        .log-item .log-status.ok { color: #34d399; background: rgba(52,211,153,.08); }
-        .log-item .log-status.fail { color: #f87171; background: rgba(248,113,113,.08); }
-        .log-item .log-status.pending { color: #fbbf24; background: rgba(251,191,36,.08); }
-        .log-item .log-url {
-            display: inline-block;
-            color: #818cf8;
-            font-size: .68rem;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            vertical-align: middle;
-            cursor: pointer;
-        }
-        .log-item .log-url:hover { text-decoration: underline; }
-        .log-empty { text-align: center; padding: 2rem; color: #444; font-size: .82rem; }
-        .log-item .log-meta { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .15rem; }
-        .log-item .log-meta span { color: #555; font-size: .65rem; }
-
-        /* ─── scrollbar ─── */
-        ::-webkit-scrollbar { width: 5px; }
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.06); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.12); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+        /* ─── Selection ─── */
+        ::selection { background: rgba(102,126,234,0.25); color: #fff; }
     </style>
 </head>
 <body>
+<canvas id="particles-canvas"></canvas>
 <div class="container">
     <header>
-        <div class="logo">
-            <div class="logo-icon">✦</div>
-            <h1>GPT Image 2</h1>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;">
+            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0.15rem;">
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+                        <defs>
+                            <linearGradient id="qlogo" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#667eea"/>
+                                <stop offset="100%" stop-color="#f093fb"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="2" y="2" width="30" height="30" rx="8" fill="url(#qlogo)" opacity="0.12"/>
+                        <rect x="2" y="2" width="30" height="30" rx="8" stroke="url(#qlogo)" stroke-width="1.2" opacity="0.4"/>
+                        <path d="M10 17l5 5 9-9" stroke="url(#qlogo)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div style="display:flex;flex-direction:column;gap:0;">
+                        <span style="font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,#667eea,#9d7ae0,#f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1.5px;">千亿AI</span>
+                        <span style="font-size:0.6rem;color:#555;letter-spacing:2.5px;text-transform:uppercase;font-weight:300;">QianYi AI</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="subtitle">AI 图片生成 · 智能编辑</div>
-        <div class="badge-row">
-            <span class="badge"><span class="dot"></span>千亿AI · Image Gen</span>
+        <div style="text-align:center;margin-bottom:2rem;">
+            <h1 style="display:inline-flex;align-items:center;gap:0.5rem;font-weight:700;">
+                <svg viewBox="0 0 32 32" width="26" height="26" fill="none">
+                    <defs>
+                        <linearGradient id="gptLogo" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#10a37f"/>
+                            <stop offset="100%" stop-color="#06b6d4"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="2" y="2" width="28" height="28" rx="6" fill="url(#gptLogo)" opacity="0.15"/>
+                    <rect x="2" y="2" width="28" height="28" rx="6" stroke="url(#gptLogo)" stroke-width="1.5"/>
+                    <path d="M10 12h12M10 16h12M10 20h12" stroke="url(#gptLogo)" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+                <span style="background:linear-gradient(135deg,#10a37f,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">GPT Image</span>
+                <span style="color:#b0b0d0;">2</span>
+            </h1>
         </div>
     </header>
 
     <!-- Settings -->
     <div class="card">
-        <div class="card-title"><span class="icon">⚙️</span> 图片生成设置</div>
+        <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7878a0" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            图片生成
+        </div>
 
         <div class="form-group">
             <label for="apiKey">API 密钥</label>
             <div style="display:flex; gap:0.5rem;">
-                <input type="password" id="apiKey" placeholder="sk-" style="flex:1;" />
-                <button class="btn-secondary" id="testKeyBtn" type="button">
+                <input type="password" id="apiKey" placeholder="sk- 输入你的 VectorEngine API 密钥" style="flex:1;" />
+                <button class="btn-test" id="testKeyBtn" type="button">
                     <span class="spinner-sm"></span>
-                    <span class="btn-secondary-text">验证</span>
-                </button>
-                <button class="btn-secondary" id="quotaBtn" type="button">
-                    <span class="spinner-sm"></span>
-                    <span class="btn-secondary-text">查额度</span>
+                    <span class="btn-test-text">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:2px;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        验证
+                    </span>
                 </button>
             </div>
             <div class="key-status" id="keyStatus"></div>
-            <div class="model-tip">向千亿AI获取</div>
+            <div class="model-tip">在千亿AI获取</div>
         </div>
 
         <div class="form-group">
             <label class="toggle-label">
                 <input type="checkbox" id="toggleEdit" />
-                🖼️ 图生图 / 编辑模式
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8888aa" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                图生图 / 编辑模式
             </label>
         </div>
 
@@ -370,22 +407,26 @@
                 <label>参考图片（可多选）</label>
                 <div class="upload-area" id="uploadArea">
                     <input type="file" id="refImageInput" accept="image/png,image/jpeg,image/webp" multiple />
-                    <div class="upload-icon">🖼️</div>
-                    <div class="upload-text">点击选择 <b>参考图片</b>（自动上传到图床）</div>
+                    <div class="upload-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7878a0" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    </div>
+                    <div class="upload-text">点击选择多张图片（支持 Ctrl/Shift 多选）</div>
                     <div class="ref-preview" id="refPreviewArea"></div>
                 </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
+                    <span id="refCount" style="font-size:0.8rem;color:#888;">已选 0 张</span>
+                    <button type="button" id="clearRefBtn" style="display:none;background:none;border:1px solid rgba(255,255,255,0.15);color:#a0a0b8;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">清空</button>
+                </div>
             </div>
-            <div style="margin-top:0.5rem;">
-                <input type="text" id="refImageUrl" placeholder="或粘贴图片URL（支持多张，用逗号分隔）" style="font-size:0.85rem;width:100%;" />
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
-                <span id="refCount" style="font-size:0.8rem;color:#888;">已选 0 张</span>
-                <button type="button" id="clearRefBtn" class="btn-secondary" style="display:none">清空</button>
+            <div class="form-group" style="margin-top:0.5rem;padding-top:0.8rem;border-top:1px solid rgba(255,255,255,0.06);">
+                <label>或粘贴图片 URL（推荐，速度快）</label>
+                <input type="text" id="refImageUrl" placeholder="https://example.com/image.png" style="font-size:0.85rem;" />
+                <div style="font-size:0.75rem;color:#666;margin-top:0.3rem;">填入 URL 后将忽略上方上传的文件，多个 URL 用逗号分隔</div>
             </div>
         </div>
 
         <div class="form-group">
-            <label for="prompt">图片描述（Prompt）</label>
+            <label for="prompt">图片描述</label>
             <textarea id="prompt" placeholder="描述你想要生成的图片..."></textarea>
         </div>
 
@@ -393,7 +434,7 @@
             <div class="form-group">
                 <label for="model">模型</label>
                 <select id="model">
-                    <option value="gpt-image-2-all">🎯 GPT Image 2-All  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.12/次</span></option>
+                    <option value="gpt-image-2-all">🎯 GPT Image 2-All</option>
                     <option value="gpt-image-1">🎯 GPT Image 1</option>
                     <option value="dall-e-3">🖼️ DALL-E 3</option>
                 </select>
@@ -428,7 +469,10 @@
         </div>
 
         <button class="btn-primary" id="generateBtn" type="button">
-            <span class="btn-text">✦ 生成图片</span>
+            <span class="btn-text">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:2px;"><path d="M12 3v18M3 12h18"/></svg>
+                生成图片
+            </span>
             <span class="spinner"></span>
         </button>
 
@@ -437,7 +481,10 @@
 
     <!-- Result -->
     <div class="card result-area" id="resultArea">
-        <div class="card-title"><span class="icon">🎯</span> 生成结果</div>
+            <div class="card-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7878a0" stroke-width="1.8" stroke-linecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                生成结果
+            </div>
         <div id="imageGallery"></div>
         <div class="image-actions" id="imageActions" style="display:none;justify-content:center;gap:0.75rem;margin-top:1rem;"></div>
     </div>
@@ -445,29 +492,93 @@
     <!-- History -->
     <div class="card" id="historyCard">
         <div class="card-title" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
-            <span><span class="icon">📜</span> 历史记录</span>
-            <button id="clearHistoryBtn" class="btn-secondary">清空</button>
+            <span style="display:flex;align-items:center;gap:0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7878a0" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                历史记录
+            </span>
+            <button id="clearHistoryBtn" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#a0a0b8;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">清空</button>
         </div>
         <div id="historyList" style="max-height:400px;overflow-y:auto;"></div>
     </div>
 
-    <!-- 生成日志（持久化，不依赖页面存活） -->
-    <div class="card" id="logCard">
-        <div class="card-title" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
-            <span><span class="icon">📋</span> 生成日志 <span id="logBadge" style="font-size:.65rem;color:#666;font-weight:400;"></span></span>
-            <div style="display:flex;gap:.4rem;">
-                <button id="exportLogBtn" class="btn-secondary">导出</button>
-                <button id="clearLogBtn" class="btn-secondary">清空</button>
-            </div>
-        </div>
-        <div id="logList" style="max-height:500px;overflow-y:auto;margin-top:.5rem;"></div>
+    <div class="footer">
     </div>
-
 </div>
 
 <script>
 (function() {
     const $ = (id) => document.getElementById(id);
+
+    // ─── Particle background ───
+    (function initParticles() {
+        const canvas = document.getElementById('particles-canvas');
+        if (!canvas) return;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const COUNT = 50;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.25;
+                this.speedY = (Math.random() - 0.5) * 0.25;
+                this.opacity = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(180, 180, 220, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (const p of particles) {
+                p.update();
+                p.draw();
+            }
+            // Lines between close particles
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(180, 180, 220, ${0.08 * (1 - dist/120)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    })();
 
     const apiKeyInput = $('apiKey');
     const promptInput = $('prompt');
@@ -490,112 +601,9 @@
     const clearRefBtn = $('clearRefBtn');
 
     const API_BASE = 'https://api.vectorengine.cn';
-    const IMG_HOST = 'https://imageproxy.zhongzhuan.chat/api/upload';
     let refImages = [];
     let abortController = null;
     let generatedImages = [];
-
-    // === 生成日志（只存 API 返回的 URL，不存 base64） ===
-    const LOG_KEY = 've_gen_log';
-
-    function getLog() {
-        try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); } catch { return []; }
-    }
-
-    function addLog(entry) {
-        var h = getLog();
-        h.unshift(entry);
-        if (h.length > 200) h.length = 200;
-        try { localStorage.setItem(LOG_KEY, JSON.stringify(h)); } catch(e) { h.splice(100); try { localStorage.setItem(LOG_KEY, JSON.stringify(h)); } catch(e2) {} }
-        try {
-            var logList = document.getElementById('logList');
-            if (logList) renderLog();
-        } catch(e) {}
-    }
-
-    function renderLog() {
-        var logList = document.getElementById('logList');
-        var logBadge = document.getElementById('logBadge');
-        if (!logList) return;
-        var h = getLog();
-        if (logBadge) logBadge.textContent = h.length > 0 ? (h.length + ' 条') : '';
-        if (h.length === 0) {
-            logList.innerHTML = '<div class="log-empty">暂无生成日志</div>';
-            return;
-        }
-        var html = '';
-        for (var i = 0; i < h.length; i++) {
-            var e = h[i];
-            var time = e.time ? new Date(e.time).toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' }) : '--';
-            var statusText = e.success ? '✅ 完成' : (e.status === 'pending' ? '⏳ 进行中' : '❌ 失败');
-            var promptShort = (e.prompt || '').substring(0, 80);
-            var images = e.images || [];
-            var urlHtml = '';
-            if (images.length > 0) {
-                urlHtml = '<div style="margin-top:.15rem;">';
-                for (var j = 0; j < images.length; j++) {
-                    var url = images[j];
-                    var shortUrl = url.substring(0, 60) + (url.length > 60 ? '...' : '');
-                    urlHtml += '<span class="log-url" title="' + url.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" onclick="navigator.clipboard.writeText(\'' + url.replace(/'/g, "\\'") + '\').then(function(){this.textContent=\'✅ 已复制\'; var _this=this; setTimeout(function(){_this.textContent=\'' + shortUrl.replace(/'/g, "\\'") + '\'},1500)})">📎 ' + shortUrl + '</span>';
-                    if (j < images.length - 1) urlHtml += '<br>';
-                }
-                urlHtml += '</div>';
-            }
-            var metaHtml = '<div class="log-meta">';
-            if (e.model) metaHtml += '<span>📦 ' + e.model + '</span>';
-            if (e.size) metaHtml += '<span>📐 ' + e.size + '</span>';
-            if (images.length > 0) metaHtml += '<span>🖼 ' + images.length + '张</span>';
-            if (e.error) metaHtml += '<span style="color:#f87171;">⚠ ' + escHtml((e.error || '').substring(0, 60)) + '</span>';
-            metaHtml += '</div>';
-
-            html += '<div class="log-item">' +
-                '<span class="log-time">' + time + '</span> ' +
-                '<span class="log-status ' + (e.success ? 'ok' : (e.status === 'pending' ? 'pending' : 'fail')) + '">' + statusText + '</span>' +
-                '<div class="log-prompt">' + escHtml(promptShort) + '</div>' +
-                metaHtml +
-                urlHtml +
-                '</div>';
-        }
-        logList.innerHTML = html;
-    }
-
-    document.getElementById('clearLogBtn').addEventListener('click', function() {
-        if (confirm('确定清空所有生成日志？')) {
-            localStorage.removeItem(LOG_KEY);
-            renderLog();
-        }
-    });
-
-    document.getElementById('exportLogBtn').addEventListener('click', function() {
-        var h = getLog();
-        if (h.length === 0) { alert('暂无日志可导出'); return; }
-        var text = '千亿AI - 生成日志\n导出时间: ' + new Date().toLocaleString('zh-CN') + '\n共 ' + h.length + ' 条\n' + '='.repeat(50) + '\n\n';
-        for (var i = 0; i < h.length; i++) {
-            var e = h[i];
-            text += '#' + (i+1) + ' | ' + (e.success ? '完成' : (e.status === 'pending' ? '进行中' : '失败')) + '\n';
-            text += '  时间: ' + new Date(e.time).toLocaleString('zh-CN') + '\n';
-            text += '  描述: ' + (e.prompt || '') + '\n';
-            text += '  模型: ' + (e.model || '') + ' | 尺寸: ' + (e.size || '') + '\n';
-            if (e.images && e.images.length > 0) {
-                text += '  图片URL:\n';
-                for (var j = 0; j < e.images.length; j++) {
-                    text += '    ' + (j+1) + '. ' + e.images[j] + '\n';
-                }
-            }
-            if (e.error) text += '  错误: ' + e.error + '\n';
-            text += '\n';
-        }
-        var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 've-gen-log-' + new Date().toISOString().slice(0, 10) + '.txt';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(a.href);
-    });
-
-    setTimeout(renderLog, 100);
 
     // === Edit mode toggle ===
     toggleEdit.addEventListener('change', function() {
@@ -603,60 +611,32 @@
         if (!toggleEdit.checked) { refImages = []; refPreviewArea.innerHTML = ''; uploadArea.classList.remove('has-image'); refImageInput.value = ''; refCount.textContent = '已选 0 张'; clearRefBtn.style.display = 'none'; }
     });
 
-    refImageInput.addEventListener('change', async function(e) {
-        const files = Array.from(e.target.files);
-        if (files.length === 0) return;
-
-        // Auto-upload to image host
-        const refUrlInput = $('refImageUrl');
-        const uploadedUrls = [];
-
-        for (const file of files) {
-            uploadArea.classList.add('has-image');
-            refCount.textContent = '上传中...';
-            try {
-                const fd = new FormData();
-                fd.append('file', file);
-                const res = await fetch(IMG_HOST, { method: 'POST', body: fd });
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const data = await res.json();
-                if (data.url) uploadedUrls.push(data.url);
-            } catch (err) {
-                console.error('上传失败:', file.name, err);
-                showMsg('error', file.name + ' 上传失败：' + (err.message || '未知错误'));
-            }
-        }
-
-        if (uploadedUrls.length > 0) {
-            const existing = refUrlInput.value.trim();
-            const newUrls = uploadedUrls.join(', ');
-            refUrlInput.value = existing ? existing + ', ' + newUrls : newUrls;
-        }
-
-        refCount.textContent = '已上传 ' + uploadedUrls.length + ' / ' + files.length + ' 张';
-        clearRefBtn.style.display = '';
-
-        // Show thumbnails
+    refImageInput.addEventListener('change', function(e) {
+        refImages = Array.from(e.target.files);
         refPreviewArea.innerHTML = '';
-        for (let i = 0; i < Math.min(files.length, 6); i++) {
+        if (refImages.length === 0) { uploadArea.classList.remove('has-image'); refCount.textContent = '已选 0 张'; clearRefBtn.style.display = 'none'; return; }
+        uploadArea.classList.add('has-image');
+        // 显示最多前 6 张缩略图
+        for (let i = 0; i < Math.min(refImages.length, 6); i++) {
             const img = document.createElement('img');
-            img.src = URL.createObjectURL(files[i]);
-            img.title = files[i].name;
+            img.src = URL.createObjectURL(refImages[i]);
+            img.title = refImages[i].name;
             refPreviewArea.appendChild(img);
         }
-        if (files.length > 6) {
+        if (refImages.length > 6) {
             const more = document.createElement('div');
-            more.style.cssText = 'display:flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:6px;background:rgba(255,255,255,0.03);color:#888;font-size:0.75rem;';
-            more.textContent = '+' + (files.length - 6);
+            more.style.cssText = 'display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:6px;background:rgba(255,255,255,0.05);color:#a0a0b8;font-size:0.8rem;';
+            more.textContent = '+' + (refImages.length - 6);
             refPreviewArea.appendChild(more);
         }
+        refCount.textContent = '已选 ' + refImages.length + ' 张';
+        clearRefBtn.style.display = '';
     });
 
     clearRefBtn.addEventListener('click', function() {
         refImages = [];
         refPreviewArea.innerHTML = '';
         refImageInput.value = '';
-        $('refImageUrl').value = '';
         uploadArea.classList.remove('has-image');
         refCount.textContent = '已选 0 张';
         clearRefBtn.style.display = 'none';
@@ -681,40 +661,49 @@
         abortController = new AbortController();
         const signal = abortController.signal;
 
-        addLog({
-            time: Date.now(),
-            prompt: prompt,
-            model: model,
-            size: sizeSelect.value,
-            status: 'pending',
-            success: false
-        });
-
         try {
             let resp;
-            const refUrl = $('refImageUrl').value.trim();
-            const isEdit = toggleEdit.checked && refUrl;
+            if (toggleEdit.checked && refImages.length > 0) {
+                // 图生图
+                const refUrlInput = $('refImageUrl');
+                const imageUrls = refUrlInput.value.trim().split(',').map(s => s.trim()).filter(Boolean);
 
-            if (isEdit) {
-                // 图生图 - 用图床URL，走 JSON generations 接口
-                const imageUrls = refUrl.split(',').map(s => s.trim()).filter(Boolean);
-                console.log('[generate] 使用图床图片URL:', imageUrls);
-                showMsg('info', '⏳ 正在生成图片（图生图模式）...');
-                const url = API_BASE + '/v1/images/generations';
-                const body = {
-                    model: model,
-                    prompt: prompt,
-                    n: parseInt(countSelect.value),
-                    size: sizeSelect.value,
-                    quality: qualitySelect.value,
-                    image: imageUrls
-                };
-                resp = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-                    body: JSON.stringify(body),
-                    signal: signal
-                });
+                if (imageUrls.length > 0) {
+                    // 用 URL 模式: POST /v1/images/generations (JSON)
+                    console.log('[generate] 使用图片URL:', imageUrls);
+                    showMsg('info', '⏳ 使用图片 URL 生成中...');
+                    resp = await fetch(API_BASE + '/v1/images/generations', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+                        body: JSON.stringify({
+                            model: model,
+                            prompt: prompt,
+                            n: parseInt(countSelect.value),
+                            size: sizeSelect.value,
+                            quality: qualitySelect.value,
+                            image: imageUrls
+                        }),
+                        signal: signal
+                    });
+                } else {
+                    // 用文件上传: POST /v1/images/edits (multipart/form-data)
+                    const url = API_BASE + '/v1/images/edits';
+                    const formData = new FormData();
+                    formData.append('model', model);
+                    formData.append('prompt', prompt);
+                    formData.append('image', refImages[0]);
+                    for (let i = 1; i < refImages.length; i++) {
+                        formData.append('image', refImages[i]);
+                    }
+                    console.log('[edits] 参考图数:', refImages.length);
+                    showMsg('info', '⏳ 正在编辑图片（' + refImages.length + ' 张参考图）...');
+                    resp = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + apiKey },
+                        body: formData,
+                        signal: signal
+                    });
+                }
             } else {
                 // 文生图: POST /v1/images/generations (JSON)
                 const url = API_BASE + '/v1/images/generations';
@@ -754,68 +743,37 @@
                 throw new Error('API 返回为空:\n' + JSON.stringify(data).slice(0, 300));
             }
 
-            const images = [];
-            const apiUrls = [];
-            for (let i = 0; i < data.data.length; i++) {
-                const imgData = data.data[i];
-                if (imgData.b64_json) {
-                    images.push('data:image/png;base64,' + imgData.b64_json);
-                } else if (imgData.url) {
-                    images.push(imgData.url);
-                    apiUrls.push(imgData.url);
-                }
-            }
-
-            if (images.length > 0) {
-                // 保存历史记录（保持原样，存 base64 缩略图也能显示）
-                saveHistoryWithThumb({
-                    prompt: prompt,
-                    model: model,
-                    size: sizeSelect.value,
-                    images: images
-                });
-
-                // 写日志：只存 API 返回的 URL
-                if (apiUrls.length > 0) {
-                    addLog({
-                        time: Date.now(),
-                        prompt: prompt,
-                        model: model,
-                        size: sizeSelect.value,
-                        images: apiUrls,
-                        status: 'completed',
-                        success: true
-                    });
-                }
-            }
-
-                }
-            }
-
             // Render images
             imageGallery.innerHTML = '';
             generatedImages = [];
+
             for (let i = 0; i < data.data.length; i++) {
                 const imgData = data.data[i];
                 let src = null;
+
                 if (imgData.b64_json) {
                     src = 'data:image/png;base64,' + imgData.b64_json;
                 } else if (imgData.url) {
                     src = imgData.url;
                 }
+
                 if (src) {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'image-wrapper';
+
                     const img = document.createElement('img');
                     img.src = src;
                     img.alt = '图片 ' + (i + 1);
                     img.onerror = function() { console.error('图片加载失败:', src.substring(0,100)); };
+
                     const label = document.createElement('div');
                     label.className = 'image-label';
                     label.textContent = '图片 ' + (i + 1) + '/' + data.data.length;
+
                     wrapper.appendChild(img);
                     wrapper.appendChild(label);
                     imageGallery.appendChild(wrapper);
+
                     generatedImages.push(src);
                 }
             }
@@ -827,7 +785,13 @@
             // Download buttons
             showDownloadButtons(generatedImages);
 
-
+            // Save history (thumbnail only to avoid localStorage quota)
+            saveHistory({
+                prompt: prompt,
+                model: model,
+                size: sizeSelect.value,
+                images: generatedImages
+            });
 
         } catch (err) {
             if (err.name === 'AbortError') {
@@ -836,17 +800,6 @@
                 console.error('[error]', err);
                 showMsg('error', err.message || '请求失败');
             }
-
-            addLog({
-                time: Date.now(),
-                prompt: prompt,
-                model: model,
-                size: sizeSelect.value,
-                status: 'failed',
-                success: false,
-                error: (err.message || '未知错误').substring(0, 200)
-            });
-
             setLoading(false);
         }
     }
@@ -913,7 +866,7 @@
         imageActions.style.display = 'flex';
 
         const btnAll = document.createElement('button');
-        btnAll.className = 'btn-secondary';
+        btnAll.className = 'btn-test';
         btnAll.style.cssText = 'padding:0.5rem 1.2rem;font-size:0.85rem;';
         btnAll.textContent = '⬇️ 全部下载';
         btnAll.addEventListener('click', function() {
@@ -928,7 +881,7 @@
         });
 
         const btnCopy = document.createElement('button');
-        btnCopy.className = 'btn-secondary';
+        btnCopy.className = 'btn-test';
         btnCopy.style.cssText = 'padding:0.5rem 1.2rem;font-size:0.85rem;';
         btnCopy.textContent = '📋 复制第一张';
         btnCopy.addEventListener('click', async function() {
@@ -958,12 +911,13 @@
         catch { return []; }
     }
 
-    function saveHistoryWithThumb(entry) {
+    function saveHistory(entry) {
         const h = getHistory();
-        // Generate thumbnail from first image
+        // Only store first image as thumbnail, truncated to avoid quota
         let thumb = '';
         if (entry.images && entry.images.length > 0) {
-            thumb = entry.images[0]; // use full URL as thumb, it's fine
+            const first = entry.images[0];
+            if (first && first.length < 200000) thumb = first;
         }
         h.unshift({
             prompt: entry.prompt,
@@ -974,11 +928,7 @@
             time: Date.now()
         });
         if (h.length > 50) h.length = 50;
-        try { localStorage.setItem('ve_image_history', JSON.stringify(h)); } catch(e) {
-            // If quota exceeded, remove more items and retry
-            h.splice(30);
-            try { localStorage.setItem('ve_image_history', JSON.stringify(h)); } catch(e2) {}
-        }
+        localStorage.setItem('ve_image_history', JSON.stringify(h));
         renderHistory();
     }
 
@@ -999,26 +949,21 @@
         for (const entry of h) {
             const item = document.createElement('div');
             item.className = 'history-item';
-            const firstImg = entry.images && entry.images.length > 0 ? entry.images[0] : '';
-            const thumbSrc = entry.thumb || firstImg;
-            const hasThumb = !!thumbSrc;
+            const thumbSrc = entry.thumb || (entry.images && entry.images.length > 0 ? entry.images[0] : '');
             const meta = (entry.model || '') + ' · ' + (entry.size || '') + ' · ' + (entry.images ? entry.images.length : 0) + '张';
             const time = new Date(entry.time).toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
 
             item.innerHTML =
-                '<img src="' + thumbSrc + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" style="' + (hasThumb ? '' : 'display:none') + '" />' +
-                '<div class="history-thumb-placeholder" style="' + (hasThumb ? 'display:none' : 'width:80px;height:80px;border-radius:8px;background:rgba(255,255,255,0.03);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#444;') + '">🖼</div>' +
+                '<img src="' + thumbSrc + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' +
                 '<div class="history-info">' +
                 '  <div class="hi-prompt">' + escHtml(entry.prompt || '') + '</div>' +
                 '  <div class="hi-meta">' + escHtml(meta) + ' · ' + time + '</div>' +
                 '</div>';
 
             item.addEventListener('click', function() {
-                const imgs = entry.images || [];
-                if (!imgs.length) return;
                 imageGallery.innerHTML = '';
-                generatedImages = imgs;
-                for (const src of imgs) {
+                generatedImages = entry.images || [];
+                for (const src of generatedImages) {
                     const w = document.createElement('div');
                     w.className = 'image-wrapper';
                     const img = document.createElement('img');
@@ -1059,49 +1004,6 @@
 
     console.log('✅ GPT Image 2 页面已加载');
 })();
-
-// Footer API Key 额度查询（全局函数）
-window.checkFooterQuota = function() {
-    const key = document.getElementById('footerApiKey').value.trim();
-    const result = document.getElementById('footerQuotaResult');
-    if (!key) { result.textContent = '❌ 请输入 API Key'; return; }
-    result.textContent = '⏳ 查询中...';
-    const queries = [
-        { name: 'chaxun.wlai.vip', url: 'https://chaxun.wlai.vip/?key=' + encodeURIComponent(key) },
-        { name: 'key.tpkcur.click', url: 'https://key.tpkcur.click/?key=' + encodeURIComponent(key) }
-    ];
-    let done = 0;
-    let lines = [];
-    queries.forEach((q, idx) => {
-        fetch(q.url, { mode: 'cors' })
-            .then(r => r.text().catch(() => ''))
-            .then(text => { lines[idx] = q.name + ': ' + (text.substring(0, 200).replace(/\n/g, ' ') || '未返回数据'); })
-            .catch(() => { lines[idx] = q.name + ': ❌ 查询失败'; })
-            .finally(() => { done++; if (done === queries.length) result.innerHTML = lines.join('<br>'); });
-    });
-    setTimeout(() => { if (done < queries.length) result.innerHTML += '<br>⏳ 部分请求超时，请手动访问查询地址'; }, 10000);
-};
 </script>
-
-<!-- API Key 额度查询 Footer -->
-<div class="card" style="margin-top:2.5rem;">
-    <div class="card-title"><span class="icon">📊</span> API Key 额度查询</div>
-    <div class="form-group">
-        <label>查询地址</label>
-        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
-            <a href="https://chaxun.wlai.vip/" target="_blank" rel="noopener" class="btn-sm">chaxun.wlai.vip ↗</a>
-            <a href="https://key.tpkcur.click/" target="_blank" rel="noopener" class="btn-sm">key.tpkcur.click ↗</a>
-        </div>
-    </div>
-    <div class="form-group">
-        <label>API Key</label>
-        <div class="key-row">
-            <input type="password" id="footerApiKey" placeholder="sk-" />
-            <button class="btn-sm" onclick="checkFooterQuota()">查额度</button>
-        </div>
-    </div>
-    <div id="footerQuotaResult" style="font-size:.82rem;color:#8888a0;margin-top:.5rem;"></div>
-</div>
-
 </body>
 </html>
