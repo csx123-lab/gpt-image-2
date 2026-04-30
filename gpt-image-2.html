@@ -721,24 +721,30 @@
     function saveHistoryInternal(entry) {
         const h = getHistory();
         let thumb = '';
+        // 过滤：只保留普通 URL，跳过 base64（base64 太长会撑爆 localStorage）
+        const safeImages = [];
         if (entry.images && entry.images.length > 0) {
-            thumb = entry.images[0];
+            for (let i = 0; i < entry.images.length; i++) {
+                const img = entry.images[i];
+                if (img && img.indexOf('data:') !== 0) {
+                    safeImages.push(img);
+                }
+            }
+            thumb = safeImages.length > 0 ? safeImages[0] : '';
         }
         h.unshift({
             prompt: entry.prompt,
             model: entry.model,
             size: entry.size,
-            images: entry.images,
+            images: safeImages,
             thumb: thumb,
             time: entry.time || Date.now()
         });
         if (h.length > 50) h.length = 50;
-        // 先写 localStorage（这是最核心的持久化操作，必须在 DOM 操作之前）
         try { localStorage.setItem('ve_image_history', JSON.stringify(h)); } catch(e) {
             h.splice(30);
             try { localStorage.setItem('ve_image_history', JSON.stringify(h)); } catch(e2) {}
         }
-        // 再尝试渲染 DOM（如果页面已被销毁，这个可能失败，不要让它影响前面的写入）
         try { renderHistory(); } catch(e) { console.warn('[saveHistoryInternal] renderHistory 跳过（页面可能已销毁）', e); }
     }
 
@@ -916,52 +922,55 @@
             }
 
             // === 立即保存到 localStorage 历史（即使页面即将被切换也执行） ===
-            // 先收集图片 URL
-            const images = [];
+            // 先收集图片 URL（只存普通 URL，跳过 base64 以免撑爆 localStorage）
+            const allImages = [];
+            const safeImages = [];
             for (let i = 0; i < data.data.length; i++) {
                 const imgData = data.data[i];
                 if (imgData.b64_json) {
-                    images.push('data:image/png;base64,' + imgData.b64_json);
+                    allImages.push('data:image/png;base64,' + imgData.b64_json);
+                    // base64 不存 localStorage，但当前渲染可以用
                 } else if (imgData.url) {
-                    images.push(imgData.url);
+                    allImages.push(imgData.url);
+                    safeImages.push(imgData.url);
                 }
             }
 
-            if (images.length > 0) {
+            if (allImages.length > 0) {
                 // === 核心：立即持久化（双重保证） ===
-                // 1. 先自己写 localStorage（如果 iframe 上下文还在）
+                // 1. 先自己写 localStorage（只存普通 URL，跳过 base64）
                 saveHistoryInternal({
                     prompt: prompt,
                     model: model,
                     size: sizeSelect.value,
-                    images: images,
+                    images: safeImages,
                     time: taskInfo.time
                 });
 
-                // === 写日志：记录生成成功结果（localStorage 写入，不依赖页面存活） ===
+                // === 写日志：记录生成成功结果（只存普通 URL） ===
                 addLog({
                     time: Date.now(),
                     prompt: prompt,
                     model: model,
                     size: sizeSelect.value,
-                    images: images,
+                    images: safeImages,
                     status: 'completed',
                     success: true
                 });
 
                 // 2. 更新 sessionStorage（切换回来时可以恢复显示）
                 taskInfo.status = 'completed';
-                taskInfo.images = images;
+                taskInfo.images = safeImages;
                 markTaskPending(taskInfo);
 
-                // 3. 通过 postMessage 让 index.html 也保存一次（iframe 被销毁时这可能是唯一有效的方式）
+                // 3. 通过 postMessage 让 index.html 也保存一次
                 try {
                     parent.postMessage({
                         type: 've_save_result',
                         prompt: prompt,
                         model: model,
                         size: sizeSelect.value,
-                        images: images,
+                        images: safeImages,
                         time: taskInfo.time
                     }, '*');
                 } catch(e) {
@@ -969,7 +978,7 @@
                 }
             }
 
-            // Render images（只有页面还在时才有意义）
+            // Render images（当前页面渲染用 allImages，包含 base64）
             imageGallery.innerHTML = '';
             generatedImages = [];
             for (let i = 0; i < data.data.length; i++) {

@@ -184,12 +184,23 @@ const PENDING_KEY = 've_pending_task';
 function saveHistory(entry) {
   var h = [];
   try { h = JSON.parse(localStorage.getItem(PERSIST_KEY) || '[]'); } catch(e) {}
-  var thumb = (entry.images && entry.images.length > 0) ? entry.images[0] : '';
+  // 过滤：只存普通 URL，跳过 base64
+  var safeImages = [];
+  var thumb = '';
+  if (entry.images && entry.images.length > 0) {
+    for (var i = 0; i < entry.images.length; i++) {
+      var img = entry.images[i];
+      if (img && img.indexOf('data:') !== 0) {
+        safeImages.push(img);
+      }
+    }
+    thumb = safeImages.length > 0 ? safeImages[0] : '';
+  }
   h.unshift({
     prompt: entry.prompt,
     model: entry.model,
     size: entry.size,
-    images: entry.images,
+    images: safeImages,
     thumb: thumb,
     time: entry.time || Date.now()
   });
@@ -224,8 +235,8 @@ function parentDoFetch(fetchParams) {
         var images = [];
         for (var i = 0; i < data.data.length; i++) {
             var imgData = data.data[i];
-            if (imgData.b64_json) images.push('data:image/png;base64,' + imgData.b64_json);
-            else if (imgData.url) images.push(imgData.url);
+            if (imgData.url) images.push(imgData.url);
+            // base64 跳过，不存 localStorage
         }
         if (images.length > 0) {
             saveHistory({
@@ -245,7 +256,9 @@ function parentDoFetch(fetchParams) {
                     time: fetchParams.time
                 }));
             } catch(e) {}
-            console.log('[index] 父页面代为保存生成结果成功');
+            console.log('[index] 父页面代为保存生成结果成功:', images.length, '张图片');
+        } else {
+            console.warn('[index] 父页面代管 fetch 返回了图片但都是 base64，未保存到历史');
         }
     }).catch(function(err) {
         if (err.name !== 'AbortError') {
