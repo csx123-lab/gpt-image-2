@@ -3,201 +3,110 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>千亿AI - AI 创作平台</title>
+<title>千亿AI</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background:#0a0a14;
-  color:#e0e0e0;
-  min-height:100vh;
-  display:flex;
-}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC",sans-serif;background:#07070d;color:#d0d0e0}
+
+/* layout */
+.app{display:flex;height:100vh}
+
+/* sidebar */
 .sidebar{
-  width:220px;
+  width:200px;flex-shrink:0;
   background:rgba(255,255,255,.02);
   border-right:1px solid rgba(255,255,255,.06);
-  padding:1.5rem 0;
-  flex-shrink:0;
-  display:flex;
-  flex-direction:column;
-}
-.sidebar-brand{
-  display:flex;
-  align-items:center;
-  gap:.5rem;
-  padding:0 1.2rem 1.5rem;
-  border-bottom:1px solid rgba(255,255,255,.06);
-  margin-bottom:.5rem;
-}
-.sidebar-brand span{
-  font-weight:800;
-  font-size:1.1rem;
-  background:linear-gradient(135deg,#10a37f,#06b6d4);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-.sidebar .nav-item{
-  display:flex;
-  align-items:center;
-  gap:.6rem;
-  padding:.7rem 1.2rem;
-  color:#7878a0;
-  cursor:pointer;
-  transition:all .15s;
-  font-size:.88rem;
-  border-left:2px solid transparent;
-}
-.sidebar .nav-item:hover{color:#c0c0d8;background:rgba(255,255,255,.02)}
-.sidebar .nav-item.active{
-  color:#10a37f;
-  border-left-color:#10a37f;
-  background:rgba(16,163,127,.04);
-}
-.nav-section{
-  padding:.5rem 1.2rem .3rem;
-  font-size:.7rem;
-  color:#444;
-  letter-spacing:.5px;
-  font-weight:600;
-}
-.main{
-  flex:1;
-  overflow-y:auto;
-  padding:0;
-}
-.main iframe{
-  width:100%;
-  height:100vh;
-  border:none;
-  display:block;
-}
-
-/* 首页 */
-.home{
+  padding:1rem 0;
   display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  min-height:80vh;padding:2rem;text-align:center;
 }
-.home h1{
-  font-size:2rem;margin-bottom:.5rem;
-  background:linear-gradient(135deg,#10a37f,#06b6d4);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
+.sidebar .brand{
+  padding:.8rem 1rem;margin-bottom:.5rem;
+  display:flex;align-items:center;gap:.5rem;
 }
-.home p{color:#7878a0;font-size:.95rem;margin-bottom:2rem}
-.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;max-width:600px;width:100%}
-.home-card{
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:12px;padding:1.5rem;
-  cursor:pointer;transition:all .15s;text-align:center;
+.sidebar .brand-icon{
+  width:30px;height:30px;background:linear-gradient(135deg,#6366f1,#06b6d4);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;color:#fff;font-weight:700;
 }
-.home-card:hover{background:rgba(16,163,127,.04);border-color:rgba(16,163,127,.2);transform:translateY(-2px)}
-.home-card h3{font-size:.95rem;margin-bottom:.25rem}
-.home-card p{font-size:.78rem;color:#666;margin:0}
+.sidebar .brand-text{font-size:.95rem;font-weight:700;background:linear-gradient(135deg,#818cf8,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-@media(max-width:640px){
-  body{flex-direction:column}
-  .sidebar{
-    width:100%;flex-direction:row;overflow-x:auto;
-    padding:.5rem;border-right:none;
-    border-bottom:1px solid rgba(255,255,255,.06);
-  }
-  .sidebar-brand{display:none}
-  .nav-section{display:none}
-  .sidebar .nav-item{
-    white-space:nowrap;border-left:none;
-    border-bottom:2px solid transparent;
-    padding:.5rem .8rem;font-size:.8rem;
-  }
-  .sidebar .nav-item.active{
-    border-left:none;border-bottom-color:#10a37f;
-  }
-  .main iframe{height:calc(100vh - 48px)}
+.nav-item{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.65rem 1rem;margin:2px 6px;
+  border-radius:8px;cursor:pointer;
+  font-size:.82rem;color:#8888a0;
+  transition:all .15s;user-select:none;
 }
+.nav-item:hover{background:rgba(255,255,255,.04);color:#c0c0d0}
+.nav-item.active{background:rgba(99,102,241,.1);color:#818cf8}
+.nav-item .ico{font-size:.9rem}
+
+/* main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.main-header{
+  padding:.7rem 1.2rem;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  font-size:.85rem;color:#666680;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.main-header .page-title{font-weight:600;color:#b0b0c0}
+.main-body{flex:1;overflow:hidden}
+
+.main-body iframe{width:100%;height:100%;border:none;display:none}
+.main-body iframe.active{display:block}
 </style>
 </head>
 <body>
-
-<div class="sidebar">
-  <div class="sidebar-brand">
-    <svg width="24" height="24" viewBox="0 0 34 34" fill="none">
-      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10a37f"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
-      <rect x="2" y="2" width="30" height="30" rx="8" fill="url(#g)" opacity=".12"/>
-      <rect x="2" y="2" width="30" height="30" rx="8" stroke="url(#g)" stroke-width="1.2" opacity=".4"/>
-      <path d="M10 17l5 5 9-9" stroke="url(#g)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span>千亿AI</span>
+<div class="app">
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">✦</div>
+      <span class="brand-text">千亿AI</span>
+    </div>
+    <div class="nav-item active" data-page="gpt-image-2" onclick="switchPage(this)">
+      <span class="ico">🎨</span> GPT Image 2
+    </div>
+    <div class="nav-item" data-page="grok" onclick="switchPage(this)">
+      <span class="ico">🎬</span> Grok 视频
+    </div>
+    <div class="nav-item" data-page="veo" onclick="switchPage(this)">
+      <span class="ico">🎥</span> VEO 视频
+    </div>
   </div>
-
-  <div class="nav-section">图像工具</div>
-  <div class="nav-item" data-page="gpt-image-2" onclick="switchPage(this)">
-    GPT Image 2
-  </div>
-
-  <div class="nav-section">视频工具</div>
-  <div class="nav-item" data-page="veo" onclick="switchPage(this)">
-    VEO 视频
-  </div>
-  <div class="nav-item" data-page="grok" onclick="switchPage(this)">
-    Grok 视频
-  </div>
-</div>
-
-<div class="main">
-  <div id="contentArea">
-    <div class="home">
-      <h1>千亿AI</h1>
-      <p>选择左侧工具开始创作</p>
-      <div class="home-grid">
-        <div class="home-card" onclick="switchPage2('gpt-image-2')">
-          <h3>GPT Image 2</h3>
-          <p>AI 图片生成</p>
-        </div>
-        <div class="home-card" onclick="switchPage2('veo')">
-          <h3>VEO 视频</h3>
-          <p>AI 视频生成</p>
-        </div>
-        <div class="home-card" onclick="switchPage2('grok')">
-          <h3>Grok 视频</h3>
-          <p>xAI 视频生成</p>
-        </div>
-      </div>
+  <div class="main">
+    <div class="main-header">
+      <span class="page-title" id="pageTitle">GPT Image 2</span>
+      <span style="font-size:.72rem;color:#555">千亿AI · 智能生成平台</span>
+    </div>
+    <div class="main-body">
+      <iframe src="gpt-image-2.html" class="active" data-page="gpt-image-2"></iframe>
+      <iframe src="grok.html" data-page="grok"></iframe>
+      <iframe src="veo.html" data-page="veo"></iframe>
     </div>
   </div>
 </div>
 
 <script>
-const pageMap = {
-  'gpt-image-2': 'gpt-image-2.html',
-  'veo': 'veo.html',
-  'grok': 'grok.html'
-};
+const titles={'gpt-image-2':'GPT Image 2','grok':'Grok 视频','veo':'VEO 视频'};
 
 function switchPage(el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   el.classList.add('active');
   const page=el.dataset.page;
-  const url=pageMap[page];
-  if(url){
-    document.getElementById('contentArea').innerHTML='<iframe src="'+url+'"></iframe>';
-    try{localStorage.setItem('qy_active_page',page)}catch(e){}
-  }
+  document.getElementById('pageTitle').textContent=titles[page]||page;
+  document.querySelectorAll('.main-body iframe').forEach(f=>{
+    f.classList.toggle('active',f.dataset.page===page);
+  });
+  try{localStorage.setItem('qy_active_page',page)}catch(e){}
 }
 
-function switchPage2(page){
-  const el=document.querySelector('.nav-item[data-page="'+page+'"]');
-  if(el) switchPage(el);
-}
-
+// 恢复上次页面
 try{
   const saved=localStorage.getItem('qy_active_page');
-  if(saved&&pageMap[saved]){
+  if(saved&&titles[saved]){
     const el=document.querySelector('.nav-item[data-page="'+saved+'"]');
-    if(el) switchPage(el);
+    if(el)switchPage(el);
   }
 }catch(e){}
 </script>
