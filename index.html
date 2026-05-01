@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>千亿AI</title>
 <style>
-/* ===== 全局布局 ===== */
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC",sans-serif;background:#07070d;color:#d0d0e0}
 .app{display:flex;height:100vh}
@@ -24,8 +23,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Ro
 .page{display:none}
 .page.active{display:block}
 .page .container{max-width:840px;margin:0 auto;position:relative;z-index:1}
-
-/* ===== 各页面样式 ===== */
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -368,7 +365,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Ro
         .log-actions button:hover { color:#c0c0d8; border-color:rgba(255,255,255,0.2); }
         .log-badge { font-size:0.68rem; color:#666; }
     
-
 *{margin:0;padding:0;box-sizing:border-box}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC",sans-serif;
@@ -535,7 +531,6 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
 .log-actions button,.btn-sm{background:none;border:1px solid rgba(255,255,255,.12);color:#8888aa;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.72rem}
 .log-actions button:hover,.btn-sm:hover{color:#c0c0d8;border-color:rgba(255,255,255,.2)}
 .log-badge{font-size:.68rem;color:#666}
-
 
 *{margin:0;padding:0;box-sizing:border-box}
 body{
@@ -704,7 +699,6 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
 .log-actions button,.btn-sm{background:none;border:1px solid rgba(255,255,255,.12);color:#8888aa;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.72rem}
 .log-actions button:hover,.btn-sm:hover{color:#c0c0d8;border-color:rgba(255,255,255,.2)}
 .log-badge{font-size:.68rem;color:#666}
-
 </style>
 </head>
 <body>
@@ -731,7 +725,6 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
     </div>
     <div class="page-container" id="pageContent">
       <div class="page active" id="page-gpt">
-        
 <canvas id="particles-canvas"></canvas>
 <div class="container">
     <header>
@@ -926,10 +919,8 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
     </div>
 </div>
 
-
-      </div>
+</div>
       <div class="page" id="page-grok">
-        
 <div class="container">
 
 <header>
@@ -954,16 +945,16 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
   </div>
   <div class="form-group">
     <label>模型</label>
-    <select id="modelSelect">
+    <select id="grok_modelSelect">
       <option value="grok-video-3-10s" selected>grok-video-3-10s  ¥0.4/次</option>
       <option value="grok-videos">grok-videos  ¥0.2/次</option>
     </select>
   </div>
-  <div class="form-desc" id="modelDesc">grok-video-3 - 10秒版</div>
+  <div class="form-desc" id="grok_modelDesc">grok-video-3 - 10秒版</div>
   <div class="form-row">
     <div class="form-group">
       <label>画面比例</label>
-      <select id="aspectSelect">
+      <select id="grok_aspectSelect">
         <option value="3:2">3:2（横屏）</option>
         <option value="2:3">2:3（竖屏）</option>
         <option value="1:1">1:1（方形）</option>
@@ -971,7 +962,7 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
     </div>
     <div class="form-group">
       <label>画质</label>
-      <select id="sizeSelect">
+      <select id="grok_sizeSelect">
         <option value="720P">720P</option>
         <option value="1080P">1080P</option>
       </select>
@@ -984,13 +975,13 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
     <div id="grok_imageFields" style="display:none;margin-top:.8rem">
       <div class="form-group">
         <label>上传图片</label>
-        <input type="file" id="imageFileInput" accept="image/*" multiple class="file-input" />
-        <div class="preview-wrap" id="filePreview"></div>
+        <input type="file" id="grok_imageFileInput" accept="image/*" multiple class="file-input" />
+        <div class="preview-wrap" id="grok_filePreview"></div>
         <div style="font-size:.75rem;color:#666;margin-top:.3rem">垫图后视频尺寸跟着图片尺寸走</div>
       </div>
       <div class="form-group" style="margin-top:.5rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.06)">
         <label>或粘贴图片 URL（多个用逗号分隔）</label>
-        <input type="text" id="imageUrls" placeholder="https://example.com/img.png" />
+        <input type="text" id="grok_imageUrls" placeholder="https://example.com/img.png" />
         <div style="font-size:.75rem;color:#666;margin-top:.3rem">填写 URL 时忽略上方上传的文件</div>
       </div>
     </div>
@@ -1001,35 +992,33 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
   </div>
   <button class="btn" id="grok_generateBtn">生成视频</button>
   <div id="grok_messageArea"></div>
-  <div class="status-text" id="statusText"></div>
+  <div class="status-text" id="grok_statusText"></div>
 </div>
 
-<div class="card result-area" id="resultArea">
+<div class="card result-area" id="grok_resultArea">
   <h3>生成结果</h3>
-  <div id="videoContainer"></div>
+  <div id="grok_videoContainer"></div>
 </div>
 
-<div class="card" id="historyCard">
-  <h3>历史记录 <span id="historyCount"></span></h3>
+<div class="card" id="grok_historyCard">
+  <h3>历史记录 <span id="grok_historyCount"></span></h3>
   <div id="grok_historyList"></div>
-  <div style="text-align:center;padding:1rem;color:#555;font-size:.85rem" id="historyEmpty">暂无记录</div>
+  <div style="text-align:center;padding:1rem;color:#555;font-size:.85rem" id="grok_historyEmpty">暂无记录</div>
 </div>
 
 <!-- 生成日志 -->
 <div class="card log-card">
     <div class="card-title" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
         <span style="display:flex;align-items:center;gap:0.4rem;">📋 生成日志 <span class="log-badge" id="gkLogBadge"></span></span>
-        <div class="log-actions"><button id="gkClearLogBtn" class="btn-sm">清空</button><button id="gkExportLogBtn" class="btn-sm">导出</button></div>
+        <div class="log-actions"><button id="grok_clearLogBtn" class="btn-sm">清空</button><button id="grok_exportLogBtn" class="btn-sm">导出</button></div>
     </div>
     <div class="log-body" id="gkLogBody"><div id="gkLogList"></div></div>
 </div>
 
 </div>
 
-
-      </div>
+</div>
       <div class="page" id="page-veo">
-        
 <div class="container">
 
 <header>
@@ -1051,7 +1040,7 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
   </div>
   <div class="form-group">
     <label>模型</label>
-    <select id="modelSelect">
+    <select id="veo_modelSelect">
       <option value="veo_3_1-fast-4K">veo_3_1-fast-4K  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.43/次</span></option>
       <option value="veo_3_1-fast" selected>veo_3_1-fast  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.43/次</span></option>
       <option value="veo3.1-fast-components">veo3.1-fast-components  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.26/次</span></option>
@@ -1059,10 +1048,10 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
       <option value="veo_3_1-lite">veo_3_1-lite  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.5/次</span></option>
     </select>
   </div>
-  <div class="form-desc" id="modelDesc"></div>
+  <div class="form-desc" id="veo_modelDesc"></div>
   <div class="form-group">
     <label>画面比例</label>
-    <select id="aspectSelect">
+    <select id="veo_aspectSelect">
       <option value="16:9">16:9（横屏）</option>
       <option value="9:16">9:16（竖屏）</option>
     </select>
@@ -1072,10 +1061,10 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
       <input type="checkbox" id="veo_enableImage" style="accent-color:#6366f1;width:15px;height:15px" /> 上传参考图 / 首尾帧
     </label>
     <div id="veo_imageFields" style="display:none;margin-top:.8rem">
-      <div class="form-group"><label>参考图片</label><input type="file" id="imageInput" accept="image/*" multiple style="padding:.5rem;font-size:.8rem" /></div>
+      <div class="form-group"><label>参考图片</label><input type="file" id="veo_imageInput" accept="image/*" multiple style="padding:.5rem;font-size:.8rem" /></div>
       <div class="form-row">
-        <div class="form-group"><label>首帧</label><input type="file" id="startFrameInput" accept="image/*" style="padding:.5rem;font-size:.8rem" /></div>
-        <div class="form-group"><label>尾帧</label><input type="file" id="endFrameInput" accept="image/*" style="padding:.5rem;font-size:.8rem" /></div>
+        <div class="form-group"><label>首帧</label><input type="file" id="veo_startFrameInput" accept="image/*" style="padding:.5rem;font-size:.8rem" /></div>
+        <div class="form-group"><label>尾帧</label><input type="file" id="veo_endFrameInput" accept="image/*" style="padding:.5rem;font-size:.8rem" /></div>
       </div>
     </div>
   </div>
@@ -1085,38 +1074,36 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
   </div>
   <button class="btn" id="veo_generateBtn">生成视频</button>
   <div id="veo_messageArea"></div>
-  <div class="status-text" id="statusText"></div>
+  <div class="status-text" id="veo_statusText"></div>
 </div>
 
-<div class="card result-area" id="resultArea">
+<div class="card result-area" id="veo_resultArea">
   <div class="card-title">🎬 生成结果</div>
-  <div id="videoContainer"></div>
+  <div id="veo_videoContainer"></div>
 </div>
 
-<div class="card" id="historyCard">
-  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0"><span>📜 历史记录</span><span id="historyCount"></span></div>
+<div class="card" id="veo_historyCard">
+  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0"><span>📜 历史记录</span><span id="veo_historyCount"></span></div>
   <div id="veo_historyList"></div>
-  <div style="text-align:center;padding:1rem;color:#555;font-size:.85rem" id="historyEmpty">暂无记录</div>
+  <div style="text-align:center;padding:1rem;color:#555;font-size:.85rem" id="veo_historyEmpty">暂无记录</div>
 </div>
 
 <!-- 生成日志 -->
 <div class="card log-card">
     <div class="card-title" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
-        <span style="display:flex;align-items:center;gap:0.4rem;">📋 生成日志 <span class="log-badge" id="veLogBadge"></span></span>
-        <div class="log-actions"><button id="veClearLogBtn" class="btn-sm">清空</button><button id="veExportLogBtn" class="btn-sm">导出</button></div>
+        <span style="display:flex;align-items:center;gap:0.4rem;">📋 生成日志 <span class="log-badge" id="veo_logBadge"></span></span>
+        <div class="log-actions"><button id="veo_clearLogBtn" class="btn-sm">清空</button><button id="veo_exportLogBtn" class="btn-sm">导出</button></div>
     </div>
     <div class="log-body" id="veLogBody"><div id="veLogList"></div></div>
 </div>
 
 </div>
 
-
-      </div>
+</div>
     </div>
   </div>
 </div>
 <script>
-// ===== 页面切换 =====
 (function(){
 var titles={gpt:'GPT Image 2',grok:'Grok 视频',veo:'VEO 视频'};
 function switchPage(el){
@@ -1758,15 +1745,15 @@ const IMAGE_HOST='https://imageproxy.zhongzhuan.chat/api/upload';
 
 // 模型描述
 const MD={'grok-video-3-10s':'grok-video-3 - 10秒版','grok-videos':'grok-videos - 视频生成'};
-$('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MD[$('modelSelect').value]||'')};
-$('modelSelect').dispatchEvent(new Event('change'));
+$('grok_modelSelect').onchange=()=>{$('grok_modelDesc').textContent=$('grok_modelSelect').value+' - '+(MD[$('grok_modelSelect').value]||'')};
+$('grok_modelSelect').dispatchEvent(new Event('change'));
 
 // 垫图 toggle
 $('grok_enableImage').onchange=function(){$('grok_imageFields').style.display=this.checked?'block':'none'};
 
 // 文件预览
-$('imageFileInput').onchange=function(){
-  const p=$('filePreview');p.innerHTML='';
+$('grok_imageFileInput').onchange=function(){
+  const p=$('grok_filePreview');p.innerHTML='';
   for(let f of this.files){
     const img=document.createElement('img');
     img.src=URL.createObjectURL(f);
@@ -1784,7 +1771,7 @@ async function uploadImg(file){
 
 // 消息
 function msg(t,txt){$('grok_messageArea').innerHTML='<div class="msg msg-'+t+'">'+txt+'</div>'}
-function clrMsg(){$('grok_messageArea').innerHTML='';$('statusText').textContent=''}
+function clrMsg(){$('grok_messageArea').innerHTML='';$('grok_statusText').textContent=''}
 
 // 验证密钥
 $('grok_testKeyBtn').onclick=async function(){
@@ -1814,11 +1801,11 @@ function gHist(){try{return JSON.parse(localStorage.getItem('grok_history')||'[]
 function sHist(h){localStorage.setItem('grok_history',JSON.stringify(h))}
 function addHist(it){const h=gHist();h.unshift(it);if(h.length>50)h.length=50;sHist(h);rHist()}
 function rHist(){
-  const h=gHist();$('historyCount').textContent=h.length?'('+h.length+')':'';
-  if(!h.length){$('grok_historyList').innerHTML='';$('historyEmpty').style.display='block';return}
-  $('historyEmpty').style.display='none';
+  const h=gHist();$('grok_historyCount').textContent=h.length?'('+h.length+')':'';
+  if(!h.length){$('grok_historyList').innerHTML='';$('grok_historyEmpty').style.display='block';return}
+  $('grok_historyEmpty').style.display='none';
   $('grok_historyList').innerHTML=h.map((it,i)=>'<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-label">'+it.m+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="gkPlay('+i+')">播放</button><button class="btn-sm" onclick="gkCopy('+i+')">链接</button><button class="btn-sm" onclick="gkDel('+i+')" style="color:#f87171">删除</button></div></div>').join('')};
-window.gkPlay=function(i){const it=gHist()[i];if(!it)return;$('videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';$('resultArea').classList.add('visible');$('resultArea').scrollIntoView({behavior:'smooth'})};
+window.gkPlay=function(i){const it=gHist()[i];if(!it)return;$('grok_videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';$('grok_resultArea').classList.add('visible');$('grok_resultArea').scrollIntoView({behavior:'smooth'})};
 window.gkCopy=function(i){const it=gHist()[i];if(it)navigator.clipboard.writeText(it.u).then(()=>msg('success','链接已复制'))};
 window.gkDel=function(i){const h=gHist();h.splice(i,1);sHist(h);rHist()};
 rHist();
@@ -1827,26 +1814,26 @@ rHist();
 $('grok_generateBtn').onclick=async function(){
   const key=$('grok_apiKey').value.trim();
   const prompt=$('grok_prompt').value.trim();
-  const model=$('modelSelect').value;
+  const model=$('grok_modelSelect').value;
   if(!key){msg('error','请输入密钥');return}
   if(!prompt){msg('error','请输入描述');return}
   clrMsg();
-  $('statusText').textContent='';
-  $('resultArea').classList.remove('visible');
+  $('grok_statusText').textContent='';
+  $('grok_resultArea').classList.remove('visible');
   this.disabled=true;this.textContent='生成中...';
 
   try{
     // 构建 Body
-    const body={model,prompt,aspect_ratio:$('aspectSelect').value,size:$('sizeSelect').value};
+    const body={model,prompt,aspect_ratio:$('grok_aspectSelect').value,size:$('grok_sizeSelect').value};
 
     // images 是必需字段（文档要求），始终发送
     if($('grok_enableImage').checked){
-      const urlText=$('imageUrls').value.trim();
+      const urlText=$('grok_imageUrls').value.trim();
       const urlImages=urlText.split(',').map(s=>s.trim()).filter(Boolean);
       if(urlImages.length>0){
         body.images=urlImages;
       } else {
-        const files=$('imageFileInput').files;
+        const files=$('grok_imageFileInput').files;
         if(files.length>0){
           msg('info','正在上传 '+files.length+' 张图片到图床...');
           body.images=[];
@@ -1890,7 +1877,7 @@ $('grok_generateBtn').onclick=async function(){
     // 轮询
     const tid=data.id||data.task_id;
     if(!tid){msg('warning','未获取到任务ID: '+JSON.stringify(data).slice(0,200));return}
-    $('statusText').textContent='任务已提交，查询进度...';
+    $('grok_statusText').textContent='任务已提交，查询进度...';
     poll(key,tid,model,prompt);
 
   }catch(e){msg('error',e.message||'请求失败')}
@@ -1909,8 +1896,8 @@ async function poll(key,tid,model,prompt){
       if(!resp.ok)continue;
       const d=await resp.json();
       const st=(d.status||'').toLowerCase();
-      if(d.progress)$('statusText').textContent='生成中 '+(d.progress||'');
-      else if(i%10===0)$('statusText').textContent='生成中... ('+Math.round(i*3)+'s)';
+      if(d.progress)$('grok_statusText').textContent='生成中 '+(d.progress||'');
+      else if(i%10===0)$('grok_statusText').textContent='生成中... ('+Math.round(i*3)+'s)';
       if(st==='completed'){
         let vu=extractUrl(d)||extractUrl(d.data||d.detail);
         if(vu){showVid(vu,model,prompt);return}
@@ -1925,9 +1912,9 @@ async function poll(key,tid,model,prompt){
 }
 
 function showVid(url,model,prompt){
-  $('videoContainer').innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
-  $('resultArea').classList.add('visible');
-  $('resultArea').scrollIntoView({behavior:'smooth'});
+  $('grok_videoContainer').innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
+  $('grok_resultArea').classList.add('visible');
+  $('grok_resultArea').scrollIntoView({behavior:'smooth'});
   addHist({u:url,m:model,p:prompt||'(空)',t:Date.now()});
   msg('success','生成成功！');
   try{
@@ -1958,8 +1945,8 @@ window.gkRenderLog=function(){
   ls.innerHTML=html;
 };
 window.gkCopyUrl=function(u){navigator.clipboard.writeText(u).then(function(){msg('success','URL已复制')}).catch(function(){const t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);msg('success','URL已复制')})};
-$('gkClearLogBtn').onclick=function(){if(confirm('清空所有日志？')){localStorage.removeItem('gk_vid_log');gkRenderLog()}};
-$('gkExportLogBtn').onclick=function(){
+$('grok_clearLogBtn').onclick=function(){if(confirm('清空所有日志？')){localStorage.removeItem('gk_vid_log');gkRenderLog()}};
+$('grok_exportLogBtn').onclick=function(){
   let h=[];try{h=JSON.parse(localStorage.getItem('gk_vid_log')||'[]')}catch(e){}
   if(!h.length){alert('暂无日志');return}
   let txt='千亿AI Grok生成日志\n导出时间: '+new Date().toLocaleString()+'\n共 '+h.length+' 条\n\n';
@@ -1975,8 +1962,8 @@ setTimeout(gkRenderLog,200);
 const API='https://api.vectorengine.cn';
 const $=id=>document.getElementById(id);
 const MODELS={'veo_3_1-fast-4K':'快速版 · 4K · 支持参考图','veo_3_1-fast':'快速版 · 支持参考图','veo3.1-fast-components':'快速版 + 元素图/首尾帧','veo_3_1-lite-4K':'轻量版 · 4K · 纯文本','veo_3_1-lite':'轻量版 · 纯文本'};
-$('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MODELS[$('modelSelect').value]||'')};
-$('modelSelect').dispatchEvent(new Event('change'));
+$('veo_modelSelect').onchange=()=>{$('veo_modelDesc').textContent=$('veo_modelSelect').value+' - '+(MODELS[$('veo_modelSelect').value]||'')};
+$('veo_modelSelect').dispatchEvent(new Event('change'));
 
 function testKey(){const k=$('veo_apiKey').value.trim();if(!k){showMsg('error','请输入密钥');return}showMsg('info','验证中...');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{showMsg('success','密钥有效')}).catch(()=>{showMsg('error','密钥无效')})}
 
@@ -1986,10 +1973,10 @@ $('veo_enableImage').onchange=function(){$('veo_imageFields').style.display=this
 function gh(){try{return JSON.parse(localStorage.getItem('veo_history')||'[]')}catch{return[]}}
 function sh(i){localStorage.setItem('veo_history',JSON.stringify(i))}
 function ah(it){const i=gh();i.unshift(it);if(i.length>50)i.length=50;sh(i);rh()}
-function rh(){const i=gh();$('historyCount').textContent=i.length?'('+i.length+')':'';if(!i.length){$('veo_historyList').innerHTML='';$('historyEmpty').style.display='block';return}
-$('historyEmpty').style.display='none';$('veo_historyList').innerHTML=i.map((it,idx)=>'<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-model">'+it.m+'</div><div class="hi-prompt">'+eh(it.p.slice(0,60))+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="ph('+idx+')">播放</button><button class="btn-sm" onclick="ch('+idx+')">链接</button><button class="btn-sm" onclick="dh('+idx+')" style="color:#f87171">删除</button></div></div>').join('')}
+function rh(){const i=gh();$('veo_historyCount').textContent=i.length?'('+i.length+')':'';if(!i.length){$('veo_historyList').innerHTML='';$('veo_historyEmpty').style.display='block';return}
+$('veo_historyEmpty').style.display='none';$('veo_historyList').innerHTML=i.map((it,idx)=>'<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-model">'+it.m+'</div><div class="hi-prompt">'+eh(it.p.slice(0,60))+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="ph('+idx+')">播放</button><button class="btn-sm" onclick="ch('+idx+')">链接</button><button class="btn-sm" onclick="dh('+idx+')" style="color:#f87171">删除</button></div></div>').join('')}
 function eh(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-function ph(i){const it=gh()[i];if(!it)return;$('videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';$('resultArea').classList.add('visible');$('resultArea').scrollIntoView({behavior:'smooth'})}
+function ph(i){const it=gh()[i];if(!it)return;$('veo_videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';$('veo_resultArea').classList.add('visible');$('veo_resultArea').scrollIntoView({behavior:'smooth'})}
 function ch(i){const it=gh()[i];if(it)navigator.clipboard.writeText(it.u).then(()=>sm('success','链接已复制'))}
 function dh(i){const it=gh();it.splice(i,1);sh(it);rh()}
 rh();
@@ -2009,16 +1996,16 @@ function extractUrl(d){
 
 // 生成视频
 $('veo_generateBtn').onclick=async function(){
-  const key=$('veo_apiKey').value.trim(),prompt=$('veo_prompt').value.trim(),model=$('modelSelect').value;
+  const key=$('veo_apiKey').value.trim(),prompt=$('veo_prompt').value.trim(),model=$('veo_modelSelect').value;
   if(!key){sm('error','请输入密钥');return}
   if(!prompt){sm('error','请输入描述');return}
-  clr();$('statusText').textContent='';$('resultArea').classList.remove('visible');
+  clr();$('veo_statusText').textContent='';$('veo_resultArea').classList.remove('visible');
   this.disabled=true;this.textContent='生成中...';
 
   try{
-    const body={model,prompt,aspect_ratio:$('aspectSelect').value,enhance_prompt:true,enable_upsample:true};
+    const body={model,prompt,aspect_ratio:$('veo_aspectSelect').value,enhance_prompt:true,enable_upsample:true};
     if($('veo_enableImage').checked){
-      const rf=$('imageInput').files,sf=$('startFrameInput').files[0],ef=$('endFrameInput').files[0];
+      const rf=$('veo_imageInput').files,sf=$('veo_startFrameInput').files[0],ef=$('veo_endFrameInput').files[0];
       if(rf.length||sf||ef){
         body.images=[];
         for(const f of rf)body.images.push(await f2b(f));
@@ -2045,7 +2032,7 @@ $('veo_generateBtn').onclick=async function(){
     // pending -> 轮询 query
     const tid=data.id||data.task_id;
     if(!tid){sm('warning','未获取到任务ID: '+JSON.stringify(data).slice(0,200));return}
-    $('statusText').textContent='任务已提交，查询进度...';
+    $('veo_statusText').textContent='任务已提交，查询进度...';
     poll(key,tid,model,prompt);
 
   }catch(e){sm('error',e.message||'请求失败')}
@@ -2061,15 +2048,15 @@ async function poll(key,tid,model,prompt){
       if(!resp.ok)continue;
       const d=await resp.json();
       const st=(d.status||'').toLowerCase();
-      if(d.progress)$('statusText').textContent='生成中 '+(d.progress||'');
-      else if(i%10===0)$('statusText').textContent='生成中... ('+Math.round(i*3)+'s)';
+      if(d.progress)$('veo_statusText').textContent='生成中 '+(d.progress||'');
+      else if(i%10===0)$('veo_statusText').textContent='生成中... ('+Math.round(i*3)+'s)';
 
       // 成功
       if(st==='completed'){
         let vu=extractUrl(d)||extractUrl(d.data||d.detail);
         if(vu){showVid(vu,model,prompt);return}
         // 还有没有视频URL但completed
-        $('statusText').textContent='已完成，获取URL中...';
+        $('veo_statusText').textContent='已完成，获取URL中...';
         continue;
       }
 
@@ -2086,9 +2073,9 @@ async function poll(key,tid,model,prompt){
 
 // 显示视频
 function showVid(url,model,prompt){
-  $('videoContainer').innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
-  $('resultArea').classList.add('visible');
-  $('resultArea').scrollIntoView({behavior:'smooth'});
+  $('veo_videoContainer').innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
+  $('veo_resultArea').classList.add('visible');
+  $('veo_resultArea').scrollIntoView({behavior:'smooth'});
   ah({u:url,m:model,p:prompt||'(空)',t:Date.now()});
   sm('success','生成成功！');
   // 存日志
@@ -2128,7 +2115,7 @@ function f2b(f){
 
 // 消息
 function sm(t,txt){$('veo_messageArea').innerHTML='<div class="msg msg-'+t+'">'+txt+'</div>'}
-function clr(){$('veo_messageArea').innerHTML='';$('statusText').textContent=''}
+function clr(){$('veo_messageArea').innerHTML='';$('veo_statusText').textContent=''}
 
 // 密钥保存
 try{const s=localStorage.getItem('ve_video_key');if(s)$('veo_apiKey').value=s}catch(e){}
@@ -2137,7 +2124,7 @@ $('veo_apiKey').oninput=function(){try{localStorage.setItem('ve_video_key',this.
 // 日志面板渲染
 var veLogKey='ve_vid_log';
 window.veRenderLog=function(){
-  var ls=document.getElementById('veLogList'),lb=document.getElementById('veLogBadge');
+  var ls=document.getElementById('veLogList'),lb=document.getElementById('veo_logBadge');
   if(!ls)return;
   var h=[];try{h=JSON.parse(localStorage.getItem(veLogKey)||'[]')}catch(e){}
   if(lb)lb.textContent=h.length>0?(h.length+'条'):'';
@@ -2149,8 +2136,8 @@ window.veRenderLog=function(){
   }
   ls.innerHTML=html;
 };
-document.getElementById('veClearLogBtn').onclick=function(){if(confirm('清空所有日志？')){localStorage.removeItem(veLogKey);window.veRenderLog()}};
-document.getElementById('veExportLogBtn').onclick=function(){
+document.getElementById('veo_clearLogBtn').onclick=function(){if(confirm('清空所有日志？')){localStorage.removeItem(veLogKey);window.veRenderLog()}};
+document.getElementById('veo_exportLogBtn').onclick=function(){
   var h=[];try{h=JSON.parse(localStorage.getItem(veLogKey)||'[]')}catch(e){}
   if(!h.length){alert('暂无日志');return}
   var txt='千亿AI VEO生成日志\n导出时间:'+new Date().toLocaleString()+'\n共'+h.length+'条\n\n';
