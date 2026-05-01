@@ -275,7 +275,7 @@ const MODEL_DESC={'grok-video-3-10s':'10秒版','grok-videos':'视频生成'};
 $('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MODEL_DESC[$('modelSelect').value]||'')};
 $('modelSelect').dispatchEvent(new Event('change'));
 
-function testKey(){const k=$('apiKey').value.trim();if(!k){showMsg('error','请输入密钥');return}showMsg('info','验证中...');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{showMsg('success','密钥有效')}).catch(()=>{showMsg('error','密钥无效')})}
+function testKey(){const k=$('apiKey').value.trim();if(!k){sm('error','请输入密钥');return}sm('info','验证中...');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{sm('success','密钥有效')}).catch(()=>{sm('error','密钥无效')})}
 
 $('enableImage').onchange=function(){$('imageFields').style.display=this.checked?'block':'none'};
 
