@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>鍗冧嚎AI - AI 鍥剧墖鐢熸垚鍣?/title>
+    <title>千亿AI - AI 图片生成器</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* 鈹€鈹€鈹€ Particle canvas 鈹€鈹€鈹€ */
+        /* ─── Particle canvas ─── */
         #particles-canvas {
             position: fixed; inset: 0;
             width: 100%; height: 100%;
@@ -64,7 +64,7 @@
             margin-bottom: 0.5rem;
         }
 
-        /* 鈹€鈹€鈹€ Glass card 鈹€鈹€鈹€ */
+        /* ─── Glass card ─── */
         .card {
             position: relative;
             background: rgba(255,255,255,0.03);
@@ -152,7 +152,7 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         @media (max-width:600px) { .form-row { grid-template-columns: 1fr; } }
 
-        /* 鈹€鈹€鈹€ Primary button 鈹€鈹€鈹€ */
+        /* ─── Primary button ─── */
         .btn-primary {
             position: relative;
             width: 100%;
@@ -242,7 +242,7 @@
 
         .footer { text-align:center; padding:2rem 0 1rem; color:#333; font-size:0.75rem; }
 
-        /* 鈹€鈹€鈹€ Small button 鈹€鈹€鈹€ */
+        /* ─── Small button ─── */
         .btn-test {
             padding: 0.5rem 1rem;
             border-radius: 10px;
@@ -266,7 +266,7 @@
         .key-status.valid { color:#6ee7b7; }
         .key-status.invalid { color:#f87171; }
 
-        /* 鈹€鈹€鈹€ Upload area 鈹€鈹€鈹€ */
+        /* ─── Upload area ─── */
         .upload-area {
             border: 1.5px dashed rgba(255,255,255,0.08);
             border-radius: 14px;
@@ -289,7 +289,7 @@
         .upload-area.has-image .upload-icon,
         .upload-area.has-image .upload-text { display: none; }
 
-        /* 鈹€鈹€鈹€ History 鈹€鈹€鈹€ */
+        /* ─── History ─── */
         .history-empty { text-align:center; padding:2rem; color:#555; font-size:0.8rem; }
         .history-item {
             display:flex; gap:0.75rem; padding:0.6rem; border-radius:10px;
@@ -317,16 +317,16 @@
         .ref-section { display:none; }
         .ref-section.visible { display:block; }
 
-        /* 鈹€鈹€鈹€ Scrollbar 鈹€鈹€鈹€ */
+        /* ─── Scrollbar ─── */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
 
-        /* 鈹€鈹€鈹€ Selection 鈹€鈹€鈹€ */
+        /* ─── Selection ─── */
         ::selection { background: rgba(102,126,234,0.25); color: #fff; }
 
-        /* 鈹€鈹€鈹€ 鐢熸垚鏃ュ織 鈹€鈹€鈹€ */
+        /* ─── 生成日志 ─── */
         .log-card { margin-top: 1rem; }
         .log-card .card-title { cursor: pointer; user-select: none; }
         .log-card .card-title:hover { opacity: 0.8; }
@@ -366,7 +366,7 @@
                         <path d="M10 17l5 5 9-9" stroke="url(#qlogo)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <div style="display:flex;flex-direction:column;gap:0;">
-                        <span style="font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,#667eea,#9d7ae0,#f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1.5px;">鍗冧嚎AI</span>
+                        <span style="font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,#667eea,#9d7ae0,#f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1.5px;">千亿AI</span>
                         <span style="font-size:0.6rem;color:#555;letter-spacing:2.5px;text-transform:uppercase;font-weight:300;">QianYi AI</span>
                     </div>
                 </div>
@@ -395,95 +395,95 @@
     <div class="card">
         <div class="card-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7878a0" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-            鍥剧墖鐢熸垚
+            图片生成
         </div>
 
         <div class="form-group">
-            <label for="apiKey">API 瀵嗛挜</label>
+            <label for="apiKey">API 密钥</label>
             <div style="display:flex; gap:0.5rem;">
-                <input type="password" id="apiKey" placeholder="sk- 杈撳叆浣犵殑 VectorEngine API 瀵嗛挜" style="flex:1;" />
+                <input type="password" id="apiKey" placeholder="sk- 输入你的 VectorEngine API 密钥" style="flex:1;" />
                 <button class="btn-test" id="testKeyBtn" type="button">
                     <span class="spinner-sm"></span>
                     <span class="btn-test-text">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:2px;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                        楠岃瘉
+                        验证
                     </span>
                 </button>
             </div>
             <div class="key-status" id="keyStatus"></div>
-            <div class="model-tip">鍦ㄥ崈浜緼I鑾峰彇</div>
+            <div class="model-tip">在千亿AI获取</div>
         </div>
 
         <div class="form-group">
             <label class="toggle-label">
                 <input type="checkbox" id="toggleEdit" />
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8888aa" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                鍥剧敓鍥?/ 缂栬緫妯″紡
+                图生图 / 编辑模式
             </label>
         </div>
 
         <div class="ref-section" id="refSection">
             <div class="form-group">
-                <label>鍙傝€冨浘鐗囷紙鍙閫夛級</label>
+                <label>参考图片（可多选）</label>
                 <div class="upload-area" id="uploadArea">
                     <input type="file" id="refImageInput" accept="image/png,image/jpeg,image/webp" multiple />
                     <div class="upload-icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7878a0" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     </div>
-                    <div class="upload-text">鐐瑰嚮閫夋嫨澶氬紶鍥剧墖锛堟敮鎸?Ctrl/Shift 澶氶€夛級</div>
+                    <div class="upload-text">点击选择多张图片（支持 Ctrl/Shift 多选）</div>
                     <div class="ref-preview" id="refPreviewArea"></div>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
-                    <span id="refCount" style="font-size:0.8rem;color:#888;">宸查€?0 寮?/span>
-                    <button type="button" id="clearRefBtn" style="display:none;background:none;border:1px solid rgba(255,255,255,0.15);color:#a0a0b8;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">娓呯┖</button>
+                    <span id="refCount" style="font-size:0.8rem;color:#888;">已选 0 张</span>
+                    <button type="button" id="clearRefBtn" style="display:none;background:none;border:1px solid rgba(255,255,255,0.15);color:#a0a0b8;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">清空</button>
                 </div>
             </div>
             <div class="form-group" style="margin-top:0.5rem;padding-top:0.8rem;border-top:1px solid rgba(255,255,255,0.06);">
-                <label>鎴栫矘璐村浘鐗?URL锛堟帹鑽愶紝閫熷害蹇級</label>
+                <label>或粘贴图片 URL（推荐，速度快）</label>
                 <input type="text" id="refImageUrl" placeholder="https://example.com/image.png" style="font-size:0.85rem;" />
-                <div style="font-size:0.75rem;color:#666;margin-top:0.3rem;">濉叆 URL 鍚庡皢蹇界暐涓婃柟涓婁紶鐨勬枃浠讹紝澶氫釜 URL 鐢ㄩ€楀彿鍒嗛殧</div>
+                <div style="font-size:0.75rem;color:#666;margin-top:0.3rem;">填入 URL 后将忽略上方上传的文件，多个 URL 用逗号分隔</div>
             </div>
         </div>
 
         <div class="form-group">
-            <label for="prompt">鍥剧墖鎻忚堪</label>
-            <textarea id="prompt" placeholder="鎻忚堪浣犳兂瑕佺敓鎴愮殑鍥剧墖..."></textarea>
+            <label for="prompt">图片描述</label>
+            <textarea id="prompt" placeholder="描述你想要生成的图片..."></textarea>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="model">妯″瀷</label>
+                <label for="model">模型</label>
                 <select id="model">
-                    <option value="gpt-image-2-all">馃幆 GPT Image 2-All</option>
-                    <option value="gpt-image-1">馃幆 GPT Image 1</option>
-                    <option value="dall-e-3">馃柤锔?DALL-E 3</option>
+                    <option value="gpt-image-2-all">🎯 GPT Image 2-All</option>
+                    <option value="gpt-image-1">🎯 GPT Image 1</option>
+                    <option value="dall-e-3">🖼️ DALL-E 3</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="size">灏哄</label>
+                <label for="size">尺寸</label>
                 <select id="size">
-                    <option value="1024x1024">1024 脳 1024锛堟柟褰級</option>
-                    <option value="1024x1536">1024 脳 1536锛堢珫鐗堬級</option>
-                    <option value="1536x1024">1536 脳 1024锛堟í鐗堬級</option>
-                    <option value="2048x2048">2048 脳 2048锛?K锛?/option>
+                    <option value="1024x1024">1024 × 1024（方形）</option>
+                    <option value="1024x1536">1024 × 1536（竖版）</option>
+                    <option value="1536x1024">1536 × 1024（横版）</option>
+                    <option value="2048x2048">2048 × 2048（2K）</option>
                 </select>
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="quality">鐢昏川</label>
+                <label for="quality">画质</label>
                 <select id="quality">
-                    <option value="standard">鏍囧噯锛坰tandard锛?/option>
-                    <option value="high">楂樻竻锛坔igh锛?/option>
+                    <option value="standard">标准（standard）</option>
+                    <option value="high">高清（high）</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="outputCount">鏁伴噺</label>
+                <label for="outputCount">数量</label>
                 <select id="outputCount">
-                    <option value="1">1 寮?/option>
-                    <option value="2">2 寮?/option>
-                    <option value="4">4 寮?/option>
+                    <option value="1">1 张</option>
+                    <option value="2">2 张</option>
+                    <option value="4">4 张</option>
                 </select>
             </div>
         </div>
@@ -491,7 +491,7 @@
         <button class="btn-primary" id="generateBtn" type="button">
             <span class="btn-text">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:2px;"><path d="M12 3v18M3 12h18"/></svg>
-                鐢熸垚鍥剧墖
+                生成图片
             </span>
             <span class="spinner"></span>
         </button>
@@ -503,7 +503,7 @@
     <div class="card result-area" id="resultArea">
             <div class="card-title">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7878a0" stroke-width="1.8" stroke-linecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-                鐢熸垚缁撴灉
+                生成结果
             </div>
         <div id="imageGallery"></div>
         <div class="image-actions" id="imageActions" style="display:none;justify-content:center;gap:0.75rem;margin-top:1rem;"></div>
@@ -514,23 +514,23 @@
         <div class="card-title" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
             <span style="display:flex;align-items:center;gap:0.5rem;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7878a0" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                鍘嗗彶璁板綍
+                历史记录
             </span>
-            <button id="clearHistoryBtn" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#a0a0b8;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">娓呯┖</button>
+            <button id="clearHistoryBtn" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#a0a0b8;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">清空</button>
         </div>
         <div id="historyList" style="max-height:400px;overflow-y:auto;"></div>
     </div>
 
-    <!-- 鐢熸垚鏃ュ織 -->
+    <!-- 生成日志 -->
     <div class="card log-card">
         <div class="card-title" id="logTitle" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
             <span style="display:flex;align-items:center;gap:0.4rem;">
-                馃搵 鐢熸垚鏃ュ織
+                📋 生成日志
                 <span class="log-badge" id="logBadge"></span>
             </span>
             <div class="log-actions">
-                <button id="clearLogBtn">娓呯┖</button>
-                <button id="exportLogBtn">瀵煎嚭</button>
+                <button id="clearLogBtn">清空</button>
+                <button id="exportLogBtn">导出</button>
             </div>
         </div>
         <div class="log-body" id="logBody">
@@ -546,7 +546,7 @@
 (function() {
     const $ = (id) => document.getElementById(id);
 
-    // 鈹€鈹€鈹€ Particle background 鈹€鈹€鈹€
+    // ─── Particle background ───
     (function initParticles() {
         const canvas = document.getElementById('particles-canvas');
         if (!canvas) return;
@@ -645,15 +645,15 @@
     // === Edit mode toggle ===
     toggleEdit.addEventListener('change', function() {
         refSection.classList.toggle('visible', toggleEdit.checked);
-        if (!toggleEdit.checked) { refImages = []; refPreviewArea.innerHTML = ''; uploadArea.classList.remove('has-image'); refImageInput.value = ''; refCount.textContent = '宸查€?0 寮?; clearRefBtn.style.display = 'none'; }
+        if (!toggleEdit.checked) { refImages = []; refPreviewArea.innerHTML = ''; uploadArea.classList.remove('has-image'); refImageInput.value = ''; refCount.textContent = '已选 0 张'; clearRefBtn.style.display = 'none'; }
     });
 
     refImageInput.addEventListener('change', function(e) {
         refImages = Array.from(e.target.files);
         refPreviewArea.innerHTML = '';
-        if (refImages.length === 0) { uploadArea.classList.remove('has-image'); refCount.textContent = '宸查€?0 寮?; clearRefBtn.style.display = 'none'; return; }
+        if (refImages.length === 0) { uploadArea.classList.remove('has-image'); refCount.textContent = '已选 0 张'; clearRefBtn.style.display = 'none'; return; }
         uploadArea.classList.add('has-image');
-        // 鏄剧ず鏈€澶氬墠 6 寮犵缉鐣ュ浘
+        // 显示最多前 6 张缩略图
         for (let i = 0; i < Math.min(refImages.length, 6); i++) {
             const img = document.createElement('img');
             img.src = URL.createObjectURL(refImages[i]);
@@ -666,7 +666,7 @@
             more.textContent = '+' + (refImages.length - 6);
             refPreviewArea.appendChild(more);
         }
-        refCount.textContent = '宸查€?' + refImages.length + ' 寮?;
+        refCount.textContent = '已选 ' + refImages.length + ' 张';
         clearRefBtn.style.display = '';
     });
 
@@ -675,7 +675,7 @@
         refPreviewArea.innerHTML = '';
         refImageInput.value = '';
         uploadArea.classList.remove('has-image');
-        refCount.textContent = '宸查€?0 寮?;
+        refCount.textContent = '已选 0 张';
         clearRefBtn.style.display = 'none';
     });
 
@@ -687,8 +687,8 @@
         const prompt = promptInput.value.trim();
         const model = modelSelect.value;
 
-        if (!apiKey) { showMsg('error', '璇疯緭鍏?API 瀵嗛挜'); return; }
-        if (!prompt) { showMsg('error', '璇疯緭鍏ュ浘鐗囨弿杩?); return; }
+        if (!apiKey) { showMsg('error', '请输入 API 密钥'); return; }
+        if (!prompt) { showMsg('error', '请输入图片描述'); return; }
 
         if (abortController) abortController.abort();
         clearMessages();
@@ -701,13 +701,14 @@
         try {
             let resp;
             if (toggleEdit.checked && refImages.length > 0) {
-                // 鍥剧敓鍥?                const refUrlInput = $('refImageUrl');
+                // 图生图
+                const refUrlInput = $('refImageUrl');
                 const imageUrls = refUrlInput.value.trim().split(',').map(s => s.trim()).filter(Boolean);
 
                 if (imageUrls.length > 0) {
-                    // 鐢?URL 妯″紡: POST /v1/images/generations (JSON)
-                    console.log('[generate] 浣跨敤鍥剧墖URL:', imageUrls);
-                    showMsg('info', '鈴?浣跨敤鍥剧墖 URL 鐢熸垚涓?..');
+                    // 用 URL 模式: POST /v1/images/generations (JSON)
+                    console.log('[generate] 使用图片URL:', imageUrls);
+                    showMsg('info', '⏳ 使用图片 URL 生成中...');
                     resp = await fetch(API_BASE + '/v1/images/generations', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
@@ -722,7 +723,7 @@
                         signal: signal
                     });
                 } else {
-                    // 鐢ㄦ枃浠朵笂浼? POST /v1/images/edits (multipart/form-data)
+                    // 用文件上传: POST /v1/images/edits (multipart/form-data)
                     const url = API_BASE + '/v1/images/edits';
                     const formData = new FormData();
                     formData.append('model', model);
@@ -731,8 +732,8 @@
                     for (let i = 1; i < refImages.length; i++) {
                         formData.append('image', refImages[i]);
                     }
-                    console.log('[edits] 鍙傝€冨浘鏁?', refImages.length);
-                    showMsg('info', '鈴?姝ｅ湪缂栬緫鍥剧墖锛? + refImages.length + ' 寮犲弬鑰冨浘锛?..');
+                    console.log('[edits] 参考图数:', refImages.length);
+                    showMsg('info', '⏳ 正在编辑图片（' + refImages.length + ' 张参考图）...');
                     resp = await fetch(url, {
                         method: 'POST',
                         headers: { 'Authorization': 'Bearer ' + apiKey },
@@ -741,7 +742,7 @@
                     });
                 }
             } else {
-                // 鏂囩敓鍥? POST /v1/images/generations (JSON)
+                // 文生图: POST /v1/images/generations (JSON)
                 const url = API_BASE + '/v1/images/generations';
                 const body = {
                     model: model,
@@ -750,8 +751,8 @@
                     size: sizeSelect.value,
                     quality: qualitySelect.value
                 };
-                console.log('[generate] 寮€濮嬭姹?', url, JSON.stringify(body));
-                showMsg('info', '鈴?姝ｅ湪鐢熸垚 ' + body.n + ' 寮犲浘鐗?..');
+                console.log('[generate] 开始请求:', url, JSON.stringify(body));
+                showMsg('info', '⏳ 正在生成 ' + body.n + ' 张图片...');
                 resp = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
@@ -760,23 +761,23 @@
                 });
             }
 
-            console.log('[response] 鐘舵€?', resp.status);
+            console.log('[response] 状态:', resp.status);
 
             if (!resp.ok) {
                 let detail = '';
                 let errJson = null;
                 try { errJson = await resp.json(); detail = errJson.error?.message || JSON.stringify(errJson); }
                 catch { detail = await resp.text(); }
-                // 鎵撳嵃瀹屾暣閿欒浠ヤ究璋冭瘯
-                console.error('[response] 閿欒璇︽儏:', errJson || detail);
+                // 打印完整错误以便调试
+                console.error('[response] 错误详情:', errJson || detail);
                 throw new Error('HTTP ' + resp.status + ': ' + detail);
             }
 
             const data = await resp.json();
-            console.log('[response] 鏁版嵁:', data);
+            console.log('[response] 数据:', data);
 
             if (!data.data || data.data.length === 0) {
-                throw new Error('API 杩斿洖涓虹┖:\n' + JSON.stringify(data).slice(0, 300));
+                throw new Error('API 返回为空:\n' + JSON.stringify(data).slice(0, 300));
             }
 
             // Render images
@@ -800,12 +801,12 @@
 
                     const img = document.createElement('img');
                     img.src = src;
-                    img.alt = '鍥剧墖 ' + (i + 1);
-                    img.onerror = function() { console.error('鍥剧墖鍔犺浇澶辫触:', src.substring(0,100)); };
+                    img.alt = '图片 ' + (i + 1);
+                    img.onerror = function() { console.error('图片加载失败:', src.substring(0,100)); };
 
                     const label = document.createElement('div');
                     label.className = 'image-label';
-                    label.textContent = '鍥剧墖 ' + (i + 1) + '/' + data.data.length;
+                    label.textContent = '图片 ' + (i + 1) + '/' + data.data.length;
 
                     wrapper.appendChild(img);
                     wrapper.appendChild(label);
@@ -818,7 +819,7 @@
 
             resultArea.classList.add('visible');
             setLoading(false);
-            showMsg('success', '鉁?鎴愬姛鐢熸垚 ' + data.data.length + ' 寮犲浘鐗囷紒');
+            showMsg('success', '✅ 成功生成 ' + data.data.length + ' 张图片！');
 
             // Download buttons
             showDownloadButtons(generatedImages);
@@ -831,7 +832,8 @@
                 images: generatedImages
             });
 
-            // 鍐欑敓鎴愭棩蹇楋紙鍙瓨 API 杩斿洖鐨?URL锛屼笉瀛?base64锛?            addLog({
+            // 写生成日志（只存 API 返回的 URL，不存 base64）
+            addLog({
                 time: Date.now(),
                 prompt: prompt,
                 model: model,
@@ -842,16 +844,16 @@
 
         } catch (err) {
             if (err.name === 'AbortError') {
-                showMsg('info', '璇锋眰宸插彇娑?);
+                showMsg('info', '请求已取消');
             } else {
                 console.error('[error]', err);
-                showMsg('error', err.message || '璇锋眰澶辫触');
+                showMsg('error', err.message || '请求失败');
             }
             setLoading(false);
         }
     }
 
-    // === 鐢熸垚鏃ュ織 ===
+    // === 生成日志 ===
     const LOG_KEY = 've_gen_log';
 
     function getLog() {
@@ -871,9 +873,9 @@
         var logBadge = document.getElementById('logBadge');
         if (!logList) return;
         var h = getLog();
-        if (logBadge) logBadge.textContent = h.length > 0 ? (h.length + ' 鏉?) : '';
+        if (logBadge) logBadge.textContent = h.length > 0 ? (h.length + ' 条') : '';
         if (h.length === 0) {
-            logList.innerHTML = '<div class="log-empty">鏆傛棤鐢熸垚鏃ュ織</div>';
+            logList.innerHTML = '<div class="log-empty">暂无生成日志</div>';
             return;
         }
         var html = '';
@@ -885,13 +887,13 @@
             var urlHtml = '';
             for (var j = 0; j < images.length; j++) {
                 var url = images[j];
-                urlHtml += '<div class="log-url" onclick="copyUrl(\'' + url.replace(/'/g, "\\'") + '\')">馃搸 ' + url.substring(0, 60) + (url.length > 60 ? '...' : '') + '</div>';
+                urlHtml += '<div class="log-url" onclick="copyUrl(\'' + url.replace(/'/g, "\\'") + '\')">📎 ' + url.substring(0, 60) + (url.length > 60 ? '...' : '') + '</div>';
             }
             html += '<div class="log-item">' +
                 '<span class="log-time">' + time + '</span> ' +
-                '<span class="log-status ' + (e.success ? 'ok' : 'fail') + '">' + (e.success ? '鉁? : '鉂?) + '</span>' +
+                '<span class="log-status ' + (e.success ? 'ok' : 'fail') + '">' + (e.success ? '✅' : '❌') + '</span>' +
                 '<div class="log-prompt">' + escHtml(promptShort) + '</div>' +
-                '<div class="log-meta">' + escHtml(e.model || '') + ' 路 ' + escHtml(e.size || '') + ' 路 ' + images.length + ' 寮?/div>' +
+                '<div class="log-meta">' + escHtml(e.model || '') + ' · ' + escHtml(e.size || '') + ' · ' + images.length + ' 张</div>' +
                 urlHtml +
                 '</div>';
         }
@@ -899,7 +901,7 @@
     }
 
     document.getElementById('clearLogBtn').addEventListener('click', function() {
-        if (confirm('纭畾娓呯┖鎵€鏈夌敓鎴愭棩蹇楋紵')) {
+        if (confirm('确定清空所有生成日志？')) {
             localStorage.removeItem(LOG_KEY);
             renderLog();
         }
@@ -907,16 +909,16 @@
 
     document.getElementById('exportLogBtn').addEventListener('click', function() {
         var h = getLog();
-        if (h.length === 0) { alert('鏆傛棤鏃ュ織鍙鍑?); return; }
-        var text = '鍗冧嚎AI 鐢熸垚鏃ュ織\n瀵煎嚭鏃堕棿: ' + new Date().toLocaleString('zh-CN') + '\n鍏?' + h.length + ' 鏉n' + '='.repeat(50) + '\n\n';
+        if (h.length === 0) { alert('暂无日志可导出'); return; }
+        var text = '千亿AI 生成日志\n导出时间: ' + new Date().toLocaleString('zh-CN') + '\n共 ' + h.length + ' 条\n' + '='.repeat(50) + '\n\n';
         for (var i = 0; i < h.length; i++) {
             var e = h[i];
-            text += '#' + (i+1) + ' | ' + (e.success ? '瀹屾垚' : '澶辫触') + '\n';
-            text += '  鏃堕棿: ' + new Date(e.time).toLocaleString('zh-CN') + '\n';
-            text += '  鎻忚堪: ' + (e.prompt || '') + '\n';
-            text += '  妯″瀷: ' + (e.model || '') + ' | 灏哄: ' + (e.size || '') + '\n';
+            text += '#' + (i+1) + ' | ' + (e.success ? '完成' : '失败') + '\n';
+            text += '  时间: ' + new Date(e.time).toLocaleString('zh-CN') + '\n';
+            text += '  描述: ' + (e.prompt || '') + '\n';
+            text += '  模型: ' + (e.model || '') + ' | 尺寸: ' + (e.size || '') + '\n';
             if (e.images && e.images.length > 0) {
-                text += '  鍥剧墖URL:\n';
+                text += '  图片URL:\n';
                 for (var j = 0; j < e.images.length; j++) {
                     text += '    ' + (j+1) + '. ' + e.images[j] + '\n';
                 }
@@ -940,10 +942,10 @@
 
     async function testApiKey() {
         const key = apiKeyInput.value.trim();
-        if (!key) { keyStatus.textContent = '鉂?璇疯緭鍏?API 瀵嗛挜'; keyStatus.className = 'key-status invalid'; return; }
+        if (!key) { keyStatus.textContent = '❌ 请输入 API 密钥'; keyStatus.className = 'key-status invalid'; return; }
 
         testKeyBtn.classList.add('loading');
-        keyStatus.textContent = '鈴?楠岃瘉涓?..';
+        keyStatus.textContent = '⏳ 验证中...';
         keyStatus.className = 'key-status';
 
         try {
@@ -954,17 +956,17 @@
             if (resp.ok) {
                 const data = await resp.json();
                 const count = data.data ? data.data.length : '?';
-                keyStatus.textContent = '鉁?瀵嗛挜鏈夋晥锛侊紙鍙敤妯″瀷鏁帮細' + count + '锛?;
+                keyStatus.textContent = '✅ 密钥有效！（可用模型数：' + count + '）';
                 keyStatus.className = 'key-status valid';
                 localStorage.setItem('ve_api_key', key);
             } else {
                 const errData = await resp.json().catch(() => ({}));
                 const msg = errData.error?.message || 'HTTP ' + resp.status;
-                keyStatus.textContent = '鉂?' + msg;
+                keyStatus.textContent = '❌ ' + msg;
                 keyStatus.className = 'key-status invalid';
             }
         } catch (err) {
-            keyStatus.textContent = '鉂?缃戠粶閿欒锛? + err.message;
+            keyStatus.textContent = '❌ 网络错误：' + err.message;
             keyStatus.className = 'key-status invalid';
         }
 
@@ -999,7 +1001,7 @@
         const btnAll = document.createElement('button');
         btnAll.className = 'btn-test';
         btnAll.style.cssText = 'padding:0.5rem 1.2rem;font-size:0.85rem;';
-        btnAll.textContent = '猬囷笍 鍏ㄩ儴涓嬭浇';
+        btnAll.textContent = '⬇️ 全部下载';
         btnAll.addEventListener('click', function() {
             images.forEach(function(src, i) {
                 const a = document.createElement('a');
@@ -1014,18 +1016,18 @@
         const btnCopy = document.createElement('button');
         btnCopy.className = 'btn-test';
         btnCopy.style.cssText = 'padding:0.5rem 1.2rem;font-size:0.85rem;';
-        btnCopy.textContent = '馃搵 澶嶅埗绗竴寮?;
+        btnCopy.textContent = '📋 复制第一张';
         btnCopy.addEventListener('click', async function() {
             try {
                 const resp = await fetch(images[0]);
                 const blob = await resp.blob();
                 await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-                btnCopy.textContent = '鉁?宸插鍒?;
-                setTimeout(function() { btnCopy.textContent = '馃搵 澶嶅埗绗竴寮?; }, 2000);
+                btnCopy.textContent = '✅ 已复制';
+                setTimeout(function() { btnCopy.textContent = '📋 复制第一张'; }, 2000);
             } catch {
                 await navigator.clipboard.writeText(images[0]);
-                btnCopy.textContent = '鉁?宸插鍒堕摼鎺?;
-                setTimeout(function() { btnCopy.textContent = '馃搵 澶嶅埗绗竴寮?; }, 2000);
+                btnCopy.textContent = '✅ 已复制链接';
+                setTimeout(function() { btnCopy.textContent = '📋 复制第一张'; }, 2000);
             }
         });
 
@@ -1073,7 +1075,7 @@
         historyList.innerHTML = '';
 
         if (h.length === 0) {
-            historyList.innerHTML = '<div class="history-empty">鏆傛棤鍘嗗彶璁板綍</div>';
+            historyList.innerHTML = '<div class="history-empty">暂无历史记录</div>';
             return;
         }
 
@@ -1081,14 +1083,14 @@
             const item = document.createElement('div');
             item.className = 'history-item';
             const thumbSrc = entry.thumb || (entry.images && entry.images.length > 0 ? entry.images[0] : '');
-            const meta = (entry.model || '') + ' 路 ' + (entry.size || '') + ' 路 ' + (entry.images ? entry.images.length : 0) + '寮?;
+            const meta = (entry.model || '') + ' · ' + (entry.size || '') + ' · ' + (entry.images ? entry.images.length : 0) + '张';
             const time = new Date(entry.time).toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
 
             item.innerHTML =
                 '<img src="' + thumbSrc + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' +
                 '<div class="history-info">' +
                 '  <div class="hi-prompt">' + escHtml(entry.prompt || '') + '</div>' +
-                '  <div class="hi-meta">' + escHtml(meta) + ' 路 ' + time + '</div>' +
+                '  <div class="hi-meta">' + escHtml(meta) + ' · ' + time + '</div>' +
                 '</div>';
 
             item.addEventListener('click', function() {
@@ -1119,7 +1121,7 @@
     }
 
     clearHistoryBtn.addEventListener('click', function() {
-        if (confirm('纭畾娓呯┖鎵€鏈夊巻鍙茶褰曪紵')) clearHistory();
+        if (confirm('确定清空所有历史记录？')) clearHistory();
     });
 
     // === LocalStorage ===
@@ -1133,12 +1135,12 @@
 
     renderHistory();
 
-    console.log('鉁?GPT Image 2 椤甸潰宸插姞杞?);
+    console.log('✅ GPT Image 2 页面已加载');
 
-    // 鍏ㄥ眬锛氭棩蹇楀鍒?URL
+    // 全局：日志复制 URL
     window.copyUrl = function(url) {
         navigator.clipboard.writeText(url).then(function() {
-            showMsg('info', '鉁?URL 宸插鍒跺埌鍓创鏉?);
+            showMsg('info', '✅ URL 已复制到剪贴板');
         }).catch(function() {
             // fallback
             var ta = document.createElement('textarea');
@@ -1147,7 +1149,7 @@
             ta.select();
             document.execCommand('copy');
             document.body.removeChild(ta);
-            showMsg('info', '鉁?URL 宸插鍒跺埌鍓创鏉?);
+            showMsg('info', '✅ URL 已复制到剪贴板');
         });
     };
 })();

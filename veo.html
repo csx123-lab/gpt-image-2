@@ -262,7 +262,7 @@ const MODELS={'veo_3_1-fast-4K':'快速版 · 4K · 支持参考图','veo_3_1-fa
 $('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MODELS[$('modelSelect').value]||'')};
 $('modelSelect').dispatchEvent(new Event('change'));
 
-function testKey(){const k=$('apiKey').value.trim();if(!k){sm('error','请输入密钥');return}sm('info','验证中...');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{sm('success','密钥有效')}).catch(()=>{sm('error','密钥无效')})}
+function testKey(){const k=$('apiKey').value.trim();if(!k){showMsg('error','请输入密钥');return}showMsg('info','验证中...');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{showMsg('success','密钥有效')}).catch(()=>{showMsg('error','密钥无效')})}
 
 $('enableImage').onchange=function(){$('imageFields').style.display=this.checked?'block':'none'};
 
@@ -271,7 +271,7 @@ function gh(){try{return JSON.parse(localStorage.getItem('veo_history')||'[]')}c
 function sh(i){localStorage.setItem('veo_history',JSON.stringify(i))}
 function ah(it){const i=gh();i.unshift(it);if(i.length>50)i.length=50;sh(i);rh()}
 function rh(){const i=gh();$('historyCount').textContent=i.length?'('+i.length+')':'';if(!i.length){$('historyList').innerHTML='';$('historyEmpty').style.display='block';return}
-$('historyEmpty').style.display='none';$('historyList').innerHTML=i.map((it,idx)=>'<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-model">'+it.m+'</div><div class="hi-prompt">'+eh((it.p||"").slice(0,60))+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="ph('+idx+')">播放</button><button class="btn-sm" onclick="ch('+idx+')">链接</button><button class="btn-sm" onclick="dh('+idx+')" style="color:#f87171">删除</button></div></div>').join('')}
+$('historyEmpty').style.display='none';$('historyList').innerHTML=i.map((it,idx)=>'<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-model">'+it.m+'</div><div class="hi-prompt">'+eh(it.p.slice(0,60))+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="ph('+idx+')">播放</button><button class="btn-sm" onclick="ch('+idx+')">链接</button><button class="btn-sm" onclick="dh('+idx+')" style="color:#f87171">删除</button></div></div>').join('')}
 function eh(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function ph(i){const it=gh()[i];if(!it)return;$('videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';$('resultArea').classList.add('visible');$('resultArea').scrollIntoView({behavior:'smooth'})}
 function ch(i){const it=gh()[i];if(it)navigator.clipboard.writeText(it.u).then(()=>sm('success','链接已复制'))}
