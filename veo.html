@@ -266,8 +266,8 @@ function testKey(){const k=$('apiKey').value.trim();if(!k){sm('error','请输入
 
 $('enableImage').onchange=function(){$('imageFields').style.display=this.checked?'block':'none'};
 ['imageInput','startFrameInput','endFrameInput'].forEach(function(id){
-  var el=$(id);
-  if(el)el.onchange=function(){
+  var el=$(id);if(!el)return;
+  el.onchange=function(){
     var pv=this.parentNode.querySelector('.fp');
     if(!pv){pv=document.createElement('div');pv.className='fp';pv.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:6px';this.parentNode.appendChild(pv)}
     pv.innerHTML='';
