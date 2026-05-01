@@ -337,7 +337,16 @@ $('generateBtn').onclick=async function(){
         if(files.length>0){
           sm('info','正在上传 ' + files.length + ' 张图片到图床...');
           body.images=[];
-          for(const f of files) body.images.push(await uploadToImageHost(f));
+          const urlList=[];
+          for(const f of files){
+            const url=await uploadToImageHost(f);
+            body.images.push(url);
+            urlList.push(url);
+          }
+          // 显示上传结果
+          const preview=document.getElementById('filePreview');
+          preview.innerHTML+=urlList.map((u,i)=>'<div style="font-size:.7rem;color:#10b981;word-break:break-all;margin-top:.2rem">✓ 图床URL: <a href="'+u+'" target="_blank">'+u+'</a></div>').join('');
+          sm('success','图片上传成功！共 ' + urlList.length + ' 张');
         }
       }
     }
