@@ -103,22 +103,22 @@ select option{background:#0e0e18;color:#d0d0e0}
 .btn-sm:hover{background:rgba(255,255,255,.05);color:#c0c0d0}
 
 /* upload zone */
-input[type="file"]{
+.file-input{
   border:2px dashed rgba(255,255,255,.06) !important;border-radius:12px !important;
   padding:1.6rem 1rem !important;text-align:center !important;
   cursor:pointer !important;transition:all .25s !important;
   background:rgba(255,255,255,.008) !important;
-  color:transparent !important;min-height:80px;position:relative;
+  color:transparent !important;min-height:80px;
 }
-input[type="file"]:hover{border-color:rgba(99,102,241,.3) !important;background:rgba(99,102,241,.015) !important}
-input[type="file"]::file-selector-button{
+.file-input:hover{border-color:rgba(99,102,241,.3) !important;background:rgba(99,102,241,.015) !important}
+.file-input::file-selector-button{
   display:inline-block;padding:.3rem .9rem;border-radius:8px;
   border:1px solid rgba(99,102,241,.25);background:rgba(99,102,241,.06);
   color:rgba(255,255,255,.65);font-size:.75rem;cursor:pointer;transition:all .15s;
 }
-input[type="file"]::file-selector-button:hover{background:rgba(99,102,241,.12);color:#fff}
+.file-input::file-selector-button:hover{background:rgba(99,102,241,.12);color:#fff}
 
-/* result area */
+/* result */
 .result-area{display:none}
 .result-area.visible{display:block}
 video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
@@ -136,12 +136,11 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
 .history-empty{text-align:center;padding:2rem;color:#444;font-size:.82rem}
 .history-item{display:flex;gap:.75rem;padding:.55rem;border-radius:8px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.03)}
 .history-item:hover{background:rgba(255,255,255,.03)}
-.history-item img,.history-thumb{width:72px;height:72px;border-radius:6px;object-fit:cover;flex-shrink:0;background:rgba(0,0,0,.3)}
-.history-thumb{height:45px;overflow:hidden}
-.history-item:hover img,.history-item:hover .history-thumb{transform:scale(1.05);transition:transform .2s}
+.history-thumb{width:72px;height:45px;border-radius:6px;object-fit:cover;flex-shrink:0;background:rgba(0,0,0,.3);overflow:hidden}
+.history-thumb video{width:100%;height:100%;object-fit:cover}
 .history-info{flex:1;min-width:0}
-.history-info .hi-prompt,.history-info .hi-label{font-size:.8rem;color:#b0b0c0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.history-info .hi-meta,.history-info .hi-time{font-size:.68rem;color:#555;margin-top:.15rem}
+.history-info .hi-label{font-size:.8rem;color:#b0b0c0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-info .hi-time{font-size:.68rem;color:#555;margin-top:.15rem}
 .history-actions{display:flex;gap:.3rem}
 
 /* scrollbar */
@@ -150,14 +149,14 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.12)}
 
-/* model desc */
 .model-desc{background:rgba(99,102,241,.04);border:1px solid rgba(99,102,241,.08);border-radius:10px;padding:.55rem .8rem;margin-bottom:1rem;font-size:.78rem;color:#8888a0}
 
-/* key row */
-.key-row{display:flex;gap:.5rem}
-.key-row input{flex:1}
+/* preview */
+.preview-wrap{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+.preview-wrap img{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.08)}
+
+/* log */
 .log-card{margin-top:1rem}
-.log-card .card-title{cursor:pointer;user-select:none}
 .log-body{max-height:300px;overflow-y:auto}
 .log-empty{text-align:center;color:#555;font-size:.8rem;padding:1rem}
 .log-item{padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.8rem}
@@ -182,9 +181,9 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
       <div class="logo-icon">✦</div>
       <h1>Grok</h1>
     </div>
-    <div class="subtitle">AI 对话 · 图片理解</div>
+    <div class="subtitle">AI 视频生成</div>
     <div class="badge-row">
-      <span class="badge"><span class="dot"></span>千亿AI · Chat</span>
+      <span class="badge"><span class="dot"></span>千亿AI · Video</span>
     </div>
   </header>
 
@@ -192,16 +191,19 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
   <h3>生成设置</h3>
   <div class="form-group">
     <label>API 密钥</label>
-    <div class="key-row"><input type="password" id="apiKey" placeholder="sk-" /><button class="btn-sm" id="testKeyBtn" onclick="testKey()">验证</button></div>
+    <div class="form-row" style="grid-template-columns:1fr auto">
+      <input type="password" id="apiKey" placeholder="sk-" />
+      <button class="btn-sm" id="testKeyBtn">验证</button>
+    </div>
   </div>
   <div class="form-group">
     <label>模型</label>
     <select id="modelSelect">
-      <option value="grok-video-3-10s" selected>grok-video-3-10s  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.4/次</span></option>
-      <option value="grok-videos">grok-videos  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.2/次</span></option>
+      <option value="grok-video-3-10s" selected>grok-video-3-10s  ¥0.4/次</option>
+      <option value="grok-videos">grok-videos  ¥0.2/次</option>
     </select>
   </div>
-  <div class="form-desc" id="modelDesc">grok-video-3 - 最新版</div>
+  <div class="form-desc" id="modelDesc">grok-video-3 - 10秒版</div>
   <div class="form-row">
     <div class="form-group">
       <label>画面比例</label>
@@ -225,20 +227,21 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
     </label>
     <div id="imageFields" style="display:none;margin-top:.8rem">
       <div class="form-group">
-        <label>上传图片（自动转 URL）</label>
-        <input type="file" id="imageFileInput" accept="image/*" multiple style="padding:.5rem;font-size:.8rem" />
+        <label>上传图片</label>
+        <input type="file" id="imageFileInput" accept="image/*" multiple class="file-input" />
+        <div class="preview-wrap" id="filePreview"></div>
         <div style="font-size:.75rem;color:#666;margin-top:.3rem">垫图后视频尺寸跟着图片尺寸走</div>
       </div>
       <div class="form-group" style="margin-top:.5rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.06)">
-        <label>或粘贴图片 URL</label>
+        <label>或粘贴图片 URL（多个用逗号分隔）</label>
         <input type="text" id="imageUrls" placeholder="https://example.com/img.png" />
-        <div style="font-size:.75rem;color:#666;margin-top:.3rem">多个 URL 用逗号分隔，填 URL 时忽略上方上传文件</div>
+        <div style="font-size:.75rem;color:#666;margin-top:.3rem">填写 URL 时忽略上方上传的文件</div>
       </div>
     </div>
   </div>
   <div class="form-group">
-    <label>视频描述（支持 --mode=custom 等参数）</label>
-    <textarea id="prompt" placeholder="小猫在吃鱼 --mode=custom"></textarea>
+    <label>视频描述</label>
+    <textarea id="prompt" placeholder="小猫在吃鱼"></textarea>
   </div>
   <button class="btn" id="generateBtn">生成视频</button>
   <div id="messageArea"></div>
@@ -268,27 +271,51 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
 </div>
 
 <script>
-const API='https://api.vectorengine.cn';
+(function(){
 const $=id=>document.getElementById(id);
-const MODEL_DESC={'grok-video-3-10s':'10秒版','grok-videos':'视频生成'};
-$('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MODEL_DESC[$('modelSelect').value]||'')};
+const API='https://api.vectorengine.cn';
+const IMAGE_HOST='https://imageproxy.zhongzhuan.chat/api/upload';
+
+// 模型描述
+const MD={'grok-video-3-10s':'grok-video-3 - 10秒版','grok-videos':'grok-videos - 视频生成'};
+$('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MD[$('modelSelect').value]||'')};
 $('modelSelect').dispatchEvent(new Event('change'));
 
-function testKey(){const k=$('apiKey').value.trim();if(!k){showMsg('error','请输入密钥');return}showMsg('info','验证中...');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{showMsg('success','密钥有效')}).catch(()=>{showMsg('error','密钥无效')})}
-
+// 垫图 toggle
 $('enableImage').onchange=function(){$('imageFields').style.display=this.checked?'block':'none'};
 
-// 历史
-function gh(){try{return JSON.parse(localStorage.getItem('grok_history')||'[]')}catch{return[]}}
-function sh(i){localStorage.setItem('grok_history',JSON.stringify(i))}
-function ah(it){const i=gh();i.unshift(it);if(i.length>50)i.length=50;sh(i);rh()}
-function rh(){const i=gh();$('historyCount').textContent=i.length?'('+i.length+')':'';if(!i.length){$('historyList').innerHTML='';$('historyEmpty').style.display='block';return}
-$('historyEmpty').style.display='none';$('historyList').innerHTML=i.map((it,idx)=>'<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-model">'+it.m+'</div><div class="hi-prompt">'+eh(it.p.slice(0,60))+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="ph('+idx+')">播放</button><button class="btn-sm" onclick="ch('+idx+')">链接</button><button class="btn-sm" onclick="dh('+idx+')" style="color:#f87171">删除</button></div></div>').join('')}
-function eh(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-function ph(i){const it=gh()[i];if(!it)return;$('videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';$('resultArea').classList.add('visible');$('resultArea').scrollIntoView({behavior:'smooth'})}
-function ch(i){const it=gh()[i];if(it)navigator.clipboard.writeText(it.u).then(()=>sm('success','链接已复制'))}
-function dh(i){const it=gh();it.splice(i,1);sh(it);rh()}
-rh();
+// 文件预览
+$('imageFileInput').onchange=function(){
+  const p=$('filePreview');p.innerHTML='';
+  for(let f of this.files){
+    const img=document.createElement('img');
+    img.src=URL.createObjectURL(f);
+    p.appendChild(img);
+  }
+};
+
+// 图床上传
+async function uploadImg(file){
+  const fd=new FormData();fd.append('file',file);
+  const r=await fetch(IMAGE_HOST,{method:'POST',body:fd});
+  if(!r.ok){let e;try{e=await r.json()}catch{};throw new Error('图床上传失败: '+(e&&e.error||r.status))}
+  const d=await r.json();return d.url;
+}
+
+// 消息
+function msg(t,txt){$('messageArea').innerHTML='<div class="msg msg-'+t+'">'+txt+'</div>'}
+function clrMsg(){$('messageArea').innerHTML='';$('statusText').textContent=''}
+
+// 验证密钥
+$('testKeyBtn').onclick=async function(){
+  const k=$('apiKey').value.trim();
+  if(!k){msg('error','请输入密钥');return}
+  msg('info','验证中...');
+  try{
+    const r=await fetch(API+'/v1/models',{headers:{'Authorization':'Bearer '+k}});
+    if(r.ok){msg('success','密钥有效')}else{msg('error','密钥无效')}
+  }catch(e){msg('error','网络错误: '+e.message)}
+};
 
 // 提取视频URL
 function extractUrl(d){
@@ -302,47 +329,91 @@ function extractUrl(d){
   return '';
 }
 
+// 历史
+function gHist(){try{return JSON.parse(localStorage.getItem('grok_history')||'[]')}catch{return[]}}
+function sHist(h){localStorage.setItem('grok_history',JSON.stringify(h))}
+function addHist(it){const h=gHist();h.unshift(it);if(h.length>50)h.length=50;sHist(h);rHist()}
+function rHist(){
+  const h=gHist();$('historyCount').textContent=h.length?'('+h.length+')':'';
+  if(!h.length){$('historyList').innerHTML='';$('historyEmpty').style.display='block';return}
+  $('historyEmpty').style.display='none';
+  $('historyList').innerHTML=h.map((it,i)=>'<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-label">'+it.m+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="gkPlay('+i+')">播放</button><button class="btn-sm" onclick="gkCopy('+i+')">链接</button><button class="btn-sm" onclick="gkDel('+i+')" style="color:#f87171">删除</button></div></div>').join('')};
+window.gkPlay=function(i){const it=gHist()[i];if(!it)return;$('videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';$('resultArea').classList.add('visible');$('resultArea').scrollIntoView({behavior:'smooth'})};
+window.gkCopy=function(i){const it=gHist()[i];if(it)navigator.clipboard.writeText(it.u).then(()=>msg('success','链接已复制'))};
+window.gkDel=function(i){const h=gHist();h.splice(i,1);sHist(h);rHist()};
+rHist();
+
 // 生成
 $('generateBtn').onclick=async function(){
-  const key=$('apiKey').value.trim(),prompt=$('prompt').value.trim(),model=$('modelSelect').value;
-  if(!key){sm('error','请输入密钥');return}
-  if(!prompt){sm('error','请输入描述');return}
-  clr();$('statusText').textContent='';$('resultArea').classList.remove('visible');
+  const key=$('apiKey').value.trim();
+  const prompt=$('prompt').value.trim();
+  const model=$('modelSelect').value;
+  if(!key){msg('error','请输入密钥');return}
+  if(!prompt){msg('error','请输入描述');return}
+  clrMsg();
+  $('statusText').textContent='';
+  $('resultArea').classList.remove('visible');
   this.disabled=true;this.textContent='生成中...';
 
   try{
+    // 构建 Body
     const body={model,prompt,aspect_ratio:$('aspectSelect').value,size:$('sizeSelect').value};
+
+    // images 是必需字段（文档要求），始终发送
     if($('enableImage').checked){
-      // 先检查是否有 URL
       const urlText=$('imageUrls').value.trim();
       const urlImages=urlText.split(',').map(s=>s.trim()).filter(Boolean);
       if(urlImages.length>0){
         body.images=urlImages;
       } else {
-        // 上传文件 -> canvas 压缩 -> base64
         const files=$('imageFileInput').files;
         if(files.length>0){
+          msg('info','正在上传 '+files.length+' 张图片到图床...');
           body.images=[];
-          for(const f of files) body.images.push(await fileToBase64(f));
+          for(const f of files){
+            body.images.push(await uploadImg(f));
+          }
+          msg('success','图片上传成功！共 '+body.images.length+' 张');
+        } else {
+          body.images=[];
         }
       }
+    } else {
+      // 不垫图也传空数组（文档要求必需）
+      body.images=[];
     }
 
-    sm('info','提交任务...');
-    const resp=await fetch(API+'/v1/video/create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
-    if(!resp.ok){let e;try{e=await resp.json()}catch{throw new Error(await resp.text())};throw new Error(e.message||JSON.stringify(e))}
+    msg('info','提交任务...');
+
+    // 严格按照文档要求的 Header 调用
+    const resp=await fetch(API+'/v1/video/create',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Accept':'application/json',
+        'Authorization':'Bearer '+key
+      },
+      body:JSON.stringify(body)
+    });
+
+    if(!resp.ok){let e;try{e=await resp.json()}catch{};throw new Error((e&&e.message)||'HTTP '+resp.status)}
     const data=await resp.json();
 
+    // 尝试提取视频URL
     let vu=extractUrl(data);
     if(vu){showVid(vu,model,prompt);return}
-    if(data.status==='SUCCESS'){vu=extractUrl(data.data||data);if(vu){showVid(vu,model,prompt);return}}
+    if(data.status==='SUCCESS'){
+      vu=extractUrl(data.data||data);
+      if(vu){showVid(vu,model,prompt);return}
+    }
 
+    // 轮询
     const tid=data.id||data.task_id;
-    if(!tid){sm('warning','未获取到任务ID: '+JSON.stringify(data).slice(0,200));return}
+    if(!tid){msg('warning','未获取到任务ID: '+JSON.stringify(data).slice(0,200));return}
     $('statusText').textContent='任务已提交，查询进度...';
     poll(key,tid,model,prompt);
 
-  }catch(e){sm('error',e.message||'请求失败')}
+  }catch(e){msg('error',e.message||'请求失败')}
   this.disabled=false;this.textContent='生成视频';
 };
 
@@ -351,89 +422,74 @@ async function poll(key,tid,model,prompt){
   for(let i=0;i<120;i++){
     await new Promise(r=>setTimeout(r,3000));
     try{
-      const resp=await fetch(API+'/v1/video/query?id='+encodeURIComponent(tid),{method:'GET',headers:{'Accept':'application/json','Authorization':'Bearer '+key}});
+      const resp=await fetch(API+'/v1/video/query?id='+encodeURIComponent(tid),{
+        method:'GET',
+        headers:{'Accept':'application/json','Authorization':'Bearer '+key}
+      });
       if(!resp.ok)continue;
       const d=await resp.json();
       const st=(d.status||'').toLowerCase();
       if(d.progress)$('statusText').textContent='生成中 '+(d.progress||'');
       else if(i%10===0)$('statusText').textContent='生成中... ('+Math.round(i*3)+'s)';
-      if(st==='completed'){let vu=extractUrl(d)||extractUrl(d.data||d.detail);if(vu){showVid(vu,model,prompt);return}}
-      if(st==='failed'||st==='error'){let err=d.error||(d.data&&d.data.error&&d.data.error.message)||d.fail_reason||st;sm('error','生成失败: '+err);return}
+      if(st==='completed'){
+        let vu=extractUrl(d)||extractUrl(d.data||d.detail);
+        if(vu){showVid(vu,model,prompt);return}
+      }
+      if(st==='failed'||st==='error'){
+        const err=d.error||(d.data&&d.data.error&&d.data.error.message)||d.fail_reason||st;
+        msg('error','生成失败: '+err);return
+      }
     }catch(e){if(i>5)throw e}
   }
-  sm('warning','等待超时, task_id: '+tid);
+  msg('warning','等待超时, task_id: '+tid);
 }
 
 function showVid(url,model,prompt){
   $('videoContainer').innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
   $('resultArea').classList.add('visible');
   $('resultArea').scrollIntoView({behavior:'smooth'});
-  ah({u:url,m:model,p:prompt||'(空)',t:Date.now()});
-  sm('success','生成成功！');
-  // 存日志
+  addHist({u:url,m:model,p:prompt||'(空)',t:Date.now()});
+  msg('success','生成成功！');
   try{
-    var h=JSON.parse(localStorage.getItem('gk_vid_log')||'[]');
-    h.unshift({url:url,m:model,p:prompt||'(空)',time:Date.now(),success:true});
+    const h=JSON.parse(localStorage.getItem('gk_vid_log')||'[]');
+    h.unshift({url,m:model,p:prompt||'(空)',time:Date.now(),success:true});
     if(h.length>200)h.length=200;
     localStorage.setItem('gk_vid_log',JSON.stringify(h));
   }catch(e){}
-  setTimeout(function(){
-    if(window.gkRenderLog)window.gkRenderLog();
-  },100);
+  setTimeout(gkRenderLog,100);
 }
 
-function sm(t,txt){$('messageArea').innerHTML='<div class="msg msg-'+t+'">'+txt+'</div>'}
-function clr(){$('messageArea').innerHTML='';$('statusText').textContent=''}
+// 恢复保存的密钥
 try{const s=localStorage.getItem('gk_video_key');if(s)$('apiKey').value=s}catch(e){}
 $('apiKey').oninput=function(){try{localStorage.setItem('gk_video_key',this.value.trim())}catch(e){}};
 
-// 图片转 base64（canvas 压缩）
-function fileToBase64(file){
-  return new Promise((ok,no)=>{
-    const r=new FileReader();
-    r.onload=()=>{
-      const img=new Image();
-      img.onload=()=>{
-        const c=document.createElement('canvas');
-        let w=img.width,h=img.height,mx=1024;
-        if(w>mx||h>mx){if(w>h){h=Math.round(h*mx/w);w=mx}else{w=Math.round(w*mx/h);h=mx}}
-        c.width=w;c.height=h;
-        c.getContext('2d').drawImage(img,0,0,w,h);
-        ok(c.toDataURL(file.type,.7));
-      };
-      img.onerror=()=>ok(r.result);
-      img.src=r.result;
-    };
-    r.onerror=no;
-    r.readAsDataURL(file);
-  });
-}
-</script>
-
-<script>
-// 日志面板渲染
-var gkLogKey='gk_vid_log';
+// ===== 日志面板 =====
 window.gkRenderLog=function(){
-  var ls=document.getElementById('gkLogList'),lb=document.getElementById('gkLogBadge');
+  const ls=$('gkLogList'),lb=$('gkLogBadge');
   if(!ls)return;
-  var h=[];try{h=JSON.parse(localStorage.getItem(gkLogKey)||'[]')}catch(e){}
-  if(lb)lb.textContent=h.length>0?(h.length+'条'):'';
+  let h=[];try{h=JSON.parse(localStorage.getItem('gk_vid_log')||'[]')}catch(e){}
+  if(lb)lb.textContent=h.length?(h.length+'条'):'';
   if(!h.length){ls.innerHTML='<div class="log-empty">暂无日志</div>';return}
-  var html='';
-  for(var i=0;i<h.length;i++){
-    var e=h[i],t=e.time?new Date(e.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'--',u=e.url||'';
-    html+='<div class="log-item"><span class="log-time">'+t+'</span><span class="log-status ok">✅</span><div class="log-prompt">'+(e.p||'').substring(0,60)+'</div><div class="log-meta">'+(e.m||'')+'</div><div class="log-url" onclick="gkCopyUrl(\''+u.replace(/'/g,"\\'")+'\')">📎 '+u.substring(0,60)+(u.length>60?'...':'')+'</div></div>';
+  let html='';
+  for(let i=0;i<h.length;i++){
+    const e=h[i],t=e.time?new Date(e.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'--',u=e.url||'';
+    html+='<div class="log-item"><span class="log-time">'+t+'</span><span class="log-status ok">✅</span><div class="log-prompt">'+(e.p||'').substring(0,60)+'</div><div class="log-meta">'+(e.m||'')+'</div><div class="log-url" onclick="window.gkCopyUrl(\''+u.replace(/'/g,"\\'")+'\')">📎 '+u.substring(0,60)+(u.length>60?'...':'')+'</div></div>';
   }
   ls.innerHTML=html;
 };
-document.getElementById('gkClearLogBtn').onclick=function(){if(confirm('清空所有日志？')){localStorage.removeItem(gkLogKey);window.gkRenderLog()}};
-document.getElementById('gkExportLogBtn').onclick=function(){
-  var h=[];try{h=JSON.parse(localStorage.getItem(gkLogKey)||'[]')}catch(e){}
+window.gkCopyUrl=function(u){navigator.clipboard.writeText(u).then(function(){msg('success','URL已复制')}).catch(function(){const t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);msg('success','URL已复制')})};
+$('gkClearLogBtn').onclick=function(){if(confirm('清空所有日志？')){localStorage.removeItem('gk_vid_log');gkRenderLog()}};
+$('gkExportLogBtn').onclick=function(){
+  let h=[];try{h=JSON.parse(localStorage.getItem('gk_vid_log')||'[]')}catch(e){}
   if(!h.length){alert('暂无日志');return}
-  var txt='千亿AI Grok生成日志\n导出时间:'+new Date().toLocaleString()+'\n共'+h.length+'条\n\n';
-  for(var i=0;i<h.length;i++){var e=h[i];txt+='#'+(i+1)+' | '+(e.success?'完成':'失败')+'\n  时间:'+new Date(e.time).toLocaleString()+'\n  描述:'+(e.p||'')+'\n  模型:'+(e.m||'')+'\n  URL:'+(e.url||'')+'\n\n'}
-  var b=new Blob([txt],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='gk-vid-log-'+new Date().toISOString().slice(0,10)+'.txt';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+  let txt='千亿AI Grok生成日志\n导出时间: '+new Date().toLocaleString()+'\n共 '+h.length+' 条\n\n';
+  for(let i=0;i<h.length;i++){const e=h[i];txt+='#'+(i+1)+' | '+(e.success?'完成':'失败')+'\n  时间: '+new Date(e.time).toLocaleString()+'\n  描述: '+(e.p||'')+'\n  模型: '+(e.m||'')+'\n  URL: '+(e.url||'')+'\n\n'}
+  const b=new Blob([txt],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='gk-vid-log-'+new Date().toISOString().slice(0,10)+'.txt';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
 };
-window.gkCopyUrl=function(u){navigator.clipboard.writeText(u).then(function(){alert('URL已复制')}).catch(function(){var t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('URL已复制')})};
-setTimeout(window.gkRenderLog,200);
+setTimeout(gkRenderLog,200);
+
+// 判断用 $ 还是 document.getElementById - 用 $ 统一
+})();
 </script>
+</body>
+</html>
