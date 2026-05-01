@@ -304,10 +304,11 @@ $('generateBtn').onclick=async function(){
     if($('enableImage').checked){
       const rf=$('imageInput').files,sf=$('startFrameInput').files[0],ef=$('endFrameInput').files[0];
       if(rf.length||sf||ef){
+        sm('info','正在上传 ' + (rf.length+(sf?1:0)+(ef?1:0)) + ' 张图片到图床...');
         body.images=[];
-        for(const f of rf)body.images.push(await f2b(f));
-        if(sf)body.images.push(await f2b(sf));
-        if(ef)body.images.push(await f2b(ef));
+        for(const f of rf)body.images.push(await uploadToImageHost(f));
+        if(sf)body.images.push(await uploadToImageHost(sf));
+        if(ef)body.images.push(await uploadToImageHost(ef));
       }
     }
 
@@ -388,16 +389,15 @@ function showVid(url,model,prompt){
   },100);
 }
 
-// 图片压缩转base64
-function f2b(f){
-  return new Promise((ok,no)=>{
-    const r=new FileReader();
-    r.onload=()=>{
-      const img=new Image();
-      img.onload=()=>{
-        const c=document.createElement('canvas');
-        let w=img.width,h=img.height,mx=1024;
-        if(w>mx||h>mx){if(w>h){h=Math.round(h*mx/w);w=mx}else{w=Math.round(w*mx/h);h=mx}}
+// 上传图片到自建图床（转 URL）
+async function uploadToImageHost(file){
+  const fd=new FormData();
+  fd.append('file',file);
+  const resp=await fetch('https://imageproxy.zhongzhuan.chat/api/upload',{method:'POST',body:fd});
+  if(!resp.ok){let e;try{e=await resp.json()}catch{};throw new Error('图床上传失败: '+(e&&e.error||resp.status))}
+  const data=await resp.json();
+  return data.url;
+}}
         c.width=w;c.height=h;
         c.getContext('2d').drawImage(img,0,0,w,h);
         ok(c.toDataURL(f.type,.7));

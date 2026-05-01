@@ -319,11 +319,12 @@ $('generateBtn').onclick=async function(){
       if(urlImages.length>0){
         body.images=urlImages;
       } else {
-        // 上传文件 -> canvas 压缩 -> base64
+        // 上传文件 -> 先上传到自建图床获取 URL
         const files=$('imageFileInput').files;
         if(files.length>0){
+          sm('info','正在上传 ' + files.length + ' 张图片到图床...');
           body.images=[];
-          for(const f of files) body.images.push(await fileToBase64(f));
+          for(const f of files) body.images.push(await uploadToImageHost(f));
         }
       }
     }
@@ -387,26 +388,14 @@ function clr(){$('messageArea').innerHTML='';$('statusText').textContent=''}
 try{const s=localStorage.getItem('gk_video_key');if(s)$('apiKey').value=s}catch(e){}
 $('apiKey').oninput=function(){try{localStorage.setItem('gk_video_key',this.value.trim())}catch(e){}};
 
-// 图片转 base64（canvas 压缩）
-function fileToBase64(file){
-  return new Promise((ok,no)=>{
-    const r=new FileReader();
-    r.onload=()=>{
-      const img=new Image();
-      img.onload=()=>{
-        const c=document.createElement('canvas');
-        let w=img.width,h=img.height,mx=1024;
-        if(w>mx||h>mx){if(w>h){h=Math.round(h*mx/w);w=mx}else{w=Math.round(w*mx/h);h=mx}}
-        c.width=w;c.height=h;
-        c.getContext('2d').drawImage(img,0,0,w,h);
-        ok(c.toDataURL(file.type,.7));
-      };
-      img.onerror=()=>ok(r.result);
-      img.src=r.result;
-    };
-    r.onerror=no;
-    r.readAsDataURL(file);
-  });
+// 上传图片到自建图床（转 URL）
+async function uploadToImageHost(file){
+  const fd=new FormData();
+  fd.append('file',file);
+  const resp=await fetch('https://imageproxy.zhongzhuan.chat/api/upload',{method:'POST',body:fd});
+  if(!resp.ok){let e;try{e=await resp.json()}catch{};throw new Error('图床上传失败: '+(e&&e.error||resp.status))}
+  const data=await resp.json();
+  return data.url;
 }
 </script>
 
