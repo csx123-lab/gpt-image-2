@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>千亿AI - AI 创作平台</title>
+<title>???AI - AI ??????</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
@@ -74,7 +74,7 @@ body{
   display:block;
 }
 
-/* 首页 */
+/* ??? */
 .home{
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
@@ -469,84 +469,84 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
       <rect x="2" y="2" width="30" height="30" rx="8" stroke="url(#g)" stroke-width="1.2" opacity=".4"/>
       <path d="M10 17l5 5 9-9" stroke="url(#g)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <span>千亿AI</span>
+    <span>???AI</span>
   </div>
 
-  <div class="nav-section">图像工具</div>
+  <div class="nav-section">??????</div>
   <div class="nav-item" data-page="gpt-image-2" onclick="switchPage(this)">
     GPT Image 2
   </div>
 
-  <div class="nav-section">视频工具</div>
+  <div class="nav-section">??????</div>
   <div class="nav-item" data-page="veo" onclick="switchPage(this)">
-    VEO 视频
+    VEO ???
   </div>
   <div class="nav-item" data-page="grok" onclick="switchPage(this)">
-    Grok 视频
+    Grok ???
   </div>
 </div>
 
 <div class="main">
   <div id="contentArea">
     <div class="home" id="homePage">
-      <h1>千亿AI</h1>
-      <p>选择左侧工具开始创作</p>
+      <h1>???AI</h1>
+      <p>????????????????/p>
       <div class="home-grid">
         <div class="home-card" onclick="switchPage2('gpt-image-2')">
           <h3>GPT Image 2</h3>
-          <p>AI 图片生成</p>
+          <p>AI ??????</p>
         </div>
         <div class="home-card" onclick="switchPage2('veo')">
-          <h3>VEO 视频</h3>
-          <p>AI 视频生成</p>
+          <h3>VEO ???</h3>
+          <p>AI ??????</p>
         </div>
         <div class="home-card" onclick="switchPage2('grok')">
-          <h3>Grok 视频</h3>
-          <p>xAI 视频生成</p>
+          <h3>Grok ???</h3>
+          <p>xAI ??????</p>
         </div>
       </div>
     </div>
 
-    <!-- Grok 视频页面 -->
+    <!-- Grok ?????? -->
     <div id="grokPage" style="display:none">
 <div class="container">
 
 <header>
     <div class="logo">
-      <div class="logo-icon">✦</div>
+      <div class="logo-icon">??/div>
       <h1>Grok</h1>
     </div>
-    <div class="subtitle">AI 对话 · 图片理解</div>
+    <div class="subtitle">AI ??? ? ??????</div>
     <div class="badge-row">
-      <span class="badge"><span class="dot"></span>千亿AI · Chat</span>
+      <span class="badge"><span class="dot"></span>???AI ? Chat</span>
     </div>
   </header>
 
 <div class="card">
-  <h3>生成设置</h3>
+  <h3>??????</h3>
   <div class="form-group">
-    <label>API 密钥</label>
-    <div class="key-row"><input type="password" id="apiKey" placeholder="sk-" /><button class="btn-sm" id="testKeyBtn" onclick="testKey()">验证</button></div>
+    <label>API ???</label>
+    <div class="key-row"><input type="password" id="apiKey" placeholder="sk-" /><button class="btn-sm" id="testKeyBtn" onclick="testKey()">???</button></div>
   </div>
   <div class="form-group">
-    <label>模型</label>
+    <label>???</label>
     <select id="modelSelect">
-      <option value="grok-video-3-10s" selected>grok-video-3-10s  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.4/次</span></option>
-      <option value="grok-videos">grok-videos  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.2/次</span></option>
+      <option value="grok-video-3-10s" selected>grok-video-3-10s  <span style="font-weight:400;color:#818cf8;font-size:.7rem">?0.4/??/span></option>
+      <option value="grok-videos">grok-videos  <span style="font-weight:400;color:#818cf8;font-size:.7rem">?0.2/??/span></option>
     </select>
   </div>
-  <div class="form-desc" id="modelDesc">grok-video-3 - 最新版</div>
+  <div class="form-desc" id="modelDesc">grok-video-3 - ?????</div>
   <div class="form-row">
     <div class="form-group">
-      <label>画面比例</label>
+      <label>??????</label>
       <select id="aspectSelect">
-        <option value="3:2">3:2（横屏）</option>
-        <option value="2:3">2:3（竖屏）</option>
-        <option value="1:1">1:1（方形）</option>
+        <option value="3:2">3:2??????</option>
+        <option value="2:3">2:3??????</option>
+        <option value="1:1">1:1??????</option>
       </select>
     </div>
     <div class="form-group">
-      <label>画质</label>
+      <label>???</label>
       <select id="sizeSelect">
         <option value="720P">720P</option>
         <option value="1080P">1080P</option>
@@ -555,47 +555,47 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
   </div>
   <div class="form-group" style="border:1px dashed rgba(255,255,255,.08);border-radius:10px;padding:1rem;">
     <label style="display:flex;align-items:center;gap:.4rem">
-      <input type="checkbox" id="enableImage" style="accent-color:#6366f1;width:15px;height:15px" /> 垫图
+      <input type="checkbox" id="enableImage" style="accent-color:#6366f1;width:15px;height:15px" /> ???
     </label>
     <div id="imageFields" style="display:none;margin-top:.8rem">
       <div class="form-group">
-        <label>上传图片（自动转 URL）</label>
+        <label>???????????? URL??/label>
         <input type="file" id="imageFileInput" accept="image/*" multiple style="padding:.5rem;font-size:.8rem" />
         <div id="filePreview" style="display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap"></div>
-        <div style="font-size:.75rem;color:#666;margin-top:.3rem">垫图后视频尺寸跟着图片尺寸走</div>
+        <div style="font-size:.75rem;color:#666;margin-top:.3rem">??????????????????????/div>
       </div>
       <div class="form-group" style="margin-top:.5rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.06)">
-        <label>或粘贴图片 URL</label>
+        <label>????????URL</label>
         <input type="text" id="imageUrls" placeholder="https://example.com/img.png" />
-        <div style="font-size:.75rem;color:#666;margin-top:.3rem">多个 URL 用逗号分隔，填 URL 时忽略上方上传文件</div>
+        <div style="font-size:.75rem;color:#666;margin-top:.3rem">??? URL ??????????? URL ??????????????/div>
       </div>
     </div>
   </div>
   <div class="form-group">
-    <label>视频描述（支持 --mode=custom 等参数）</label>
-    <textarea id="prompt" placeholder="小猫在吃鱼 --mode=custom"></textarea>
+    <label>???????????--mode=custom ??????</label>
+    <textarea id="prompt" placeholder="????????--mode=custom"></textarea>
   </div>
-  <button class="btn" id="generateBtn">生成视频</button>
+  <button class="btn" id="generateBtn">??????</button>
   <div id="messageArea"></div>
   <div class="status-text" id="statusText"></div>
 </div>
 
 <div class="card result-area" id="resultArea">
-  <h3>生成结果</h3>
+  <h3>??????</h3>
   <div id="videoContainer"></div>
 </div>
 
 <div class="card" id="historyCard">
-  <h3>历史记录 <span id="historyCount"></span></h3>
+  <h3>?????? <span id="historyCount"></span></h3>
   <div id="historyList"></div>
-  <div style="text-align:center;padding:1rem;color:#555;font-size:.85rem" id="historyEmpty">暂无记录</div>
+  <div style="text-align:center;padding:1rem;color:#555;font-size:.85rem" id="historyEmpty">??????</div>
 </div>
 
-<!-- 生成日志 -->
+<!-- ?????? -->
 <div class="card log-card">
     <div class="card-title" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
-        <span style="display:flex;align-items:center;gap:0.4rem;">📋 生成日志 <span class="log-badge" id="gkLogBadge"></span></span>
-        <div class="log-actions"><button id="gkClearLogBtn" class="btn-sm">清空</button><button id="gkExportLogBtn" class="btn-sm">导出</button></div>
+        <span style="display:flex;align-items:center;gap:0.4rem;">?? ?????? <span class="log-badge" id="gkLogBadge"></span></span>
+        <div class="log-actions"><button id="gkClearLogBtn" class="btn-sm">???</button><button id="gkExportLogBtn" class="btn-sm">???</button></div>
     </div>
     <div class="log-body" id="gkLogBody"><div id="gkLogList"></div></div>
 </div>
@@ -603,502 +603,9 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
 </div>
 
 <script>
-const API='https://api.vectorengine.cn';
-const $=id=>document.getElementById(id);
-const MODEL_DESC={'grok-video-3-10s':'10秒版','grok-videos':'视频生成'};
-$('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MODEL_DESC[$('modelSelect').value]||'')};
-$('modelSelect').dispatchEvent(new Event('change'));
+const $$=id=>document.getElementById(id);
 
-function testKey(){const k=$('apiKey').value.trim();if(!k){sm('error','请输入密钥');return}sm('info','验证中...');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{sm('success','密钥有效')}).catch(()=>{sm('error','密钥无效')})}
-
-$('enableImage').onchange=function(){$('imageFields').style.display=this.checked?'block':'none'};
-
-// 文件预览
-$('imageFileInput').onchange=function(){
-  const preview=document.getElementById('filePreview');
-  preview.innerHTML='';
-  for(const f of this.files){
-    const img=document.createElement('img');
-    img.src=URL.createObjectURL(f);
-    img.style.cssText='width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.1)';
-    preview.appendChild(img);
-  }
-};
-
-// 历史
-function gh(){try{return JSON.parse(localStorage.getItem('grok_history')||'[]')}catch{return[]}}
-function sh(i){localStorage.setItem('grok_history',JSON.stringify(i))}
-function ah(it){const i=gh();i.unshift(it);if(i.length>50)i.length=50;sh(i);rh()}
-function rh(){const i=gh();$('historyCount').textContent=i.length?'('+i.length+')':'';if(!i.length){$('historyList').innerHTML='';$('historyEmpty').style.display='block';return}
-$('historyEmpty').style.display='none';$('historyList').innerHTML=i.map((it,idx)=>'<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-model">'+it.m+'</div><div class="hi-prompt">'+eh(it.p.slice(0,60))+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="ph('+idx+')">播放</button><button class="btn-sm" onclick="ch('+idx+')">链接</button><button class="btn-sm" onclick="dh('+idx+')" style="color:#f87171">删除</button></div></div>').join('')}
-function eh(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-function ph(i){const it=gh()[i];if(!it)return;$('videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';$('resultArea').classList.add('visible');$('resultArea').scrollIntoView({behavior:'smooth'})}
-function ch(i){const it=gh()[i];if(it)navigator.clipboard.writeText(it.u).then(()=>sm('success','链接已复制'))}
-function dh(i){const it=gh();it.splice(i,1);sh(it);rh()}
-rh();
-
-// 提取视频URL
-function extractUrl(d){
-  if(!d)return '';
-  if(typeof d.video_url==='string'&&d.video_url)return d.video_url;
-  if(d.data&&typeof d.data.video_url==='string'&&d.data.video_url)return d.data.video_url;
-  if(d.data&&d.data.detail&&typeof d.data.detail.download_url==='string')return d.data.detail.download_url;
-  if(d.detail&&d.detail.upsample_video_url)return d.detail.upsample_video_url;
-  if(d.detail&&d.detail.video_url)return d.detail.video_url;
-  if(d.upsample_video_url)return d.upsample_video_url;
-  return '';
-}
-
-// 生成
-$('generateBtn').onclick=async function(){
-  const key=$('apiKey').value.trim(),prompt=$('prompt').value.trim(),model=$('modelSelect').value;
-  if(!key){sm('error','请输入密钥');return}
-  if(!prompt){sm('error','请输入描述');return}
-  clr();$('statusText').textContent='';$('resultArea').classList.remove('visible');
-  this.disabled=true;this.textContent='生成中...';
-
-  try{
-    const body={model,prompt,aspect_ratio:$('aspectSelect').value,size:$('sizeSelect').value,images:[]};
-    if($('enableImage').checked){
-      // 先检查是否有 URL
-      const urlText=$('imageUrls').value.trim();
-      const urlImages=urlText.split(',').map(s=>s.trim()).filter(Boolean);
-      if(urlImages.length>0){
-        body.images=urlImages;
-      } else {
-        // 上传文件 -> 先上传到自建图床获取 URL
-        const files=$('imageFileInput').files;
-        if(files.length>0){
-          sm('info','正在上传 ' + files.length + ' 张图片到图床...');
-          body.images=[];
-          const urlList=[];
-          for(const f of files){
-            const url=await uploadToImageHost(f);
-            body.images.push(url);
-            urlList.push(url);
-          }
-          // 显示上传结果
-          const preview=document.getElementById('filePreview');
-          preview.innerHTML+=urlList.map((u,i)=>'<div style="font-size:.7rem;color:#10b981;word-break:break-all;margin-top:.2rem">✓ 图床URL: <a href="'+u+'" target="_blank">'+u+'</a></div>').join('');
-          sm('success','图片上传成功！共 ' + urlList.length + ' 张');
-        }
-      }
-    }
-
-    sm('info','提交任务...');
-    const resp=await fetch(API+'/v1/video/create',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
-    if(!resp.ok){let e;try{e=await resp.json()}catch{throw new Error(await resp.text())};throw new Error(e.message||JSON.stringify(e))}
-    const data=await resp.json();
-
-    let vu=extractUrl(data);
-    if(vu){showVid(vu,model,prompt);return}
-    if(data.status==='SUCCESS'){vu=extractUrl(data.data||data);if(vu){showVid(vu,model,prompt);return}}
-
-    const tid=data.id||data.task_id;
-    if(!tid){sm('warning','未获取到任务ID: '+JSON.stringify(data).slice(0,200));return}
-    $('statusText').textContent='任务已提交，查询进度...';
-    poll(key,tid,model,prompt);
-
-  }catch(e){sm('error',e.message||'请求失败')}
-  this.disabled=false;this.textContent='生成视频';
-};
-
-// 轮询
-async function poll(key,tid,model,prompt){
-  for(let i=0;i<120;i++){
-    await new Promise(r=>setTimeout(r,3000));
-    try{
-      const resp=await fetch(API+'/v1/video/query?id='+encodeURIComponent(tid),{method:'GET',headers:{'Accept':'application/json','Authorization':'Bearer '+key}});
-      if(!resp.ok)continue;
-      const d=await resp.json();
-      const st=(d.status||'').toLowerCase();
-      if(d.progress)$('statusText').textContent='生成中 '+(d.progress||'');
-      else if(i%10===0)$('statusText').textContent='生成中... ('+Math.round(i*3)+'s)';
-      if(st==='completed'){let vu=extractUrl(d)||extractUrl(d.data||d.detail);if(vu){showVid(vu,model,prompt);return}}
-      if(st==='failed'||st==='error'){let err=d.error||(d.data&&d.data.error&&d.data.error.message)||d.fail_reason||st;sm('error','生成失败: '+err);return}
-    }catch(e){if(i>5)throw e}
-  }
-  sm('warning','等待超时, task_id: '+tid);
-}
-
-function showVid(url,model,prompt){
-  $('videoContainer').innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
-  $('resultArea').classList.add('visible');
-  $('resultArea').scrollIntoView({behavior:'smooth'});
-  ah({u:url,m:model,p:prompt||'(空)',t:Date.now()});
-  sm('success','生成成功！');
-  // 存日志
-  try{
-    var h=JSON.parse(localStorage.getItem('gk_vid_log')||'[]');
-    h.unshift({url:url,m:model,p:prompt||'(空)',time:Date.now(),success:true});
-    if(h.length>200)h.length=200;
-    localStorage.setItem('gk_vid_log',JSON.stringify(h));
-  }catch(e){}
-  setTimeout(function(){
-    if(window.gkRenderLog)window.gkRenderLog();
-  },100);
-}
-
-
-function clr(){$('messageArea').innerHTML='';$('statusText').textContent=''}
-try{const s=localStorage.getItem('gk_video_key');if(s)$('apiKey').value=s}catch(e){}
-$('apiKey').oninput=function(){try{localStorage.setItem('gk_video_key',this.value.trim())}catch(e){}};
-
-// 上传图片到自建图床（转 URL）
-
-</script>
-
-<script>
-// 日志面板渲染
-var gkLogKey='gk_vid_log';
-window.gkRenderLog=function(){
-  var ls=document.getElementById('gkLogList'),lb=document.getElementById('gkLogBadge');
-  if(!ls)return;
-  var h=[];try{h=JSON.parse(localStorage.getItem(gkLogKey)||'[]')}catch(e){}
-  if(lb)lb.textContent=h.length>0?(h.length+'条'):'';
-  if(!h.length){ls.innerHTML='<div class="log-empty">暂无日志</div>';return}
-  var html='';
-  for(var i=0;i<h.length;i++){
-    var e=h[i],t=e.time?new Date(e.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'--',u=e.url||'';
-    html+='<div class="log-item"><span class="log-time">'+t+'</span><span class="log-status ok">✅</span><div class="log-prompt">'+(e.p||'').substring(0,60)+'</div><div class="log-meta">'+(e.m||'')+'</div><div class="log-url" onclick="gkCopyUrl(\''+u.replace(/'/g,"\\'")+'\')">📎 '+u.substring(0,60)+(u.length>60?'...':'')+'</div></div>';
-  }
-  ls.innerHTML=html;
-};
-document.getElementById('gkClearLogBtn').onclick=function(){if(confirm('清空所有日志？')){localStorage.removeItem(gkLogKey);window.gkRenderLog()}};
-document.getElementById('gkExportLogBtn').onclick=function(){
-  var h=[];try{h=JSON.parse(localStorage.getItem(gkLogKey)||'[]')}catch(e){}
-  if(!h.length){alert('暂无日志');return}
-  var txt='千亿AI Grok生成日志\n导出时间:'+new Date().toLocaleString()+'\n共'+h.length+'条\n\n';
-  for(var i=0;i<h.length;i++){var e=h[i];txt+='#'+(i+1)+' | '+(e.success?'完成':'失败')+'\n  时间:'+new Date(e.time).toLocaleString()+'\n  描述:'+(e.p||'')+'\n  模型:'+(e.m||'')+'\n  URL:'+(e.url||'')+'\n\n'}
-  var b=new Blob([txt],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='gk-vid-log-'+new Date().toISOString().slice(0,10)+'.txt';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
-};
-window.gkCopyUrl=function(u){navigator.clipboard.writeText(u).then(function(){alert('URL已复制')}).catch(function(){var t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('URL已复制')})};
-setTimeout(window.gkRenderLog,200);
-</script>
-    </div>
-
-    <!-- VEO 视频页面 -->
-    <div id="veoPage" style="display:none">
-<div class="container">
-
-<header>
-    <div class="logo">
-      <div class="logo-icon">✦</div>
-      <h1>VEO</h1>
-    </div>
-    <div class="subtitle">AI 视频生成 · 支持参考图</div>
-    <div class="badge-row">
-      <span class="badge"><span class="dot"></span>千亿AI · Video Gen</span>
-    </div>
-  </header>
-
-<div class="card">
-  <div class="card-title">⚙️ 视频生成设置</div>
-  <div class="form-group">
-    <label>API 密钥</label>
-    <input type="password" id="apiKey" placeholder="输入密钥" />
-  </div>
-  <div class="form-group">
-    <label>模型</label>
-    <select id="modelSelect">
-      <option value="veo_3_1-fast-4K">veo_3_1-fast-4K  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.43/次</span></option>
-      <option value="veo_3_1-fast" selected>veo_3_1-fast  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.43/次</span></option>
-      <option value="veo3.1-fast-components">veo3.1-fast-components  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.26/次</span></option>
-      <option value="veo_3_1-lite-4K">veo_3_1-lite-4K  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.55/次</span></option>
-      <option value="veo_3_1-lite">veo_3_1-lite  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.5/次</span></option>
-    </select>
-  </div>
-  <div class="form-desc" id="modelDesc"></div>
-  <div class="form-group">
-    <label>画面比例</label>
-    <select id="aspectSelect">
-      <option value="16:9">16:9（横屏）</option>
-      <option value="9:16">9:16（竖屏）</option>
-    </select>
-  </div>
-  <div style="margin-bottom:1rem">
-    <label style="display:flex;align-items:center;gap:.4rem">
-      <input type="checkbox" id="enableImage" style="accent-color:#6366f1;width:15px;height:15px" /> 上传参考图 / 首尾帧
-    </label>
-    <div id="imageFields" style="display:none;margin-top:.8rem">
-      <div class="form-group"><label>参考图片</label><input type="file" id="imageInput" accept="image/*" multiple style="padding:.5rem;font-size:.8rem" /></div>
-      <div class="form-row">
-        <div class="form-group"><label>首帧</label><input type="file" id="startFrameInput" accept="image/*" style="padding:.5rem;font-size:.8rem" /></div>
-        <div class="form-group"><label>尾帧</label><input type="file" id="endFrameInput" accept="image/*" style="padding:.5rem;font-size:.8rem" /></div>
-      </div>
-    </div>
-  </div>
-  <div class="form-group">
-    <label>视频描述</label>
-    <textarea id="prompt" placeholder="A cat running in the park"></textarea>
-  </div>
-  <button class="btn" id="generateBtn">生成视频</button>
-  <div id="messageArea"></div>
-  <div class="status-text" id="statusText"></div>
-</div>
-
-<div class="card result-area" id="resultArea">
-  <div class="card-title">🎬 生成结果</div>
-  <div id="videoContainer"></div>
-</div>
-
-<div class="card" id="historyCard">
-  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0"><span>📜 历史记录</span><span id="historyCount"></span></div>
-  <div id="historyList"></div>
-  <div style="text-align:center;padding:1rem;color:#555;font-size:.85rem" id="historyEmpty">暂无记录</div>
-</div>
-
-<!-- 生成日志 -->
-<div class="card log-card">
-    <div class="card-title" style="margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
-        <span style="display:flex;align-items:center;gap:0.4rem;">📋 生成日志 <span class="log-badge" id="veLogBadge"></span></span>
-        <div class="log-actions"><button id="veClearLogBtn" class="btn-sm">清空</button><button id="veExportLogBtn" class="btn-sm">导出</button></div>
-    </div>
-    <div class="log-body" id="veLogBody"><div id="veLogList"></div></div>
-</div>
-
-</div>
-
-<script>
-const API='https://api.vectorengine.cn';
-const $=id=>document.getElementById(id);
-const MODELS={'veo_3_1-fast-4K':'快速版 · 4K · 支持参考图','veo_3_1-fast':'快速版 · 支持参考图','veo3.1-fast-components':'快速版 + 元素图/首尾帧','veo_3_1-lite-4K':'轻量版 · 4K · 纯文本','veo_3_1-lite':'轻量版 · 纯文本'};
-$('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MODELS[$('modelSelect').value]||'')};
-$('modelSelect').dispatchEvent(new Event('change'));
-
-function testKey(){const k=$('apiKey').value.trim();if(!k){sm('error','请输入密钥');return}sm('info','验证中...');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{sm('success','密钥有效')}).catch(()=>{sm('error','密钥无效')})}
-
-$('enableImage').onchange=function(){$('imageFields').style.display=this.checked?'block':'none'};
-
-// 历史
-function gh(){try{return JSON.parse(localStorage.getItem('veo_history')||'[]')}catch{return[]}}
-function sh(i){localStorage.setItem('veo_history',JSON.stringify(i))}
-function ah(it){const i=gh();i.unshift(it);if(i.length>50)i.length=50;sh(i);rh()}
-function rh(){const i=gh();$('historyCount').textContent=i.length?'('+i.length+')':'';if(!i.length){$('historyList').innerHTML='';$('historyEmpty').style.display='block';return}
-$('historyEmpty').style.display='none';$('historyList').innerHTML=i.map((it,idx)=>'<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-model">'+it.m+'</div><div class="hi-prompt">'+eh(it.p.slice(0,60))+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="ph('+idx+')">播放</button><button class="btn-sm" onclick="ch('+idx+')">链接</button><button class="btn-sm" onclick="dh('+idx+')" style="color:#f87171">删除</button></div></div>').join('')}
-function eh(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-function ph(i){const it=gh()[i];if(!it)return;$('videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';$('resultArea').classList.add('visible');$('resultArea').scrollIntoView({behavior:'smooth'})}
-function ch(i){const it=gh()[i];if(it)navigator.clipboard.writeText(it.u).then(()=>sm('success','链接已复制'))}
-function dh(i){const it=gh();it.splice(i,1);sh(it);rh()}
-rh();
-
-// 提取视频URL
-function extractUrl(d){
-  if(!d)return '';
-  if(typeof d.video_url==='string'&&d.video_url)return d.video_url;
-  if(d.data&&typeof d.data.video_url==='string'&&d.data.video_url)return d.data.video_url;
-  if(d.data&&d.data.detail&&typeof d.data.detail.download_url==='string'&&d.data.detail.download_url)return d.data.detail.download_url;
-  if(d.detail&&d.detail.upsample_video_url)return d.detail.upsample_video_url;
-  if(d.detail&&d.detail.video_url)return d.detail.video_url;
-  if(d.upsample_video_url)return d.upsample_video_url;
-  if(d.output&&d.output.video_url)return d.output.video_url;
-  return '';
-}
-
-// 生成视频
-$('generateBtn').onclick=async function(){
-  const key=$('apiKey').value.trim(),prompt=$('prompt').value.trim(),model=$('modelSelect').value;
-  if(!key){sm('error','请输入密钥');return}
-  if(!prompt){sm('error','请输入描述');return}
-  clr();$('statusText').textContent='';$('resultArea').classList.remove('visible');
-  this.disabled=true;this.textContent='生成中...';
-
-  try{
-    const body={model,prompt,aspect_ratio:$('aspectSelect').value,enhance_prompt:true,enable_upsample:true};
-    if($('enableImage').checked){
-      const rf=$('imageInput').files,sf=$('startFrameInput').files[0],ef=$('endFrameInput').files[0];
-      if(rf.length||sf||ef){
-        sm('info','正在上传 ' + (rf.length+(sf?1:0)+(ef?1:0)) + ' 张图片到图床...');
-        body.images=[];
-        for(const f of rf)body.images.push(await uploadToImageHost(f));
-        if(sf)body.images.push(await uploadToImageHost(sf));
-        if(ef)body.images.push(await uploadToImageHost(ef));
-      }
-    }
-
-    sm('info','提交任务...');
-    const resp=await fetch(API+'/v1/video/create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
-    if(!resp.ok){let e;try{e=await resp.json()}catch{throw new Error(await resp.text())};throw new Error(e.message||JSON.stringify(e))}
-    const data=await resp.json();
-
-    // 尝试提取视频URL
-    let vu=extractUrl(data);
-    if(vu){showVid(vu,model,prompt);return}
-
-    // SUCCESS 状态
-    if(data.status==='SUCCESS'){
-      vu=extractUrl(data.data||data);
-      if(vu){showVid(vu,model,prompt);return}
-    }
-
-    // pending -> 轮询 query
-    const tid=data.id||data.task_id;
-    if(!tid){sm('warning','未获取到任务ID: '+JSON.stringify(data).slice(0,200));return}
-    $('statusText').textContent='任务已提交，查询进度...';
-    poll(key,tid,model,prompt);
-
-  }catch(e){sm('error',e.message||'请求失败')}
-  this.disabled=false;this.textContent='生成视频';
-};
-
-// 轮询
-async function poll(key,tid,model,prompt){
-  for(let i=0;i<120;i++){
-    await new Promise(r=>setTimeout(r,3000));
-    try{
-      const resp=await fetch(API+'/v1/video/query?id='+encodeURIComponent(tid),{method:'GET',headers:{'Accept':'application/json','Authorization':'Bearer '+key}});
-      if(!resp.ok)continue;
-      const d=await resp.json();
-      const st=(d.status||'').toLowerCase();
-      if(d.progress)$('statusText').textContent='生成中 '+(d.progress||'');
-      else if(i%10===0)$('statusText').textContent='生成中... ('+Math.round(i*3)+'s)';
-
-      // 成功
-      if(st==='completed'){
-        let vu=extractUrl(d)||extractUrl(d.data||d.detail);
-        if(vu){showVid(vu,model,prompt);return}
-        // 还有没有视频URL但completed
-        $('statusText').textContent='已完成，获取URL中...';
-        continue;
-      }
-
-      // 失败
-      if(st==='failed'||st==='error'){
-        let err=d.error||(d.data&&d.data.error&&d.data.error.message)||d.fail_reason||st;
-        sm('error','生成失败: '+err);
-        return;
-      }
-    }catch(e){if(i>5)throw e}
-  }
-  sm('warning','等待超时, task_id: '+tid);
-}
-
-// 显示视频
-function showVid(url,model,prompt){
-  $('videoContainer').innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
-  $('resultArea').classList.add('visible');
-  $('resultArea').scrollIntoView({behavior:'smooth'});
-  ah({u:url,m:model,p:prompt||'(空)',t:Date.now()});
-  sm('success','生成成功！');
-  // 存日志
-  try{
-    var h=JSON.parse(localStorage.getItem('ve_vid_log')||'[]');
-    h.unshift({url:url,m:model,p:prompt||'(空)',time:Date.now(),success:true});
-    if(h.length>200)h.length=200;
-    localStorage.setItem('ve_vid_log',JSON.stringify(h));
-  }catch(e){}
-  setTimeout(function(){
-    var ls=document.getElementById('veLogList');
-    if(ls&&window.veRenderLog)window.veRenderLog();
-  },100);
-}
-
-// 上传图片到自建图床（转 URL）
-}
-        c.width=w;c.height=h;
-        c.getContext('2d').drawImage(img,0,0,w,h);
-        ok(c.toDataURL(f.type,.7));
-      };
-      img.onerror=()=>ok(r.result);
-      img.src=r.result;
-    };
-    r.onerror=no;
-    r.readAsDataURL(f);
-  });
-}
-
-// 消息
-
-function clr(){$('messageArea').innerHTML='';$('statusText').textContent=''}
-
-// 密钥保存
-try{const s=localStorage.getItem('ve_video_key');if(s)$('apiKey').value=s}catch(e){}
-$('apiKey').oninput=function(){try{localStorage.setItem('ve_video_key',this.value.trim())}catch(e){}};
-
-// 日志面板渲染
-var veLogKey='ve_vid_log';
-window.veRenderLog=function(){
-  var ls=document.getElementById('veLogList'),lb=document.getElementById('veLogBadge');
-  if(!ls)return;
-  var h=[];try{h=JSON.parse(localStorage.getItem(veLogKey)||'[]')}catch(e){}
-  if(lb)lb.textContent=h.length>0?(h.length+'条'):'';
-  if(!h.length){ls.innerHTML='<div class="log-empty">暂无日志</div>';return}
-  var html='';
-  for(var i=0;i<h.length;i++){
-    var e=h[i],t=e.time?new Date(e.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'--',u=e.url||'';
-    html+='<div class="log-item"><span class="log-time">'+t+'</span><span class="log-status ok">✅</span><div class="log-prompt">'+(e.p||'').substring(0,60)+'</div><div class="log-meta">'+(e.m||'')+'</div><div class="log-url" onclick="veCopyUrl(\''+u.replace(/'/g,"\\'")+'\')">📎 '+u.substring(0,60)+(u.length>60?'...':'')+'</div></div>';
-  }
-  ls.innerHTML=html;
-};
-document.getElementById('veClearLogBtn').onclick=function(){if(confirm('清空所有日志？')){localStorage.removeItem(veLogKey);window.veRenderLog()}};
-document.getElementById('veExportLogBtn').onclick=function(){
-  var h=[];try{h=JSON.parse(localStorage.getItem(veLogKey)||'[]')}catch(e){}
-  if(!h.length){alert('暂无日志');return}
-  var txt='千亿AI VEO生成日志\n导出时间:'+new Date().toLocaleString()+'\n共'+h.length+'条\n\n';
-  for(var i=0;i<h.length;i++){var e=h[i];txt+='#'+(i+1)+' | '+(e.success?'完成':'失败')+'\n  时间:'+new Date(e.time).toLocaleString()+'\n  描述:'+(e.p||'')+'\n  模型:'+(e.m||'')+'\n  URL:'+(e.url||'')+'\n\n'}
-  var b=new Blob([txt],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ve-vid-log-'+new Date().toISOString().slice(0,10)+'.txt';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
-};
-window.veCopyUrl=function(u){navigator.clipboard.writeText(u).then(function(){alert('URL已复制')}).catch(function(){var t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('URL已复制')})};
-setTimeout(window.veRenderLog,200);
-</script>
-    </div>
-
-    <!-- GPT Image 2 iframe -->
-    <div id="gptPage" style="display:none">
-      <iframe src="gpt-image-2.html" style="width:100%;height:100vh;border:none;display:block"></iframe>
-    </div>
-  </div>
-        <div class="home-card" onclick="switchPage2('veo')">
-          <h3>VEO 视频</h3>
-          <p>AI 视频生成</p>
-        </div>
-        <div class="home-card" onclick="switchPage2('grok')">
-          <h3>Grok 视频</h3>
-          <p>xAI 视频生成</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-const pageMap = {
-  'gpt-image-2': 'gpt',
-  'veo': 'veo',
-  'grok': 'grok'
-};
-
-function switchPage(el){
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  el.classList.add('active');
-  const page=el.dataset.page;
-  const divId=pageMap[page];
-  if(divId){
-    document.getElementById('homePage').style.display='none';
-    document.getElementById('grokPage').style.display='none';
-    document.getElementById('veoPage').style.display='none';
-    document.getElementById('gptPage').style.display='none';
-    document.getElementById(divId+'Page').style.display='block';
-    try{localStorage.setItem('qy_active_page',page)}catch(e){}
-  }
-}
-
-function switchPage2(page){
-  const el=document.querySelector('.nav-item[data-page="'+page+'"]');
-  if(el) switchPage(el);
-}
-
-try{
-  const saved=localStorage.getItem('qy_active_page');
-  if(saved&&pageMap[saved]){
-    const el=document.querySelector('.nav-item[data-page="'+saved+'"]');
-    if(el) switchPage(el);
-  }
-}catch(e){}
-
-const $=id=>document.getElementById(id);
-
-// 上传图片到自建图床（转 URL） — 合并版本
+// ===== 全局工具函数 =====
 async function uploadToImageHost(file){
   const fd=new FormData();
   fd.append('file',file);
@@ -1109,6 +616,249 @@ async function uploadToImageHost(file){
 }
 
 function sm(t,txt){document.getElementById('messageArea').innerHTML='<div class="msg msg-'+t+'">'+txt+'</div>'}
+
+// ===== 页面切换 =====
+var pageMap={'gpt-image-2':'gpt','veo':'veo','grok':'grok'};
+function switchPage(el){
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  el.classList.add('active');
+  var divId=pageMap[el.dataset.page];
+  if(divId){
+    document.getElementById('homePage').style.display='none';
+    document.getElementById('grokPage').style.display='none';
+    document.getElementById('veoPage').style.display='none';
+    document.getElementById('gptPage').style.display='none';
+    document.getElementById(divId+'Page').style.display='block';
+    try{localStorage.setItem('qy_active_page',el.dataset.page)}catch(e){}
+  }
+}
+function switchPage2(p){var el=document.querySelector('.nav-item[data-page="'+p+'"]');if(el)switchPage(el)}
+try{
+  var s=localStorage.getItem('qy_active_page');
+  if(s&&pageMap[s]){var el=document.querySelector('.nav-item[data-page="'+s+'"]');if(el)switchPage(el)}
+}catch(e){}
+
+// ===== Grok 视频 =====
+(function gkScope(){
+var gkAPI='https://api.vectorengine.cn';
+var gk$=id=>document.getElementById(id);
+
+var MODEL_DESC={'grok-video-3-10s':'10秒版','grok-videos':'视频生成'};
+gk$('modelSelect').onchange=function(){gk$('modelDesc').textContent=gk$('modelSelect').value+' - '+(MODEL_DESC[gk$('modelSelect').value]||'')};
+gk$('modelSelect').dispatchEvent(new Event('change'));
+
+gk$('enableImage').onchange=function(){gk$('imageFields').style.display=this.checked?'block':'none'};
+
+gk$('imageFileInput').onchange=function(){
+  var preview=document.getElementById('filePreview');
+  preview.innerHTML='';
+  for(var i=0;i<this.files.length;i++){
+    var img=document.createElement('img');
+    img.src=URL.createObjectURL(this.files[i]);
+    img.style.cssText='width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.1)';
+    preview.appendChild(img);
+  }
+};
+
+// 历史
+var gkHist=[];(function(){
+try{gkHist=JSON.parse(localStorage.getItem('grok_history')||'[]')}catch(e){}
+function sh(i){localStorage.setItem('grok_history',JSON.stringify(i))}
+function ah(it){gkHist.unshift(it);if(gkHist.length>50)gkHist.length=50;sh(gkHist);rh()}
+function rh(){
+  var i=gkHist,c=document.getElementById('historyCount'),l=document.getElementById('historyList'),e=document.getElementById('historyEmpty');
+  if(c)c.textContent=i.length?'('+i.length+')':'';
+  if(!i.length){if(l)l.innerHTML='';if(e)e.style.display='block';return}
+  if(e)e.style.display='none';
+  if(l)l.innerHTML=i.map(function(it,idx){
+    return '<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-model">'+it.m+'</div><div class="hi-prompt">'+eh(it.p.slice(0,60))+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="gkHistPlay('+idx+')">播放</button><button class="btn-sm" onclick="gkHistCopy('+idx+')">链接</button><button class="btn-sm" onclick="gkHistDel('+idx+')" style="color:#f87171">删除</button></div></div>';
+  }).join('');
+}
+function eh(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+window.gkHistPlay=function(i){var it=gkHist[i];if(!it)return;gk$('videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';gk$('resultArea').classList.add('visible');gk$('resultArea').scrollIntoView({behavior:'smooth'})};
+window.gkHistCopy=function(i){var it=gkHist[i];if(it)navigator.clipboard.writeText(it.u).then(function(){sm('success','链接已复制')})};
+window.gkHistDel=function(i){gkHist.splice(i,1);sh(gkHist);rh()};
+rh();
+})();
+
+function gkExtractUrl(d){
+  if(!d)return'';
+  if(typeof d.video_url==='string'&&d.video_url)return d.video_url;
+  if(d.data&&typeof d.data.video_url==='string'&&d.data.video_url)return d.data.video_url;
+  if(d.data&&d.data.detail&&typeof d.data.detail.download_url==='string')return d.data.detail.download_url;
+  if(d.detail&&d.detail.upsample_video_url)return d.detail.upsample_video_url;
+  if(d.detail&&d.detail.video_url)return d.detail.video_url;
+  if(d.upsample_video_url)return d.upsample_video_url;
+  return'';
+}
+
+gk$('generateBtn').onclick=async function(){
+  var key=gk$('apiKey').value.trim(),prompt=gk$('prompt').value.trim(),model=gk$('modelSelect').value;
+  if(!key){sm('error','请输入密钥');return}
+  if(!prompt){sm('error','请输入描述');return}
+  gk$('statusText').textContent='';gk$('resultArea').classList.remove('visible');
+  this.disabled=true;this.textContent='生成中...';
+  try{
+    var body={model:model,prompt:prompt,aspect_ratio:gk$('aspectSelect').value,size:gk$('sizeSelect').value,images:[]};
+    if(gk$('enableImage').checked){
+      var urlText=gk$('imageUrls').value.trim();
+      var urlImages=urlText.split(',').map(function(s){return s.trim()}).filter(Boolean);
+      if(urlImages.length>0){
+        body.images=urlImages;
+      } else {
+        var files=gk$('imageFileInput').files;
+        if(files.length>0){
+          sm('info','正在上传 '+files.length+' 张图片到图床...');
+          body.images=[];
+          for(var i=0;i<files.length;i++){
+            body.images.push(await uploadToImageHost(files[i]));
+          }
+          sm('success','图片上传成功！共 '+body.images.length+' 张');
+        }
+      }
+    }
+    sm('info','提交任务...');
+    var resp=await fetch(gkAPI+'/v1/video/create',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
+    if(!resp.ok){var e;try{e=await resp.json()}catch(e){e=null};throw new Error((e&&e.message)||await resp.text())}
+    var data=await resp.json();
+    var vu=gkExtractUrl(data);
+    if(vu){gkShowVid(vu,model,prompt);return}
+    if(data.status==='SUCCESS'){vu=gkExtractUrl(data.data||data);if(vu){gkShowVid(vu,model,prompt);return}}
+    var tid=data.id||data.task_id;
+    if(!tid){sm('warning','未获取到任务ID: '+JSON.stringify(data).slice(0,200));return}
+    gk$('statusText').textContent='任务已提交，查询进度...';
+    gkPoll(key,tid,model,prompt);
+  }catch(e){sm('error',e.message||'请求失败')}
+  this.disabled=false;this.textContent='生成视频';
+};
+
+async function gkPoll(key,tid,model,prompt){
+  for(var i=0;i<120;i++){
+    await new Promise(function(r){setTimeout(r,3000)});
+    try{
+      var resp=await fetch(gkAPI+'/v1/video/query?id='+encodeURIComponent(tid),{method:'GET',headers:{'Accept':'application/json','Authorization':'Bearer '+key}});
+      if(!resp.ok)continue;
+      var d=await resp.json();
+      var st=(d.status||'').toLowerCase();
+      if(d.progress)gk$('statusText').textContent='生成中 '+(d.progress||'');
+      else if(i%10===0)gk$('statusText').textContent='生成中... ('+Math.round(i*3)+'s)';
+      if(st==='completed'){var vu=gkExtractUrl(d)||gkExtractUrl(d.data||d.detail);if(vu){gkShowVid(vu,model,prompt);return}}
+      if(st==='failed'||st==='error'){var err=d.error||(d.data&&d.data.error&&d.data.error.message)||d.fail_reason||st;sm('error','生成失败: '+err);return}
+    }catch(e){if(i>5)throw e}
+  }
+  sm('warning','等待超时, task_id: '+tid);
+}
+
+function gkShowVid(url,model,prompt){
+  gk$('videoContainer').innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
+  gk$('resultArea').classList.add('visible');
+  gk$('resultArea').scrollIntoView({behavior:'smooth'});
+  ah({u:url,m:model,p:prompt||'(空)',t:Date.now()});
+  sm('success','生成成功！');
+  try{
+    var h=JSON.parse(localStorage.getItem('gk_vid_log')||'[]');
+    h.unshift({url:url,m:model,p:prompt||'(空)',time:Date.now(),success:true});
+    if(h.length>200)h.length=200;
+    localStorage.setItem('gk_vid_log',JSON.stringify(h));
+  }catch(e){}
+}
+
+// Init
+try{var s=localStorage.getItem('gk_video_key');if(s)gk$('apiKey').value=s}catch(e){}
+gk$('apiKey').oninput=function(){try{localStorage.setItem('gk_video_key',this.value.trim())}catch(e){}};
+})();
+
+// ===== VEO 视频 =====
+(function veScope(){
+var veAPI='https://api.vectorengine.cn';
+var ve$=id=>document.getElementById(id);
+
+var MODELS_VE={'veo_3_1-fast-4K':'快速版 · 4K · 支持参考图','veo_3_1-fast':'快速版 · 支持参考图','veo3.1-fast-components':'快速版 + 元素图/首尾帧','veo_3_1-lite-4K':'轻量版 · 4K · 纯文本','veo_3_1-lite':'轻量版 · 纯文本'};
+ve$('modelSelect').onchange=function(){ve$('modelDesc').textContent=ve$('modelSelect').value+' - '+(MODELS_VE[ve$('modelSelect').value]||'')};
+ve$('modelSelect').dispatchEvent(new Event('change'));
+
+ve$('enableImage').onchange=function(){ve$('imageFields').style.display=this.checked?'block':'none'};
+
+ve$('generateBtn').onclick=async function(){
+  var key=ve$('apiKey').value.trim(),prompt=ve$('prompt').value.trim(),model=ve$('modelSelect').value;
+  if(!key){sm('error','请输入密钥');return}
+  if(!prompt){sm('error','请输入描述');return}
+  ve$('statusText').textContent='';ve$('resultArea').classList.remove('visible');
+  this.disabled=true;this.textContent='生成中...';
+  try{
+    var body={model:model,prompt:prompt,aspect_ratio:ve$('aspectSelect').value,enhance_prompt:true,enable_upsample:true};
+    if(ve$('enableImage').checked){
+      var rf=ve$('imageInput').files,sf=ve$('startFrameInput').files[0],ef=ve$('endFrameInput').files[0];
+      if(rf.length||sf||ef){
+        sm('info','正在上传 '+(rf.length+(sf?1:0)+(ef?1:0))+' 张图片到图床...');
+        body.images=[];
+        for(var i=0;i<rf.length;i++)body.images.push(await uploadToImageHost(rf[i]));
+        if(sf)body.images.push(await uploadToImageHost(sf));
+        if(ef)body.images.push(await uploadToImageHost(ef));
+      }
+    }
+    sm('info','提交任务...');
+    var resp=await fetch(veAPI+'/v1/video/create',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
+    if(!resp.ok){var e;try{e=await resp.json()}catch(e){e=null};throw new Error((e&&e.message)||await resp.text())}
+    var data=await resp.json();
+    var vu=veExtractUrl(data);
+    if(vu){veShowVid(vu,model,prompt);return}
+    if(data.status==='SUCCESS'){vu=veExtractUrl(data.data||data);if(vu){veShowVid(vu,model,prompt);return}}
+    var tid=data.id||data.task_id;
+    if(!tid){sm('warning','未获取到任务ID: '+JSON.stringify(data).slice(0,200));return}
+    ve$('statusText').textContent='任务已提交，查询进度...';
+    vePoll(key,tid,model,prompt);
+  }catch(e){sm('error',e.message||'请求失败')}
+  this.disabled=false;this.textContent='生成视频';
+};
+
+function veExtractUrl(d){
+  if(!d)return'';
+  if(typeof d.video_url==='string'&&d.video_url)return d.video_url;
+  if(d.data&&typeof d.data.video_url==='string'&&d.data.video_url)return d.data.video_url;
+  if(d.data&&d.data.detail&&typeof d.data.detail.download_url==='string'&&d.data.detail.download_url)return d.data.detail.download_url;
+  if(d.detail&&d.detail.upsample_video_url)return d.detail.upsample_video_url;
+  if(d.detail&&d.detail.video_url)return d.detail.video_url;
+  if(d.upsample_video_url)return d.upsample_video_url;
+  if(d.output&&d.output.video_url)return d.output.video_url;
+  return'';
+}
+
+async function vePoll(key,tid,model,prompt){
+  for(var i=0;i<120;i++){
+    await new Promise(function(r){setTimeout(r,3000)});
+    try{
+      var resp=await fetch(veAPI+'/v1/video/query?id='+encodeURIComponent(tid),{method:'GET',headers:{'Accept':'application/json','Authorization':'Bearer '+key}});
+      if(!resp.ok)continue;
+      var d=await resp.json();
+      var st=(d.status||'').toLowerCase();
+      if(d.progress)ve$('statusText').textContent='生成中 '+(d.progress||'');
+      else if(i%10===0)ve$('statusText').textContent='生成中... ('+Math.round(i*3)+'s)';
+      if(st==='completed'){var vu=veExtractUrl(d)||veExtractUrl(d.data||d.detail);if(vu){veShowVid(vu,model,prompt);return}}
+      if(st==='failed'||st==='error'){var err=d.error||(d.data&&d.data.error&&d.data.error.message)||d.fail_reason||st;sm('error','生成失败: '+err);return}
+    }catch(e){if(i>5)throw e}
+  }
+  sm('warning','等待超时, task_id: '+tid);
+}
+
+function veShowVid(url,model,prompt){
+  ve$('videoContainer').innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
+  ve$('resultArea').classList.add('visible');
+  ve$('resultArea').scrollIntoView({behavior:'smooth'});
+  try{var h=JSON.parse(localStorage.getItem('veo_history')||'[]');h.unshift({u:url,m:model,p:prompt||'(空)',t:Date.now()});if(h.length>50)h.length=50;localStorage.setItem('veo_history',JSON.stringify(h))}catch(e){}
+  sm('success','生成成功！');
+  try{
+    var h=JSON.parse(localStorage.getItem('ve_vid_log')||'[]');
+    h.unshift({url:url,m:model,p:prompt||'(空)',time:Date.now(),success:true});
+    if(h.length>200)h.length=200;
+    localStorage.setItem('ve_vid_log',JSON.stringify(h));
+  }catch(e){}
+}
+
+// Init
+try{var s=localStorage.getItem('ve_video_key');if(s)ve$('apiKey').value=s}catch(e){}
+ve$('apiKey').oninput=function(){try{localStorage.setItem('ve_video_key',this.value.trim())}catch(e){}};
+})();
 </script>
 </body>
 </html>
