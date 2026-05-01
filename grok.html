@@ -311,7 +311,7 @@ $('generateBtn').onclick=async function(){
   this.disabled=true;this.textContent='生成中...';
 
   try{
-    const body={model,prompt,aspect_ratio:$('aspectSelect').value,size:$('sizeSelect').value};
+    const body={model,prompt,aspect_ratio:$('aspectSelect').value,size:$('sizeSelect').value,images:[]};
     if($('enableImage').checked){
       // 先检查是否有 URL
       const urlText=$('imageUrls').value.trim();
@@ -330,7 +330,7 @@ $('generateBtn').onclick=async function(){
     }
 
     sm('info','提交任务...');
-    const resp=await fetch(API+'/v1/video/create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
+    const resp=await fetch(API+'/v1/video/create',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});
     if(!resp.ok){let e;try{e=await resp.json()}catch{throw new Error(await resp.text())};throw new Error(e.message||JSON.stringify(e))}
     const data=await resp.json();
 
