@@ -179,7 +179,7 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
 
 <header>
     <div class="logo">
-      <div class="logo-icon">�?/div>
+      <div class="logo-icon">✦</div>
       <h1>VEO</h1>
     </div>
     <div class="subtitle">AI 视频生成 · 支持参考图</div>
@@ -197,11 +197,11 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
   <div class="form-group">
     <label>模型</label>
     <select id="modelSelect">
-      <option value="veo_3_1-fast-4K">veo_3_1-fast-4K  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.43/�?/span></option>
-      <option value="veo_3_1-fast" selected>veo_3_1-fast  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.43/�?/span></option>
-      <option value="veo3.1-fast-components">veo3.1-fast-components  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.26/�?/span></option>
-      <option value="veo_3_1-lite-4K">veo_3_1-lite-4K  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.55/�?/span></option>
-      <option value="veo_3_1-lite">veo_3_1-lite  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.5/�?/span></option>
+      <option value="veo_3_1-fast-4K">veo_3_1-fast-4K  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.43/次</span></option>
+      <option value="veo_3_1-fast" selected>veo_3_1-fast  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.43/次</span></option>
+      <option value="veo3.1-fast-components">veo3.1-fast-components  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.26/次</span></option>
+      <option value="veo_3_1-lite-4K">veo_3_1-lite-4K  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.55/次</span></option>
+      <option value="veo_3_1-lite">veo_3_1-lite  <span style="font-weight:400;color:#818cf8;font-size:.7rem">¥0.5/次</span></option>
     </select>
   </div>
   <div class="form-desc" id="modelDesc"></div>
@@ -214,10 +214,10 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
   </div>
   <div style="margin-bottom:1rem">
     <label style="display:flex;align-items:center;gap:.4rem">
-      <input type="checkbox" id="enableImage" style="accent-color:#6366f1;width:15px;height:15px" /> 上传参考图 / 首尾�?
+      <input type="checkbox" id="enableImage" style="accent-color:#6366f1;width:15px;height:15px" /> 上传参考图 / 首尾帧
     </label>
     <div id="imageFields" style="display:none;margin-top:.8rem">
-      <div class="form-group"><label>参考图�?/label><input type="file" id="imageInput" accept="image/*" multiple style="padding:.5rem;font-size:.8rem" /></div>
+      <div class="form-group"><label>参考图片</label><input type="file" id="imageInput" accept="image/*" multiple style="padding:.5rem;font-size:.8rem" /></div>
       <div class="form-row">
         <div class="form-group"><label>首帧</label><input type="file" id="startFrameInput" accept="image/*" style="padding:.5rem;font-size:.8rem" /></div>
         <div class="form-group"><label>尾帧</label><input type="file" id="endFrameInput" accept="image/*" style="padding:.5rem;font-size:.8rem" /></div>
@@ -258,13 +258,27 @@ video{width:100%;border-radius:10px;display:block;margin-top:.5rem}
 <script>
 const API='https://api.vectorengine.cn';
 const $=id=>document.getElementById(id);
-const MODELS={'veo_3_1-fast-4K':'快速版 · 4K · 支持参考图','veo_3_1-fast':'快速版 · 支持参考图','veo3.1-fast-components':'快速版 + 元素�?首尾�?,'veo_3_1-lite-4K':'轻量�?· 4K · 纯文�?,'veo_3_1-lite':'轻量�?· 纯文�?};
-$('modelSelect').onchange=()=>{$('modelDesc').textContent=$('modelSelect').value+' - '+(MODELS[$('modelSelect').value]||'')};
+const MODELS={};MODELS['veo_3_1-fast-4K']='快速版 - 4K - 支持参考图';MODELS['veo_3_1-fast']='快速版 - 支持参考图';MODELS['veo3.1-fast-components']='快速版 - 元素图/首尾帧';MODELS['veo_3_1-lite-4K']='轻量版 - 4K - 纯文本';MODELS['veo_3_1-lite']='轻量版 - 纯文本';
+document.getElementById('modelSelect').onchange=function(){document.getElementById('modelDesc').textContent=document.getElementById('modelSelect').value+' - '+(MODELS[document.getElementById('modelSelect').value]||'')};
 $('modelSelect').dispatchEvent(new Event('change'));
 
-function testKey(){const k=$('apiKey').value.trim();if(!k){sm('error','请输入密�?);return}sm('info','验证�?..');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{sm('success','密钥有效')}).catch(()=>{sm('error','密钥无效')})}
+function testKey(){const k=$('apiKey').value.trim();if(!k){sm('error','请输入密钥');return}sm('info','验证中...');fetch('https://api.vectorengine.cn/v1/models',{headers:{'Authorization':'Bearer '+k}}).then(r=>r.ok?r.json():Promise.reject()).then(()=>{sm('success','密钥有效')}).catch(()=>{sm('error','密钥无效')})}
 
 $('enableImage').onchange=function(){$('imageFields').style.display=this.checked?'block':'none'};
+['imageInput','startFrameInput','endFrameInput'].forEach(function(id){
+  var el=$(id);
+  if(el)el.onchange=function(){
+    var pv=this.parentNode.querySelector('.fp');
+    if(!pv){pv=document.createElement('div');pv.className='fp';pv.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:6px';this.parentNode.appendChild(pv)}
+    pv.innerHTML='';
+    for(var f of this.files){
+      var im=document.createElement('img');
+      im.src=URL.createObjectURL(f);
+      im.style.cssText='width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.08)';
+      pv.appendChild(im);
+    }
+  };
+});
 
 // 历史
 function gh(){try{return JSON.parse(localStorage.getItem('veo_history')||'[]')}catch{return[]}}
@@ -274,7 +288,7 @@ function rh(){const i=gh();$('historyCount').textContent=i.length?'('+i.length+'
 $('historyEmpty').style.display='none';$('historyList').innerHTML=i.map((it,idx)=>'<div class="history-item"><div class="history-thumb"><video src="'+it.u+'" muted preload="metadata"></video></div><div class="history-info"><div class="hi-model">'+it.m+'</div><div class="hi-prompt">'+eh(it.p.slice(0,60))+'</div><div class="hi-time">'+new Date(it.t).toLocaleString()+'</div></div><div class="history-actions"><button class="btn-sm" onclick="ph('+idx+')">播放</button><button class="btn-sm" onclick="ch('+idx+')">链接</button><button class="btn-sm" onclick="dh('+idx+')" style="color:#f87171">删除</button></div></div>').join('')}
 function eh(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function ph(i){const it=gh()[i];if(!it)return;$('videoContainer').innerHTML='<video src="'+it.u+'" controls autoplay style="width:100%"></video>';$('resultArea').classList.add('visible');$('resultArea').scrollIntoView({behavior:'smooth'})}
-function ch(i){const it=gh()[i];if(it)navigator.clipboard.writeText(it.u).then(()=>sm('success','链接已复�?))}
+function ch(i){const it=gh()[i];if(it)navigator.clipboard.writeText(it.u).then(()=>sm('success','链接已复制'))}
 function dh(i){const it=gh();it.splice(i,1);sh(it);rh()}
 rh();
 
@@ -294,10 +308,10 @@ function extractUrl(d){
 // 生成视频
 $('generateBtn').onclick=async function(){
   const key=$('apiKey').value.trim(),prompt=$('prompt').value.trim(),model=$('modelSelect').value;
-  if(!key){sm('error','请输入密�?);return}
-  if(!prompt){sm('error','请输入描�?);return}
+  if(!key){sm('error','请输入密钥');return}
+  if(!prompt){sm('error','请输入描述');return}
   clr();$('statusText').textContent='';$('resultArea').classList.remove('visible');
-  this.disabled=true;this.textContent='生成�?..';
+  this.disabled=true;this.textContent='生成中...';
 
   try{
     const body={model,prompt,aspect_ratio:$('aspectSelect').value,enhance_prompt:true,enable_upsample:true};
@@ -320,7 +334,7 @@ $('generateBtn').onclick=async function(){
     let vu=extractUrl(data);
     if(vu){showVid(vu,model,prompt);return}
 
-    // SUCCESS 状�?
+    // SUCCESS 状态
     if(data.status==='SUCCESS'){
       vu=extractUrl(data.data||data);
       if(vu){showVid(vu,model,prompt);return}
@@ -345,15 +359,15 @@ async function poll(key,tid,model,prompt){
       if(!resp.ok)continue;
       const d=await resp.json();
       const st=(d.status||'').toLowerCase();
-      if(d.progress)$('statusText').textContent='生成�?'+(d.progress||'');
-      else if(i%10===0)$('statusText').textContent='生成�?.. ('+Math.round(i*3)+'s)';
+      if(d.progress)$('statusText').textContent='生成中 '+(d.progress||'');
+      else if(i%10===0)$('statusText').textContent='生成中... ('+Math.round(i*3)+'s)';
 
       // 成功
       if(st==='completed'){
         let vu=extractUrl(d)||extractUrl(d.data||d.detail);
         if(vu){showVid(vu,model,prompt);return}
         // 还有没有视频URL但completed
-        $('statusText').textContent='已完成，获取URL�?..';
+        $('statusText').textContent='已完成，获取URL中...';
         continue;
       }
 
@@ -373,12 +387,12 @@ function showVid(url,model,prompt){
   $('videoContainer').innerHTML='<video src="'+url+'" controls autoplay style="width:100%"></video>';
   $('resultArea').classList.add('visible');
   $('resultArea').scrollIntoView({behavior:'smooth'});
-  ah({u:url,m:model,p:prompt||'(�?',t:Date.now()});
-  sm('success','生成成功�?);
-  // 存日�?
+  ah({u:url,m:model,p:prompt||'(空)',t:Date.now()});
+  sm('success','生成成功！');
+  // 存日志
   try{
     var h=JSON.parse(localStorage.getItem('ve_vid_log')||'[]');
-    h.unshift({url:url,m:model,p:prompt||'(�?',time:Date.now(),success:true});
+    h.unshift({url:url,m:model,p:prompt||'(空)',time:Date.now(),success:true});
     if(h.length>200)h.length=200;
     localStorage.setItem('ve_vid_log',JSON.stringify(h));
   }catch(e){}
@@ -424,12 +438,12 @@ window.veRenderLog=function(){
   var ls=document.getElementById('veLogList'),lb=document.getElementById('veLogBadge');
   if(!ls)return;
   var h=[];try{h=JSON.parse(localStorage.getItem(veLogKey)||'[]')}catch(e){}
-  if(lb)lb.textContent=h.length>0?(h.length+'�?):'';
+  if(lb)lb.textContent=h.length>0?(h.length+'条'):'';
   if(!h.length){ls.innerHTML='<div class="log-empty">暂无日志</div>';return}
   var html='';
   for(var i=0;i<h.length;i++){
     var e=h[i],t=e.time?new Date(e.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'--',u=e.url||'';
-    html+='<div class="log-item"><span class="log-time">'+t+'</span><span class="log-status ok">�?/span><div class="log-prompt">'+(e.p||'').substring(0,60)+'</div><div class="log-meta">'+(e.m||'')+'</div><div class="log-url" onclick="veCopyUrl(\''+u.replace(/'/g,"\\'")+'\')">📎 '+u.substring(0,60)+(u.length>60?'...':'')+'</div></div>';
+    html+='<div class="log-item"><span class="log-time">'+t+'</span><span class="log-status ok">✅</span><div class="log-prompt">'+(e.p||'').substring(0,60)+'</div><div class="log-meta">'+(e.m||'')+'</div><div class="log-url" onclick="veCopyUrl(\''+u.replace(/'/g,"\\'")+'\')">📎 '+u.substring(0,60)+(u.length>60?'...':'')+'</div></div>';
   }
   ls.innerHTML=html;
 };
@@ -437,11 +451,11 @@ document.getElementById('veClearLogBtn').onclick=function(){if(confirm('清空�
 document.getElementById('veExportLogBtn').onclick=function(){
   var h=[];try{h=JSON.parse(localStorage.getItem(veLogKey)||'[]')}catch(e){}
   if(!h.length){alert('暂无日志');return}
-  var txt='千亿AI VEO生成日志\n导出时间:'+new Date().toLocaleString()+'\n�?+h.length+'条\n\n';
+  var txt='千亿AI VEO生成日志\n导出时间:'+new Date().toLocaleString()+'\n共'+h.length+'条\n\n';
   for(var i=0;i<h.length;i++){var e=h[i];txt+='#'+(i+1)+' | '+(e.success?'完成':'失败')+'\n  时间:'+new Date(e.time).toLocaleString()+'\n  描述:'+(e.p||'')+'\n  模型:'+(e.m||'')+'\n  URL:'+(e.url||'')+'\n\n'}
   var b=new Blob([txt],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ve-vid-log-'+new Date().toISOString().slice(0,10)+'.txt';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
 };
-window.veCopyUrl=function(u){navigator.clipboard.writeText(u).then(function(){alert('URL已复�?)}).catch(function(){var t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('URL已复�?)})};
+window.veCopyUrl=function(u){navigator.clipboard.writeText(u).then(function(){alert('URL已复制')}).catch(function(){var t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('URL已复制')})};
 setTimeout(window.veRenderLog,200);
 </script>
 </body>
